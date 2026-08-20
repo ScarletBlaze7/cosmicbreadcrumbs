@@ -53,8 +53,14 @@ jobs:
           cd cosmicbreadcrumbs/android
           ./gradlew bundleRelease
 
+      - name: Sign App Bundle
+        run: |
+          cd cosmicbreadcrumbs/android/app/build/outputs/bundle/release
+          keytool -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=CosmicBreadcrumbs, OU=App, O=Dev, L=City, S=State, C=US"
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore release.keystore -storepass password123 -keypass password123 app-release.aab release
+
       - name: Upload Release AAB Artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-release-bundle
-          path: cosmicbreadcrumbs/android/app/build/outputs/bundle/release/*.aab
+          path: cosmicbreadcrumbs/android/app/build/outputs/bundle/release/app-release.aab
