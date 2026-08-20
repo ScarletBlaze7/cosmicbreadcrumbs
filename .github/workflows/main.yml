@@ -22,6 +22,7 @@ jobs:
           cd cosmicbreadcrumbs
           rm -rf node_modules package-lock.json
           npm install
+          npm install --save @capacitor/core @capacitor/android @capacitor/cli
 
       - name: Build Web Assets
         run: |
@@ -31,14 +32,12 @@ jobs:
       - name: Clean Termux Gradle Config & Sync Capacitor
         run: |
           cd cosmicbreadcrumbs
-          # Remove local Termux AAPT2 override if present
           if [ -f android/gradle.properties ]; then
             sed -i '/android.aapt2FromMavenOverride/d' android/gradle.properties
           fi
-          # Create missing Cordova variables file if required by capacitor.build.gradle
           mkdir -p android/capacitor-cordova-android-plugins
           touch android/capacitor-cordova-android-plugins/cordova.variables.gradle
-          npx --yes @capacitor/cli sync android
+          npx cap sync android
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
