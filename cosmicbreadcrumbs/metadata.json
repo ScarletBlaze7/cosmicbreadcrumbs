@@ -1,0 +1,6 @@
+{
+  "name": "Cosmic Breadcrumbs",
+  "description": "Your daily guide to universal insights—designed to awaken your third eye, expand awareness, and unlock your intuitive power. The universe is always leaving trails of wisdom—follow the breadcrumbs and explore the depths of your true potential.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

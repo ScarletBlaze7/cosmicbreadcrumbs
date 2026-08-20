@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Cosmic Breadcrumbs</string>
+    <string name="title_activity_main">Cosmic Breadcrumbs</string>
+    <string name="package_name">com.cosmicbreadcrumbs.app</string>
+    <string name="custom_url_scheme">com.cosmicbreadcrumbs.app</string>
+</resources>
