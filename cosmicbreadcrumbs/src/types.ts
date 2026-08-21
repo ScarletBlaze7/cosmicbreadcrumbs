@@ -125,7 +125,7 @@ export interface TarotSpread {
   name: string;
   cardCount: number;
   description: string;
-  category: 'Daily' | 'Love' | 'Spiritual' | 'Decision' | 'General' | 'OtherPeople';
+  category: string;
   positions: { name: string; description: string }[];
 }
 

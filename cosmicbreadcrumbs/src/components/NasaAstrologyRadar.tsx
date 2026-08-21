@@ -501,7 +501,7 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                         Solar Wind Stream (km/s)
                       </h4>
                       <span className="font-mono text-[10px] text-purple-300">
-                        Current: {spaceWeather.solarWindSpeed} km/s • {spaceWeather.solarWindStatus}
+                        Current: {spaceWeather.solarWindSpeed} km/s • {(spaceWeather as any).solarWindStatus || 'Nominal'}
                       </span>
                     </div>
                   </div>
