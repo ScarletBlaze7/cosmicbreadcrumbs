@@ -239,103 +239,120 @@ export const NumerologyView: React.FC<NumerologyViewProps> = ({
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 border-b border-purple-900/50 pb-5">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
-            <Radio className="h-4 w-4" />
-            <span>Sacred Sound Vibrations & Babylonian Geometry</span>
-          </div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-100 mt-1">
-            Chaldean Sacred Numerology
-          </h1>
-          <p className="text-xs text-purple-300/80 mt-1">
-            Free Life Path Blueprints • Members-Only Sound Vibrations (Destiny, Soul Urge, Synastry & Auxiliary Calculations)
-          </p>
+      <div className="border-b border-purple-900/50 pb-5">
+        <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <Radio className="h-4 w-4" />
+          <span>Sacred Sound Vibrations & Babylonian Geometry</span>
         </div>
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-100 mt-1">
+          Chaldean Sacred Numerology
+        </h1>
+        <p className="text-xs text-purple-300/80 mt-1">
+          Free Life Path Blueprints • Members-Only Sound Vibrations (Destiny, Soul Urge, Synastry & Auxiliary Calculations)
+        </p>
+      </div>
 
-        {/* View Navigation Tabs */}
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-purple-700/60 bg-slate-900/90 p-1.5 self-start lg:self-auto shadow-lg">
-          {/* Tab 1: My Soul Matrix */}
-          <button
-            id="tab-numerology-matrix"
-            onClick={() => setActiveTab('matrix')}
-            className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-all flex items-center space-x-2 ${
-              activeTab === 'matrix'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
-                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-            }`}
-          >
-            <Hash className="h-4 w-4 text-purple-300" />
-            <span>My Soul Matrix</span>
-            <span className="rounded-full bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 text-[9px] font-extrabold border border-emerald-500/30">
-              Free Life Path
-            </span>
-          </button>
+      {/* PERMANENT FEATURED NUMEROLOGY ARTWORK BANNER */}
+      <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-black/50">
+        <img
+          src="/assets/numerologyart.jpg"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/numerologyart.jpg'; }}
+          alt="Sacred Numerology Matrix"
+          className="w-full h-auto object-cover rounded-3xl select-none"
+        />
+      </div>
 
-          {/* Tab 2: Chaldean Wisdom */}
-          <button
-            id="tab-numerology-chaldean-wisdom"
-            onClick={() => setActiveTab('chaldean')}
-            className={`rounded-xl px-3.5 py-2 text-xs font-bold flex items-center space-x-2 transition-all ${
-              activeTab === 'chaldean'
-                ? 'bg-amber-500 text-slate-950 font-extrabold shadow-md'
-                : 'text-amber-300 hover:bg-purple-950/60 hover:text-amber-200'
-            }`}
-          >
-            <Sparkles className="h-4 w-4" />
-            <span>Chaldean Wisdom</span>
-          </button>
+      {/* View Navigation Tabs - Positioned Under Photo & Above Calculation Section */}
+      <div className="flex flex-wrap items-center justify-center gap-2 rounded-2xl border border-purple-700/60 bg-slate-900/95 p-2 sm:p-2.5 shadow-xl max-w-4xl mx-auto">
+        {/* Tab 1: My Soul Matrix */}
+        <button
+          key="tab-matrix"
+          id="tab-numerology-matrix"
+          onClick={() => setActiveTab('matrix')}
+          className={`shrink-0 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all flex items-center space-x-2 cursor-pointer ${
+            activeTab === 'matrix'
+              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50 scale-105'
+              : 'bg-slate-950/80 border border-purple-900/60 text-purple-100 hover:bg-purple-950/60 hover:text-white'
+          }`}
+        >
+          <Hash className="h-4 w-4 text-purple-300" />
+          <span>My Soul Matrix</span>
+          <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-extrabold border ${
+            activeTab === 'matrix'
+              ? 'bg-emerald-400 text-slate-950 border-emerald-300'
+              : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+          }`}>
+            Free Life Path
+          </span>
+        </button>
 
-          {/* Tab 3: All Numbers Guide */}
-          <button
-            id="tab-numerology-all-numbers"
-            onClick={() => setActiveTab('all-numbers')}
-            className={`rounded-xl px-3.5 py-2 text-xs font-bold transition-all flex items-center space-x-2 ${
-              activeTab === 'all-numbers'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
-                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-            }`}
-          >
-            <BookOpen className="h-4 w-4 text-purple-300" />
-            <span>All Numbers Guide</span>
-          </button>
+        {/* Tab 2: Chaldean Wisdom */}
+        <button
+          key="tab-chaldean"
+          id="tab-numerology-chaldean-wisdom"
+          onClick={() => setActiveTab('chaldean')}
+          className={`shrink-0 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all cursor-pointer ${
+            activeTab === 'chaldean'
+              ? 'bg-amber-500 text-slate-950 font-extrabold shadow-md border border-amber-300 scale-105'
+              : 'bg-slate-950/80 border border-purple-900/60 text-amber-300 hover:bg-purple-950/60 hover:text-amber-200'
+          }`}
+        >
+          <Sparkles className="h-4 w-4" />
+          <span>Chaldean Wisdom</span>
+        </button>
 
-          {/* Tab 4: Calculate for Someone Else */}
-          <button
-            id="tab-numerology-other-person"
-            onClick={() => setActiveTab('other-person')}
-            className={`rounded-xl px-3.5 py-2 text-xs font-bold flex items-center space-x-2 transition-all ${
-              activeTab === 'other-person'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
-                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-            }`}
-          >
-            <UserPlus className="h-4 w-4 text-amber-400" />
-            <span>Calculate for Someone Else</span>
-            <span className="flex items-center space-x-0.5 rounded-full bg-amber-400/20 text-amber-300 px-1.5 py-0.5 text-[9px] font-bold border border-amber-400/40">
-              <Lock className="h-2.5 w-2.5 inline" />
-              <span>PRO</span>
-            </span>
-          </button>
+        {/* Tab 3: All Numbers Guide */}
+        <button
+          key="tab-all-numbers"
+          id="tab-numerology-all-numbers"
+          onClick={() => setActiveTab('all-numbers')}
+          className={`shrink-0 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold transition-all flex items-center space-x-2 cursor-pointer ${
+            activeTab === 'all-numbers'
+              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50 scale-105'
+              : 'bg-slate-950/80 border border-purple-900/60 text-purple-100 hover:bg-purple-950/60 hover:text-white'
+          }`}
+        >
+          <BookOpen className="h-4 w-4 text-purple-300" />
+          <span>All Numbers Guide</span>
+        </button>
 
-          {/* Tab 5: Vibrational Compatibility */}
-          <button
-            id="tab-numerology-compatibility"
-            onClick={() => setActiveTab('compatibility')}
-            className={`rounded-xl px-3.5 py-2 text-xs font-bold flex items-center space-x-2 transition-all ${
-              activeTab === 'compatibility'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
-                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-            }`}
-          >
-            <HeartHandshake className="h-4 w-4 text-rose-400" />
-            <span>Vibrational Match</span>
-            <span className="flex items-center space-x-0.5 rounded-full bg-amber-400/20 text-amber-300 px-1.5 py-0.5 text-[9px] font-bold border border-amber-400/40">
-              <Lock className="h-2.5 w-2.5 inline" />
-              <span>PRO</span>
-            </span>
-          </button>
-        </div>
+        {/* Tab 4: Calculate for Someone Else */}
+        <button
+          key="tab-other-person"
+          id="tab-numerology-other-person"
+          onClick={() => setActiveTab('other-person')}
+          className={`shrink-0 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all cursor-pointer ${
+            activeTab === 'other-person'
+              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50 scale-105'
+              : 'bg-slate-950/80 border border-purple-900/60 text-purple-100 hover:bg-purple-950/60 hover:text-white'
+          }`}
+        >
+          <UserPlus className="h-4 w-4 text-amber-400" />
+          <span>Calculate for Someone Else</span>
+          <span className="flex items-center space-x-0.5 rounded-full bg-amber-400/20 text-amber-300 px-1.5 py-0.5 text-[9px] font-bold border border-amber-400/40">
+            <Lock className="h-2.5 w-2.5 inline" />
+            <span>PRO</span>
+          </span>
+        </button>
+
+        {/* Tab 5: Vibrational Compatibility */}
+        <button
+          key="tab-compatibility"
+          id="tab-numerology-compatibility"
+          onClick={() => setActiveTab('compatibility')}
+          className={`shrink-0 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-bold flex items-center space-x-2 transition-all cursor-pointer ${
+            activeTab === 'compatibility'
+              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50 scale-105'
+              : 'bg-slate-950/80 border border-purple-900/60 text-purple-100 hover:bg-purple-950/60 hover:text-white'
+          }`}
+        >
+          <HeartHandshake className="h-4 w-4 text-rose-400" />
+          <span>Vibrational Match</span>
+          <span className="flex items-center space-x-0.5 rounded-full bg-amber-400/20 text-amber-300 px-1.5 py-0.5 text-[9px] font-bold border border-amber-400/40">
+            <Lock className="h-2.5 w-2.5 inline" />
+            <span>PRO</span>
+          </span>
+        </button>
       </div>
 
       {/* Trial Expired Alert Banner (Encouraging Membership) */}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { ArchangelDynamicArtwork } from './ArchangelDynamicArtwork';
 
 interface Props {
   className?: string;
@@ -6,15 +7,7 @@ interface Props {
 }
 
 export const ArchangelChamuelArtwork: React.FC<Props> = ({ className = 'w-full h-full' }) => {
-  return (
-    <div className={`relative overflow-hidden rounded-2xl ${className}`}>
-      <img
-        src="/assets/ArchAngel.Chamuel.png.jpg"
-        alt="Archangel Chamuel"
-        className="w-full h-full object-cover select-none pointer-events-none"
-      />
-    </div>
-  );
+  return <ArchangelDynamicArtwork archangel="Archangel Chamuel" className={className} />;
 };
 
 export default ArchangelChamuelArtwork;

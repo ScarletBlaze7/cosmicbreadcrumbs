@@ -22,6 +22,24 @@ export interface MembershipStatus {
   hasSeenWelcomeLetter: boolean;
 }
 
+export interface UserLocation {
+  latitude: number;
+  longitude: number;
+  city?: string;
+  region?: string;
+  country?: string;
+  timezone?: string;
+  detectedAt?: string;
+  accuracy?: number;
+}
+
+export interface AppPermissionsState {
+  notifications: 'granted' | 'denied' | 'prompt' | 'unsupported';
+  location: 'granted' | 'denied' | 'prompt' | 'unsupported';
+  hasRequestedPermissions: boolean;
+  lastPromptedAt?: string;
+}
+
 export interface UserProfile {
   name: string;
   birthDate: string; // YYYY-MM-DD
@@ -38,6 +56,9 @@ export interface UserProfile {
   avatarUrl?: string; // Custom user photo or data URL
   birthDateChangeCount?: number; // Number of times birthdate was modified (allowed up to 2 times)
   hasCompletedOnboarding?: boolean;
+  location?: UserLocation;
+  notificationsEnabled?: boolean;
+  hasGrantedPermissions?: boolean;
 }
 
 export type ZodiacElement = 'Fire' | 'Earth' | 'Air' | 'Water';

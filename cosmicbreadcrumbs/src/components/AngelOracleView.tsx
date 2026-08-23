@@ -60,7 +60,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
 
   const [isDrawingPrimary, setIsDrawingPrimary] = useState(false);
   const [isDrawingClarification, setIsDrawingClarification] = useState(false);
-  const [activeTab, setActiveTab] = useState<'daily-guidance' | 'archangel-temple'>('daily-guidance');
+  const [activeTab, setActiveTab] = useState<'archangel-temple' | 'daily-guidance'>('archangel-temple');
 
   // AI Channeling State
   const [customQuestion, setCustomQuestion] = useState('');
@@ -204,19 +204,9 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
         {/* Tab Controls */}
         <div className="flex items-center space-x-1.5 rounded-2xl border border-purple-700/60 bg-slate-900/90 p-1.5 self-start sm:self-auto shadow-md">
           <button
-            onClick={() => setActiveTab('daily-guidance')}
-            className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-              activeTab === 'daily-guidance'
-                ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-md border border-rose-300/40'
-                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-            }`}
-          >
-            <Sparkles className="h-4 w-4 text-rose-300" />
-            <span>Daily Guidance Pull</span>
-          </button>
-          <button
+            id="tab-archangel-temple"
             onClick={() => setActiveTab('archangel-temple')}
-            className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+            className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
               activeTab === 'archangel-temple'
                 ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-md border border-rose-300/40'
                 : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
@@ -224,6 +214,18 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
           >
             <Crown className="h-4 w-4 text-amber-300" />
             <span>Archangel Temple</span>
+          </button>
+          <button
+            id="tab-daily-guidance"
+            onClick={() => setActiveTab('daily-guidance')}
+            className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'daily-guidance'
+                ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-md border border-rose-300/40'
+                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
+            }`}
+          >
+            <Sparkles className="h-4 w-4 text-rose-300" />
+            <span>Daily Guidance Pull</span>
           </button>
         </div>
       </div>

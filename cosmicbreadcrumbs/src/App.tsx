@@ -13,11 +13,14 @@ import { CosmicOracleChat } from './components/CosmicOracleChat';
 import { CosmicLogo } from './components/CosmicLogo';
 import { WelcomeLetterModal } from './components/WelcomeLetterModal';
 import { FirstLaunchOnboardingModal } from './components/FirstLaunchOnboardingModal';
+import { PermissionsRequestModal } from './components/PermissionsRequestModal';
+import { SanctuaryWelcomeVideoModal } from './components/SanctuaryWelcomeVideoModal';
 import { ShootingStarsCanvas } from './components/ShootingStarsCanvas';
 import { getSunSignFromDate } from './utils/astrologyCalc';
 import { calculateLifePath, calculateDestinyNumber } from './utils/numerologyCalc';
 import { getStoredMembership, isFeatureUnlocked, activateSubscription } from './utils/membership';
 import { initFontSize } from './utils/fontSizePreference';
+import { initCelestialNotificationService, getStoredPermissionsState } from './utils/permissionManager';
 import { Sparkles, Moon, Compass, Hash, Feather, Heart, Lock, Gift, Crown } from 'lucide-react';
 
 const INITIAL_PROFILE: UserProfile = {
@@ -81,21 +84,37 @@ export default function App() {
     }
   });
 
+  // First Download / Permission Request Modal for Location Grounding & Notifications
+  const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState<boolean>(() => {
+    const saved = localStorage.getItem('auranova_profile');
+    const permState = getStoredPermissionsState();
+    if (!saved) return false;
+    try {
+      const parsed = JSON.parse(saved);
+      if (!parsed.hasCompletedOnboarding) return false;
+    } catch {
+      return false;
+    }
+    return !permState.hasRequestedPermissions;
+  });
+
   // Show welcome letter modal after onboarding or on first visit
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState<boolean>(() => {
     const current = getStoredMembership();
     const savedProfile = localStorage.getItem('auranova_profile');
-    // If first launch onboarding is active, let onboarding finish first before showing welcome letter
+    // If first launch onboarding or permission modal is active, let them finish first
     if (!savedProfile) return false;
     return !current.hasSeenWelcomeLetter;
   });
 
   const [requestedLockedFeature, setRequestedLockedFeature] = useState<string | undefined>(undefined);
   const [welcomeModalTab, setWelcomeModalTab] = useState<'letter' | 'plans' | 'guide'>('letter');
+  const [isWelcomeVideoOpen, setIsWelcomeVideoOpen] = useState<boolean>(false);
 
-  // Check URL params for Stripe checkout redirect return
+  // Check URL params for Stripe checkout redirect return & init background celestial services
   useEffect(() => {
     initFontSize();
+    initCelestialNotificationService();
     try {
       const params = new URLSearchParams(window.location.search);
       if (params.get('payment_success') === 'true') {
@@ -112,11 +131,13 @@ export default function App() {
             if (data.verified) {
               const updated = activateSubscription(data.planId || plan);
               setMembership(updated);
+              setIsWelcomeVideoOpen(true);
             }
           })
           .catch(() => {
             const updated = activateSubscription(plan);
             setMembership(updated);
+            setIsWelcomeVideoOpen(true);
           })
           .finally(() => {
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -190,7 +211,7 @@ export default function App() {
       case 'angel-oracle':
         return 'Archangel Daily Guidance Sanctuary';
       case 'dreams':
-        return 'Dream Sanctuary & Symbol Calculator';
+        return 'Dreamscape';
       case 'diary':
       case 'journal':
         return 'Daily Log/Journal';
@@ -201,6 +222,7 @@ export default function App() {
 
   // Navigation with Access Control Gating
   const handleNavigate = (view: CosmicView) => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
     if (isFeatureUnlocked(view, membership)) {
       setCurrentView(view);
     } else {
@@ -256,6 +278,7 @@ export default function App() {
               onSaveJournal={handleSaveJournal}
               membership={membership}
               onOpenWelcomeModal={handleOpenWelcomeModal}
+              onOpenProfile={() => setIsProfileOpen(true)}
             />
           )}
 
@@ -357,7 +380,7 @@ export default function App() {
                   onClick={() => handleNavigate('dreams')}
                   className="hover:text-white transition-colors"
                 >
-                  Dream Sanctuary
+                  Dreamscape
                 </button>
                 <button
                   onClick={() => handleNavigate('diary')}
@@ -392,6 +415,8 @@ export default function App() {
         onSaveProfile={handleSaveProfile}
         membership={membership}
         onOpenMembership={() => handleOpenWelcomeModal(undefined, 'plans')}
+        onMembershipUpdated={(newStatus) => setMembership(newStatus)}
+        onPlayWelcomeVideo={() => setIsWelcomeVideoOpen(true)}
       />
 
       {/* Live AI Oracle Chat Modal */}
@@ -409,7 +434,39 @@ export default function App() {
         onComplete={(newProfile) => {
           handleSaveProfile(newProfile);
           setIsFirstLaunchModalOpen(false);
-          // After finding zodiac sign on first launch, open the sanctuary club welcome letter if not seen yet
+          // Request permissions for location and notifications on first download
+          const permState = getStoredPermissionsState();
+          if (!permState.hasRequestedPermissions) {
+            setIsPermissionsModalOpen(true);
+          } else if (!membership.hasSeenWelcomeLetter) {
+            setIsWelcomeModalOpen(true);
+          }
+        }}
+      />
+
+      {/* Permissions Request Modal: Location Grounding & Notifications on First Download */}
+      <PermissionsRequestModal
+        isOpen={isPermissionsModalOpen}
+        onComplete={(detectedLocation) => {
+          if (detectedLocation) {
+            const placeStr = [detectedLocation.city, detectedLocation.region, detectedLocation.country].filter(Boolean).join(', ');
+            const updatedProfile: UserProfile = {
+              ...userProfile,
+              location: detectedLocation,
+              birthPlace: (!userProfile.birthPlace || userProfile.birthPlace === 'Sedona, Arizona') && placeStr
+                ? placeStr
+                : userProfile.birthPlace,
+              hasGrantedPermissions: true,
+            };
+            handleSaveProfile(updatedProfile);
+          }
+          setIsPermissionsModalOpen(false);
+          if (!membership.hasSeenWelcomeLetter) {
+            setIsWelcomeModalOpen(true);
+          }
+        }}
+        onSkip={() => {
+          setIsPermissionsModalOpen(false);
           if (!membership.hasSeenWelcomeLetter) {
             setIsWelcomeModalOpen(true);
           }
@@ -427,6 +484,13 @@ export default function App() {
         onMembershipUpdated={(newStatus) => setMembership(newStatus)}
         initialTab={welcomeModalTab}
         requestedFeatureName={requestedLockedFeature}
+        onPlayWelcomeVideo={() => setIsWelcomeVideoOpen(true)}
+      />
+
+      {/* Sanctuary Welcome Video Modal (Plays SanctuaryWelcome.mp4 after joining trial or purchasing membership) */}
+      <SanctuaryWelcomeVideoModal
+        isOpen={isWelcomeVideoOpen}
+        onClose={() => setIsWelcomeVideoOpen(false)}
       />
     </div>
   );

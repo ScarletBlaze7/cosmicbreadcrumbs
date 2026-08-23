@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize2 } from 'lucide-react';
-const cosmicVideoImport = '/assets/gemini_generated_video_71alSolarKnowlwdge.mp4';
 
 interface CosmicTitleVideoProps {
   variant?: 'hero' | 'header' | 'compact';
@@ -67,16 +66,20 @@ export const CosmicTitleVideo: React.FC<CosmicTitleVideoProps> = ({
           loop
           muted
           playsInline
-          webkit-playsinline="true"
           preload="auto"
           className="w-full h-full object-cover"
           onPlay={() => setIsPlaying(true)}
           onPause={() => setIsPlaying(false)}
         >
-          <source src={cosmicVideoImport} type="video/mp4" />
+          <source src="./assets/gemini_generated_video_71a1SolarKnowlwdge.mp4" type="video/mp4" />
+          <source src="/assets/gemini_generated_video_71a1SolarKnowlwdge.mp4" type="video/mp4" />
+          <source src="./gemini_generated_video_71a1SolarKnowlwdge.mp4" type="video/mp4" />
+          <source src="/gemini_generated_video_71a1SolarKnowlwdge.mp4" type="video/mp4" />
           <source src="./assets/gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
-          <source src="./gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
-          <source src="/gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
+          <source src="/assets/gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
+          <source src="./assets/SolarKniw.mp4" type="video/mp4" />
+          <source src="/assets/SolarKniw.mp4" type="video/mp4" />
+          <source src="/master-video.mp4" type="video/mp4" />
         </video>
         
         {/* Play/Pause Overlay Indicator */}
@@ -91,6 +94,7 @@ export const CosmicTitleVideo: React.FC<CosmicTitleVideoProps> = ({
         {/* Bottom Bar Controls */}
         <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between pointer-events-auto">
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               handleContainerClick();
@@ -102,12 +106,14 @@ export const CosmicTitleVideo: React.FC<CosmicTitleVideoProps> = ({
           
           <div className="flex items-center space-x-2">
             <button
+              type="button"
               onClick={toggleMute}
               className="p-2 rounded-full bg-purple-900/70 hover:bg-purple-700 text-white backdrop-blur-sm"
             >
               {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
             </button>
             <button
+              type="button"
               onClick={handleFullscreen}
               className="p-2 rounded-full bg-purple-900/70 hover:bg-purple-700 text-white backdrop-blur-sm"
             >
@@ -130,13 +136,15 @@ export const CosmicTitleVideo: React.FC<CosmicTitleVideoProps> = ({
               loop
               controls
               playsInline
-              webkit-playsinline="true"
               className="w-full h-full object-contain rounded-2xl"
             >
-              <source src={cosmicVideoImport} type="video/mp4" />
+              <source src="./assets/gemini_generated_video_71a1SolarKnowlwdge.mp4" type="video/mp4" />
+              <source src="/assets/gemini_generated_video_71a1SolarKnowlwdge.mp4" type="video/mp4" />
               <source src="./assets/gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
-              <source src="./gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
-              <source src="/gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
+              <source src="/assets/gemini_generated_video_71alSolarKnowlwdge.mp4" type="video/mp4" />
+              <source src="./assets/SolarKniw.mp4" type="video/mp4" />
+              <source src="/assets/SolarKniw.mp4" type="video/mp4" />
+              <source src="/master-video.mp4" type="video/mp4" />
             </video>
           </div>
         </div>

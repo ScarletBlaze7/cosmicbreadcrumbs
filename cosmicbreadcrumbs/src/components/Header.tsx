@@ -30,6 +30,7 @@ import { getStoredFontSize, applyFontSize, FontSizeSetting } from '../utils/font
 import { CosmicLogo } from './CosmicLogo';
 import { ZodiacSymbolIcon } from './ZodiacSymbolIcon';
 import { SanctuaryEmblem } from './SanctuaryEmblem';
+import { SanctuaryProfileBadge } from './SanctuaryProfileBadge';
 
 interface HeaderProps {
   currentView: CosmicView;
@@ -93,12 +94,25 @@ export const Header: React.FC<HeaderProps> = ({
     return () => window.removeEventListener('resize', checkScrollState);
   }, []);
 
-  // Auto-scroll the active tab into view on mobile
+  // Auto-scroll the active tab into view on mobile safely within its container only
   useEffect(() => {
-    if (mobileNavRef.current) {
-      const activeEl = mobileNavRef.current.querySelector(`[data-nav-id="${currentView}"]`) as HTMLElement;
+    const navContainer = mobileNavRef.current;
+    if (navContainer) {
+      const activeEl = navContainer.querySelector(`[data-nav-id="${currentView}"]`) as HTMLElement;
       if (activeEl) {
-        activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        const containerRect = navContainer.getBoundingClientRect();
+        const activeRect = activeEl.getBoundingClientRect();
+        const offset =
+          activeRect.left -
+          containerRect.left +
+          navContainer.scrollLeft -
+          navContainer.clientWidth / 2 +
+          activeRect.width / 2;
+
+        navContainer.scrollTo({
+          left: Math.max(0, offset),
+          behavior: 'smooth',
+        });
       }
       setTimeout(checkScrollState, 350);
     }
@@ -140,25 +154,25 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'tarot', label: 'Daily Tarot', icon: Moon },
     { id: 'numerology', label: 'Numerology', icon: Hash },
     { id: 'angel-oracle', label: 'Archangels', icon: Feather },
-    { id: 'dreams', label: 'Dream Sanctuary', icon: CloudMoon },
+    { id: 'dreams', label: 'Dreamscape', icon: CloudMoon },
     { id: 'diary', label: 'Daily Log/Journal', icon: BookMarked },
   ];
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-purple-950/80 bg-[#060710]/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2 sm:px-6 sm:py-3 gap-2">
         {/* Logo & Brand */}
         <div 
           onClick={() => onViewChange('dashboard')}
-          className="group flex cursor-pointer items-center space-x-2.5 sm:space-x-3"
+          className="group flex cursor-pointer items-center space-x-1.5 sm:space-x-3 min-w-0 shrink"
           id="app-brand-logo"
         >
           <CosmicLogo size="md" showUploadTrigger={true} />
-          <div className="flex flex-col text-left">
-            <span className="font-flavors text-2xl sm:text-3xl md:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 tracking-wide drop-shadow-sm leading-none py-0.5">
+          <div className="flex flex-col text-left min-w-0">
+            <span className="font-flavors text-lg sm:text-2xl md:text-3xl lg:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 tracking-wide drop-shadow-sm leading-tight py-0.5 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-none">
               Cosmic Breadcrumbs
             </span>
-            <span className="text-xs sm:text-sm font-revalia tracking-wider text-amber-200 uppercase hidden sm:block mt-0.5 font-bold">
+            <span className="text-[9px] sm:text-xs font-revalia tracking-wider text-amber-200 uppercase hidden sm:block font-bold">
               YOUR PERSONALIZED COSMIC ALIGNMENT
             </span>
           </div>
@@ -221,14 +235,14 @@ export const Header: React.FC<HeaderProps> = ({
         </nav>
 
         {/* Right Controls */}
-        <div className="flex items-center space-x-2 sm:space-x-3">
+        <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
           
           {/* Font Size Quick Toggle Button (Accessibility) */}
           <button
             id="btn-toggle-font-size"
             onClick={handleCycleFontSize}
             title={`Font Size: ${fontSize.toUpperCase()} • Tap to enlarge fonts for reading comfort`}
-            className="flex items-center space-x-1.5 rounded-2xl border border-purple-800/80 bg-[#120f26] px-3 py-2 text-xs sm:text-sm font-bold text-amber-200 hover:border-amber-400 hover:bg-purple-950 transition-all shadow-sm"
+            className="hidden lg:flex items-center space-x-1.5 rounded-2xl border border-purple-800/80 bg-[#120f26] px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-bold text-amber-200 hover:border-amber-400 hover:bg-purple-950 transition-all shadow-sm"
           >
             <Type className="h-4 w-4 text-amber-300" />
             <span className="font-mono text-xs hidden sm:inline">
@@ -236,104 +250,44 @@ export const Header: React.FC<HeaderProps> = ({
             </span>
           </button>
 
-          {/* Sanctuary Club / Trial Status Pill Button */}
-          <button
-            id="btn-header-membership"
-            onClick={onOpenMembership}
-            className={`flex items-center space-x-2 rounded-2xl px-3.5 py-2 text-xs sm:text-sm font-sans font-bold tracking-wide transition-all shadow-sm ${
-              membership.tier === 'trial' && membership.isActive
-                ? 'border border-amber-400/80 bg-purple-950/95 text-amber-200 hover:border-amber-300'
-                : membership.tier !== 'free' && membership.isActive
-                ? 'border border-purple-500/70 bg-purple-900 text-white hover:bg-purple-800'
-                : 'border border-purple-500/80 bg-purple-900 text-white hover:bg-purple-800 shadow-md shadow-purple-950/60'
-            }`}
-            title="The Sanctuary Club - 3-Day Free Trial & Membership Options ($3, $11, $33)"
-          >
-            {membership.tier === 'trial' && membership.isActive ? (
-              <>
-                <Gift className="h-4 w-4 text-amber-300" />
-                <span>Club Trial ({trialTime.days}d {trialTime.hours}h)</span>
-              </>
-            ) : membership.tier !== 'free' && membership.isActive ? (
-              <>
-                <SanctuaryEmblem size="xs" isUnlocked={true} tier={membership.tier} />
-                <span>{membership.tier === 'lifetime' ? 'Sanctuary VIP' : 'Club Member'}</span>
-              </>
-            ) : (
-              <>
-                <Gift className="h-4 w-4 text-white" />
-                <span>Join Club (Free Trial)</span>
-              </>
-            )}
-          </button>
-
-          {/* Ask Oracle Button */}
-          <button
-            id="btn-ask-oracle"
-            onClick={onOpenOracleChat}
-            className="flex items-center space-x-1.5 rounded-2xl border border-purple-800/80 bg-[#120f26] px-3.5 py-2 text-xs sm:text-sm font-sans font-bold tracking-wide text-white hover:border-purple-400 hover:bg-purple-950 transition-all shadow-sm"
-          >
-            <MessageSquareQuote className="h-4 w-4 text-purple-300" />
-            <span className="hidden sm:inline">Ask Oracle</span>
-            {!membership.isActive && <Lock className="h-3 w-3 text-purple-300/70" />}
-          </button>
-
           {/* Share */}
           <button
             id="btn-share-app"
             onClick={handleShareApp}
             title="Share Sanctuary"
-            className="flex h-10 w-10 items-center justify-center rounded-2xl border border-purple-800/80 bg-[#120f26] text-purple-200 hover:border-purple-400 hover:text-white transition-all"
+            className="hidden md:flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl border border-purple-800/80 bg-[#120f26] text-purple-200 hover:border-purple-400 hover:text-white transition-all"
           >
             <Share2 className="h-4 w-4" />
           </button>
 
-          {/* User Account & Photo */}
+          {/* Chat with Cosmic AI for Guidance Button (Next to Badge) */}
           <button
-            id="btn-open-profile"
-            onClick={onOpenProfile}
-            title={`My Account • ${userProfile.name || 'Seeker'} (${sunSign.name}) - Click to customize photo and matrix`}
-            className="group relative flex items-center space-x-2.5 rounded-2xl border border-purple-800/80 bg-[#120f26] px-3 py-1.5 text-sm text-white hover:border-purple-400 transition-all"
+            id="btn-ask-oracle"
+            onClick={onOpenOracleChat}
+            className="flex items-center space-x-1 sm:space-x-1.5 rounded-2xl border border-purple-600/80 bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-sans font-bold tracking-wide text-white hover:border-amber-400 hover:bg-purple-900 transition-all shadow-md active:scale-95 shrink-0"
+            title="Chat with Cosmic AI for Guidance"
           >
-            {/* User Avatar: Custom Photo or Default Zodiac Sign */}
-            <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-purple-900 bg-[#171233]">
-              {userProfile.avatarUrl ? (
-                <img
-                  src={userProfile.avatarUrl}
-                  alt={userProfile.name || 'My Account'}
-                  className="h-full w-full object-cover rounded-xl"
-                />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-purple-200">
-                  <ZodiacSymbolIcon 
-                    sign={sunSign.name} 
-                    size="sm" 
-                    fallbackText={sunSign.symbol} 
-                    className="scale-90 text-purple-200"
-                  />
-                </div>
-              )}
-
-              {/* Subtle Camera Hover Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
-                <Camera className="h-3.5 w-3.5 text-white" />
-              </div>
-            </div>
-
-            {/* Label: My Account */}
-            <div className="text-left hidden sm:block">
-              <span className="block font-sans font-bold text-xs sm:text-sm text-white tracking-wide group-hover:text-purple-200 transition-colors leading-tight">
-                Account
-              </span>
-              <span className="block text-xs text-purple-300 font-medium leading-none truncate max-w-[110px]">
-                {userProfile.avatarUrl ? (userProfile.name || 'Seeker') : `${sunSign.symbol} ${sunSign.name}`}
-              </span>
-            </div>
-
-            <span className="sm:hidden font-sans font-bold text-xs text-white">
-              Account
-            </span>
+            <MessageSquareQuote className="h-4 w-4 text-amber-300 shrink-0" />
+            <span className="hidden xs:inline">Cosmic AI</span>
+            <span className="xs:hidden inline">AI</span>
+            {!membership.isActive && <Lock className="h-3 w-3 text-amber-300/80 shrink-0" />}
           </button>
+
+          {/* OFFICIAL MEMBERSHIP BADGE BUTTON (Replaces "Club Trial" button & opens Account Area) */}
+          <SanctuaryProfileBadge
+            isMember={Boolean(membership.isActive || membership.tier !== 'free')}
+            username={userProfile.name}
+            size="header"
+            countdownText={
+              membership.tier === 'trial' && membership.isActive
+                ? `${trialTime.days}d ${trialTime.hours}h ${trialTime.minutes}m`
+                : membership.isActive
+                ? (membership.planName || 'VIP Member')
+                : 'Account'
+            }
+            onClick={onOpenProfile}
+            className="shrink-0"
+          />
         </div>
       </div>
 
@@ -401,37 +355,17 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             );
           })}
-        </div>
 
-        {/* Mobile Swipe Awareness Cue (Prominently alerts user about tabs past Numerology) */}
-        <div className="flex items-center justify-between px-3.5 py-1.5 bg-gradient-to-r from-purple-950/50 via-amber-950/40 to-purple-950/50 border-t border-purple-900/40 text-xs text-purple-200">
-          <div className="flex items-center space-x-1.5 truncate">
-            <span className="inline-block animate-bounce text-amber-300">👉</span>
-            <span className="text-amber-200 font-bold truncate">
-              Slide or tap arrows for tabs past Numerology:
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-1.5 shrink-0 ml-1">
-            <button
-              onClick={() => onViewChange('angel-oracle')}
-              className="text-xs px-2 py-0.5 rounded-lg bg-purple-900/80 text-purple-100 hover:text-white hover:bg-purple-800 border border-purple-700/60 font-semibold"
-            >
-              Archangels
-            </button>
-            <button
-              onClick={() => onViewChange('dreams')}
-              className="text-xs px-2 py-0.5 rounded-lg bg-purple-900/80 text-purple-100 hover:text-white hover:bg-purple-800 border border-purple-700/60 font-semibold"
-            >
-              Dreams
-            </button>
-            <button
-              onClick={() => onViewChange('diary')}
-              className="text-xs px-2 py-0.5 rounded-lg bg-purple-900/80 text-purple-100 hover:text-white hover:bg-purple-800 border border-purple-700/60 font-semibold"
-            >
-              Journal
-            </button>
-          </div>
+          {/* Direct My Account Tab */}
+          <button
+            type="button"
+            onClick={onOpenProfile}
+            id="btn-mobile-nav-account"
+            className="flex shrink-0 items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-sans font-bold tracking-wide transition-all bg-gradient-to-r from-amber-500/20 via-purple-900 to-indigo-950 text-amber-200 border border-amber-400/60 shadow-md ring-1 ring-amber-400/30"
+          >
+            <User className="h-4 w-4 text-amber-300" />
+            <span>My Account</span>
+          </button>
         </div>
       </div>
     </header>

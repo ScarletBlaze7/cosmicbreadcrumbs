@@ -376,26 +376,36 @@ export const DreamSanctuaryView: React.FC<DreamSanctuaryViewProps> = ({ userProf
   return (
     <div className="space-y-8 animate-in fade-in duration-300">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-purple-900/50 pb-5">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
-            <Moon className="h-4 w-4" />
-            <span>Subconscious Oracle & Dream Calculator</span>
-          </div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-100 mt-1">
-            Dream Sanctuary & Interpretation Reader
-          </h1>
-          <p className="text-xs text-purple-300/80 mt-1">
-            Decode last night's visions or past unresolved dreams using standout symbols, Jungian archetypes, and cosmic vibration frequencies.
-          </p>
+      <div className="border-b border-purple-900/50 pb-5">
+        <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <Moon className="h-4 w-4" />
+          <span>Subconscious Oracle</span>
         </div>
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-100 mt-1">
+          Dream Log and Interpretation
+        </h1>
+        <p className="text-xs text-purple-300/80 mt-1">
+          Decode last night's visions or past unresolved dreams using standout symbols, Carl Jung's archetypes, and cosmic vibration frequencies.
+        </p>
+      </div>
 
-        {/* Action tabs, PIN Security & Export */}
-        <div className="flex items-center space-x-2 self-start sm:self-auto flex-wrap gap-y-2">
+      {/* PERMANENT FEATURED DREAMSCAPE ARTWORK BANNER - Positioned right under the subtitle */}
+      <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-black/50">
+        <img
+          src="/assets/dream.png"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/dream.png'; }}
+          alt="Dreamscape Nocturnal Portal Artwork"
+          className="w-full h-auto object-cover rounded-3xl select-none"
+        />
+      </div>
+
+      {/* Action tabs, PIN Security & Export Bar - Positioned under the photo */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-purple-700/60 bg-slate-900/90 p-2 sm:p-2.5 shadow-xl">
+        <div className="flex items-center space-x-2 flex-wrap gap-2">
           {/* Dedicated Search Previous Dreams Button */}
           <button
             onClick={() => setShowSearchModal(true)}
-            className="flex items-center space-x-1.5 rounded-xl border border-cyan-400/50 bg-cyan-500/10 px-3.5 py-1.5 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400 transition-all shadow-sm"
+            className="flex items-center space-x-1.5 rounded-xl border border-cyan-400/50 bg-cyan-500/10 px-3.5 py-2 text-xs font-bold text-cyan-300 hover:bg-cyan-500/20 hover:border-cyan-400 transition-all shadow-sm cursor-pointer"
             title="Search previous dreams and nocturnal codex"
           >
             <Search className="h-3.5 w-3.5 text-cyan-400" />
@@ -405,7 +415,7 @@ export const DreamSanctuaryView: React.FC<DreamSanctuaryViewProps> = ({ userProf
           {/* Calendar Toggle Button */}
           <button
             onClick={() => setShowCalendar(!showCalendar)}
-            className={`flex items-center space-x-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all ${
+            className={`flex items-center space-x-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
               showCalendar
                 ? 'border-purple-600 bg-purple-950/90 text-purple-200 shadow-sm'
                 : 'border-purple-800/60 bg-slate-900/80 text-purple-300 hover:text-white'
@@ -419,7 +429,7 @@ export const DreamSanctuaryView: React.FC<DreamSanctuaryViewProps> = ({ userProf
           {/* PIN Lock Security Button */}
           <button
             onClick={() => setShowPinModal(true)}
-            className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3 py-1.5 text-xs font-medium text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all"
+            className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3.5 py-2 text-xs font-medium text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all cursor-pointer"
             title="Configure 4-Digit PIN Protection"
           >
             <KeyRound className="h-3.5 w-3.5 text-amber-400" />
@@ -432,18 +442,20 @@ export const DreamSanctuaryView: React.FC<DreamSanctuaryViewProps> = ({ userProf
               onClick={() => {
                 setIsLocked(true);
               }}
-              className="flex items-center space-x-1.5 rounded-xl bg-purple-900/80 border border-purple-600/50 px-3 py-1.5 text-xs font-semibold text-purple-100 hover:bg-purple-800 transition-all shadow-sm"
+              className="flex items-center space-x-1.5 rounded-xl bg-purple-900/80 border border-purple-600/50 px-3.5 py-2 text-xs font-semibold text-purple-100 hover:bg-purple-800 transition-all shadow-sm cursor-pointer"
               title="Immediately lock dream diary from view"
             >
               <Lock className="h-3.5 w-3.5 text-amber-300" />
               <span>Lock Now</span>
             </button>
           )}
+        </div>
 
+        <div className="flex items-center space-x-2 flex-wrap gap-2">
           <div className="flex rounded-xl border border-purple-700/60 bg-slate-900/90 p-1 shadow-md">
             <button
               onClick={() => setActiveTab('reader')}
-              className={`flex items-center space-x-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-all ${
+              className={`flex items-center space-x-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'reader'
                   ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
                   : 'text-purple-100 hover:text-white hover:bg-purple-950/60'
@@ -454,7 +466,7 @@ export const DreamSanctuaryView: React.FC<DreamSanctuaryViewProps> = ({ userProf
             </button>
             <button
               onClick={() => setActiveTab('log')}
-              className={`flex items-center space-x-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-all ${
+              className={`flex items-center space-x-2 rounded-lg px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'log'
                   ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
                   : 'text-purple-100 hover:text-white hover:bg-purple-950/60'
@@ -468,7 +480,7 @@ export const DreamSanctuaryView: React.FC<DreamSanctuaryViewProps> = ({ userProf
           {dreamLogs.length > 0 && (
             <button
               onClick={handleExportDreamCodex}
-              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3 py-2 text-xs font-medium text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all"
+              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3.5 py-2 text-xs font-medium text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all cursor-pointer"
             >
               <Download className="h-3.5 w-3.5" />
               <span className="hidden sm:inline">Export Codex</span>

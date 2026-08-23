@@ -22,7 +22,9 @@ import {
   Radio,
   Activity,
   AlertCircle,
-  Globe2
+  Globe2,
+  Download,
+  Smartphone
 } from 'lucide-react';
 import { UserProfile, CosmicView, TarotCard, DrawnCard, MembershipStatus } from '../types';
 import { getSunSignFromDate, getMoonPhaseInfo, getDailyPlanetaryTransits } from '../utils/astrologyCalc';
@@ -46,6 +48,7 @@ interface DailyDashboardProps {
   onSaveJournal: (title: string, type: 'tarot' | 'horoscope' | 'angel' | 'numerology' | 'affirmation', content: string) => void;
   membership: MembershipStatus;
   onOpenWelcomeModal: (featureName?: string, tab?: 'letter' | 'plans' | 'guide') => void;
+  onOpenProfile?: () => void;
 }
 
 export const DailyDashboard: React.FC<DailyDashboardProps> = ({
@@ -54,6 +57,7 @@ export const DailyDashboard: React.FC<DailyDashboardProps> = ({
   onSaveJournal,
   membership,
   onOpenWelcomeModal,
+  onOpenProfile,
 }) => {
   const sunSign = getSunSignFromDate(userProfile.birthDate);
   const moonInfo = getMoonPhaseInfo();
@@ -153,8 +157,91 @@ export const DailyDashboard: React.FC<DailyDashboardProps> = ({
     <div className="mx-auto max-w-xl sm:max-w-2xl px-3 py-4 sm:py-6 space-y-5 animate-in fade-in duration-300 pb-20">
 
       {/* CENTERPIECE MAIN TITLE: EXACT ANIMATED COSMIC BREADCRUMBS VIDEO TITLE */}
-      <div className="space-y-3 pt-1">
+      <div className="space-y-4 pt-1">
         <CosmicTitleVideo variant="hero" />
+
+        {/* PERMANENT FEATURED PHOTO UNDER VIDEO */}
+        <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-black/50">
+          <img
+            src="/assets/Screenshot_20260821-045128_Chrome.png"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/Screenshot_20260821-045128_Chrome.png'; }}
+            alt="Cosmic Breadcrumbs Featured Artwork"
+            className="w-full h-auto object-cover rounded-3xl select-none"
+          />
+        </div>
+      </div>
+
+      {/* SEEKER ACCOUNT & SANCTUARY MEMBERSHIP BADGE CARD */}
+      <div 
+        onClick={onOpenProfile}
+        id="card-dashboard-account-badge"
+        className={`group cursor-pointer rounded-3xl border-2 p-4 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-2xl ${
+          membership.isActive || membership.tier !== 'free'
+            ? 'border-amber-400/80 bg-gradient-to-r from-amber-950/40 via-purple-950/60 to-slate-950 shadow-amber-500/10'
+            : 'border-purple-700/80 bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-950'
+        }`}
+      >
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {/* Badge Image: sanctemb.jpg for Member / seeker.png for Free */}
+          <div className={`relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl overflow-hidden border-2 shrink-0 shadow-lg ${
+            membership.isActive || membership.tier !== 'free'
+              ? 'border-amber-400 drop-shadow-[0_0_12px_rgba(212,175,55,0.5)] bg-slate-950'
+              : 'border-purple-600/80 shadow-purple-950/50 bg-slate-950'
+          }`}>
+            <img
+              src={membership.isActive || membership.tier !== 'free' ? '/assets/sanctemb.jpg' : '/assets/seeker.png'}
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                if (membership.isActive || membership.tier !== 'free') {
+                  target.src = target.src.includes('sanctuaryemb') ? './assets/sanctemb.jpg' : './assets/sanctuaryemb.jpg';
+                } else {
+                  target.src = target.src.includes('seeker.png') ? './assets/seeker.png' : './assets/freeseeker.jpg';
+                }
+              }}
+              alt={membership.isActive || membership.tier !== 'free' ? 'Sanctuary Member Emblem (sanctemb.jpg)' : 'Free Seeker Badge (seeker.png)'}
+              className="h-full w-full object-cover select-none"
+            />
+          </div>
+
+          <div className="text-left space-y-0.5">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <span className="font-serif text-sm sm:text-base font-bold text-slate-100 group-hover:text-amber-200 transition-colors">
+                {userProfile.name}'s Account
+              </span>
+              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
+                membership.isActive || membership.tier !== 'free'
+                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                  : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+              }`}>
+                {membership.tier === 'trial' && membership.isActive
+                  ? 'Sanctuary Trial'
+                  : membership.isActive
+                  ? (membership.planName || 'Sanctuary Member')
+                  : 'Free Seeker'}
+              </span>
+            </div>
+
+            <p className="text-xs text-purple-200/80">
+              {sunSign.symbol} {sunSign.name} • Life Path #{lifePath}
+              {userProfile.birthPlace && ` • ${userProfile.birthPlace}`}
+            </p>
+
+            {membership.tier === 'trial' && membership.isActive ? (
+              <span className="text-[11px] font-mono font-semibold text-amber-300 block leading-tight">
+                ⏳ Trial Countdown: {trialTime.days}d {trialTime.hours}h {trialTime.minutes}m remaining
+              </span>
+            ) : !membership.isActive ? (
+              <span className="text-[11px] text-amber-300/90 font-medium block leading-tight">
+                Tap to view Credentials & Unlock Sanctuary Club ($0 Free Trial)
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="hidden sm:flex items-center space-x-1.5 rounded-2xl border border-amber-400/50 bg-amber-400/10 px-3.5 py-2 text-xs font-semibold text-amber-200 shrink-0 group-hover:bg-amber-400/20 transition-all">
+          <span>Open Account Area</span>
+          <span className="text-amber-400">→</span>
+        </div>
       </div>
 
       {/* CARD 1: TODAY'S FORECAST */}

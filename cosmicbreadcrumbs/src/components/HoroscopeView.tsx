@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Compass, 
   Sparkles, 
@@ -57,6 +57,48 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiReading, setAiReading] = useState<any | null>(null);
   const [isSaved, setIsSaved] = useState(false);
+
+  // Real-time midnight watcher: automatically updates horoscope data every midnight
+  const [currentDateKey, setCurrentDateKey] = useState<string>(() => new Date().toDateString());
+
+  useEffect(() => {
+    const checkDateChange = () => {
+      const todayStr = new Date().toDateString();
+      if (todayStr !== currentDateKey) {
+        setCurrentDateKey(todayStr);
+        setAiReading(null); // Clear previous day's ephemeral data to refresh for the new day
+      }
+    };
+
+    // Calculate exact milliseconds until upcoming midnight
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
+    const msUntilMidnight = midnight.getTime() - now.getTime();
+
+    const midnightTimeout = setTimeout(() => {
+      checkDateChange();
+    }, msUntilMidnight);
+
+    // Also check on window focus / visibility change (e.g. phone wakes up next morning)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        checkDateChange();
+      }
+    };
+
+    // Periodic safety check every 60 seconds
+    const interval = setInterval(checkDateChange, 60000);
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', checkDateChange);
+
+    return () => {
+      clearTimeout(midnightTimeout);
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', checkDateChange);
+    };
+  }, [currentDateKey]);
 
   const handleSetLoveCategory = (status: RelationshipStatus) => {
     setLoveCategory(status);
@@ -138,61 +180,27 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-purple-900/50 pb-5">
-        <div>
-          <div className="flex items-center space-x-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-amber-300">
-            <Compass className="h-4 w-4 text-amber-400" />
-            <span>Celestial Astrological Sanctuary</span>
-          </div>
-          <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-100 mt-1">
-            Personalized Horoscope & Transits
-          </h1>
-          <p className="text-xs sm:text-sm text-purple-200 mt-1">
-            Real-time planetary alignments, dimensional forecasts, and AI cosmic synthesis
-          </p>
+      <div className="border-b border-purple-900/50 pb-5 space-y-1.5">
+        <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
+          <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
+          <span>NASA's Real-time planetary alignments, dimensional forecasts, and AI cosmic synthesis</span>
         </div>
+        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-100 mt-1">
+          Astrological Insights
+        </h1>
+        <p className="text-xs sm:text-sm text-purple-200 mt-1 leading-relaxed">
+          Free Daily horoscope for all users. Sanctuary members may see Daily/Tomorrow/weekly/monthy and AI deep transit synthsis, Love and relationship, Career and wellness etc..
+        </p>
+      </div>
 
-        {/* Time Period Selector with Free/Membership Access Control */}
-        <div className="flex items-center space-x-1.5 rounded-2xl border border-purple-700/60 bg-slate-900/90 p-1.5 shadow-md self-start sm:self-auto">
-          {(
-            [
-              { id: 'today', label: 'Daily', isFree: true },
-              { id: 'tomorrow', label: 'Tomorrow', isFree: false },
-              { id: 'weekly', label: 'Weekly', isFree: false },
-              { id: 'monthly', label: 'Monthly', isFree: false },
-            ] as const
-          ).map((p) => {
-            const isSelected = period === p.id;
-            const isLocked = !p.isFree && !isPaidMember;
-
-            return (
-              <button
-                key={p.id}
-                id={`btn-period-${p.id}`}
-                onClick={() => handleSelectPeriod(p.id)}
-                className={`flex items-center space-x-2 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-900/60 border border-amber-400/50'
-                    : isLocked
-                    ? 'text-purple-200 hover:bg-purple-950/60 hover:text-amber-300'
-                    : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-                }`}
-              >
-                <span>{p.label}</span>
-                {p.isFree ? (
-                  <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-xs font-extrabold text-emerald-300 border border-emerald-500/30">
-                    Free
-                  </span>
-                ) : isLocked ? (
-                  <span className="flex items-center space-x-1 rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-bold text-amber-300 border border-amber-500/40">
-                    <Lock className="h-3 w-3" />
-                    <span>PRO</span>
-                  </span>
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
+      {/* PERMANENT FEATURED HOROSCOPE ARTWORK BANNER */}
+      <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-black/50">
+        <img
+          src="/assets/astrology.png"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/astrology.png'; }}
+          alt="Horoscope Astrological Artwork"
+          className="w-full h-auto object-cover rounded-3xl select-none"
+        />
       </div>
 
       {/* NASA REAL-TIME DATA & EPHEMERIS SCIENTIFIC PROVENANCE BANNER */}
@@ -461,6 +469,61 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
 
         {/* Right Side: Deep 4-Dimensional Forecast & AI Synthesis (8 Cols) */}
         <div className="lg:col-span-8 space-y-6">
+          {/* Time Period Navigation Bar (Daily, Tomorrow, Weekly, Monthly) - Directly Above Synthesis Reading */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-purple-600/70 bg-gradient-to-r from-slate-900 via-purple-950/60 to-slate-900 p-3 sm:p-3.5 shadow-2xl">
+            <div className="flex items-center space-x-2 text-xs sm:text-sm font-bold text-amber-300 pl-1">
+              <Compass className="h-4 w-4 text-amber-400" />
+              <span className="uppercase tracking-wider">Forecast Horizon:</span>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
+              {(
+                [
+                  { id: 'today', label: 'Daily', isFree: true },
+                  { id: 'tomorrow', label: 'Tomorrow', isFree: false },
+                  { id: 'weekly', label: 'Weekly', isFree: false },
+                  { id: 'monthly', label: 'Monthly', isFree: false },
+                ] as const
+              ).map((p) => {
+                const isSelected = period === p.id;
+                const isLocked = !p.isFree && !isPaidMember;
+
+                return (
+                  <button
+                    key={p.id}
+                    id={`btn-period-${p.id}`}
+                    onClick={() => handleSelectPeriod(p.id)}
+                    className={`flex shrink-0 items-center space-x-2 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-black tracking-wide transition-all cursor-pointer shadow-sm ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white shadow-lg shadow-purple-900/80 border-2 border-amber-400 scale-105'
+                        : isLocked
+                        ? 'bg-slate-950/80 border border-purple-900/60 text-purple-200 hover:border-amber-400/50 hover:text-amber-300'
+                        : 'bg-slate-950/80 border border-purple-900/60 text-slate-100 hover:border-purple-600 hover:text-white'
+                    }`}
+                  >
+                    <span className={isSelected ? 'text-white font-extrabold drop-shadow' : 'text-slate-100 font-bold'}>
+                      {p.label}
+                    </span>
+                    {p.isFree ? (
+                      <span className={`rounded-md px-1.5 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider ${
+                        isSelected 
+                          ? 'bg-emerald-400 text-slate-950 shadow' 
+                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      }`}>
+                        Free
+                      </span>
+                    ) : isLocked ? (
+                      <span className="flex items-center space-x-0.5 rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[10px] sm:text-xs font-bold text-amber-300 border border-amber-500/40">
+                        <Lock className="h-3 w-3" />
+                        <span>PRO</span>
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* AI Astrologer Deep Synthesis Card */}
           <div className="relative overflow-hidden rounded-3xl border border-purple-700/50 bg-gradient-to-br from-purple-950/70 via-slate-900 to-slate-950 p-6 shadow-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-800/40 pb-4">

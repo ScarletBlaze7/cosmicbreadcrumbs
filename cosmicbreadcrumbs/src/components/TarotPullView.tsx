@@ -355,113 +355,125 @@ export const TarotPullView: React.FC<TarotPullViewProps> = ({
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300">
       {/* Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-purple-900/50 pb-5">
+      <div className="border-b border-purple-900/50 pb-5 space-y-4">
         <div>
           <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
             <Moon className="h-4 w-4" />
-            <span>Rider-Waite-Smith Tarot Sanctuary • 78 Complete Sacred Cards</span>
+            <span>Complete set of 78 ~ Rider-Waite Deck</span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-100 mt-1">
-            Rider-Waite Tarot Oracle
+            Tarot Readings
           </h1>
-          <p className="text-xs text-purple-300/80 mt-1">
-            Daily one-card draw with clarification pull (resets at midnight), specialized domain guidance (Love, Finance, Health), and readings for others.
+          <p className="text-xs sm:text-sm text-purple-300/80 mt-1 leading-relaxed">
+            Daily one-card draw (resets at midnight) for all users. Sanctuary members may recieve a clarification pull, specialized domain guidance (Love, Finance, Health), and readings for others.
           </p>
         </div>
 
+        {/* PERMANENT FEATURED TAROT ARTWORK BANNER */}
+        <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-black/50">
+          <img
+            src="/assets/tarotcards.jpg"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/tarotcards.jpg'; }}
+            alt="Tarot Readings and Rider-Waite Cards"
+            className="w-full h-auto object-cover rounded-3xl select-none"
+          />
+        </div>
+
         {/* Navigation Tabs */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar rounded-2xl border border-purple-800/60 bg-slate-900/90 p-1.5 self-start md:self-auto shadow-lg">
-          <button
-            onClick={() => {
-              setActiveTab('daily');
-              setAiInterpretation(null);
-            }}
-            id="tab-tarot-daily"
-            className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
-              activeTab === 'daily'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
-            }`}
-          >
-            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-            <span>Card of the Day (1 + Clarification)</span>
-          </button>
+        <div className="flex items-center justify-center pt-1">
+          <div className="flex items-center space-x-1.5 overflow-x-auto no-scrollbar rounded-2xl border border-purple-800/60 bg-slate-900/90 p-1.5 shadow-lg max-w-full">
+            <button
+              onClick={() => {
+                setActiveTab('daily');
+                setAiInterpretation(null);
+              }}
+              id="tab-tarot-daily"
+              className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
+                activeTab === 'daily'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
+              }`}
+            >
+              <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+              <span>Card of the Day (1 + Clarification)</span>
+            </button>
 
-          <button
-            onClick={() => {
-              setActiveTab('lookup');
-              setAiInterpretation(null);
-            }}
-            id="tab-tarot-lookup"
-            className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
-              activeTab === 'lookup'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
-            }`}
-          >
-            <BookOpen className="h-3.5 w-3.5 text-amber-300" />
-            <span>Card Meaning Directory (78)</span>
-          </button>
+            <button
+              onClick={() => {
+                setActiveTab('lookup');
+                setAiInterpretation(null);
+              }}
+              id="tab-tarot-lookup"
+              className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
+                activeTab === 'lookup'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
+              }`}
+            >
+              <BookOpen className="h-3.5 w-3.5 text-amber-300" />
+              <span>Card Meaning Directory (78)</span>
+            </button>
 
-          <button
-            onClick={() => {
-              setActiveTab('others');
-              setAiInterpretation(null);
-            }}
-            id="tab-tarot-others"
-            className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
-              activeTab === 'others'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
-            }`}
-          >
-            <Users className="h-3.5 w-3.5 text-pink-400" />
-            <span>For Other People</span>
-            {!isMember && (
-              <span className="flex items-center space-x-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-300 border border-amber-500/30">
-                <Crown className="h-2.5 w-2.5" />
-                <span>Member</span>
-              </span>
-            )}
-          </button>
+            <button
+              onClick={() => {
+                setActiveTab('others');
+                setAiInterpretation(null);
+              }}
+              id="tab-tarot-others"
+              className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
+                activeTab === 'others'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
+              }`}
+            >
+              <Users className="h-3.5 w-3.5 text-pink-400" />
+              <span>For Other People</span>
+              {!isMember && (
+                <span className="flex items-center space-x-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-300 border border-amber-500/30">
+                  <Crown className="h-2.5 w-2.5" />
+                  <span>Member</span>
+                </span>
+              )}
+            </button>
 
-          <button
-            onClick={() => {
-              setActiveTab('domains');
-              setAiInterpretation(null);
-            }}
-            id="tab-tarot-domains"
-            className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
-              activeTab === 'domains'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
-            }`}
-          >
-            <Layers className="h-3.5 w-3.5 text-emerald-400" />
-            <span>Love • Finance • Health</span>
-            {!isMember && (
-              <span className="flex items-center space-x-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-300 border border-amber-500/30">
-                <Crown className="h-2.5 w-2.5" />
-                <span>Member</span>
-              </span>
-            )}
-          </button>
+            <button
+              onClick={() => {
+                setActiveTab('domains');
+                setAiInterpretation(null);
+              }}
+              id="tab-tarot-domains"
+              className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
+                activeTab === 'domains'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
+              }`}
+            >
+              <Layers className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Love • Finance • Health</span>
+              {!isMember && (
+                <span className="flex items-center space-x-0.5 rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold text-amber-300 border border-amber-500/30">
+                  <Crown className="h-2.5 w-2.5" />
+                  <span>Member</span>
+                </span>
+              )}
+            </button>
 
-          <button
-            onClick={() => {
-              setActiveTab('spreads');
-              setAiInterpretation(null);
-            }}
-            id="tab-tarot-spreads"
-            className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
-              activeTab === 'spreads'
-                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
-                : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
-            }`}
-          >
-            <Compass className="h-3.5 w-3.5 text-sky-400" />
-            <span>Spreads & Dives</span>
-          </button>
+            <button
+              onClick={() => {
+                setActiveTab('spreads');
+                setAiInterpretation(null);
+              }}
+              id="tab-tarot-spreads"
+              className={`flex items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 transition-all ${
+                activeTab === 'spreads'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md'
+                  : 'text-purple-300/70 hover:bg-purple-950/50 hover:text-purple-200'
+              }`}
+            >
+              <Compass className="h-3.5 w-3.5 text-sky-400" />
+              <span>Spreads & Dives</span>
+            </button>
+          </div>
         </div>
       </div>
 

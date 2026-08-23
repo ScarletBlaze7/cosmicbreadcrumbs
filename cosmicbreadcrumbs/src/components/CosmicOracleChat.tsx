@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, Bot, User, RefreshCw, MessageSquareQuote, Lock, Gift } from 'lucide-react';
 import { UserProfile, MembershipStatus } from '../types';
+import { generateCelestialOracleResponse } from '../utils/celestialOracleEngine';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -61,7 +62,8 @@ export const CosmicOracleChat: React.FC<CosmicOracleChatProps> = ({
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, newMsg]);
+    const updatedHistory = [...messages, newMsg];
+    setMessages(updatedHistory);
     setIsLoading(true);
 
     try {
@@ -69,7 +71,7 @@ export const CosmicOracleChat: React.FC<CosmicOracleChatProps> = ({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, newMsg].map((m) => ({
+          messages: updatedHistory.map((m) => ({
             role: m.role,
             content: m.content,
           })),
@@ -78,7 +80,9 @@ export const CosmicOracleChat: React.FC<CosmicOracleChatProps> = ({
       });
 
       const data = await res.json();
-      if (data.reply) {
+      const genericFallback = "The celestial currents are aligned with your heart. Trust your intuition and take one mindful step toward your highest joy today.";
+
+      if (data.reply && data.reply.trim() !== genericFallback) {
         setMessages((prev) => [
           ...prev,
           {
@@ -87,13 +91,36 @@ export const CosmicOracleChat: React.FC<CosmicOracleChatProps> = ({
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           },
         ]);
+      } else {
+        // Dynamic Astrological / Hermetic engine response tailored to seeker & topic
+        const dynamicAnswer = generateCelestialOracleResponse({
+          userProfile,
+          lastMessage: userText,
+          chatHistoryLength: updatedHistory.length,
+        });
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: 'assistant',
+            content: dynamicAnswer,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          },
+        ]);
       }
     } catch (err) {
+      // Dynamic fallback for offline mobile WebView or serverless environment
+      const dynamicAnswer = generateCelestialOracleResponse({
+        userProfile,
+        lastMessage: userText,
+        chatHistoryLength: updatedHistory.length,
+      });
+
       setMessages((prev) => [
         ...prev,
         {
           role: 'assistant',
-          content: 'The celestial veil is vibrating with high energy. Take three deep breaths, align your heart center, and ask again in a moment.',
+          content: dynamicAnswer,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);

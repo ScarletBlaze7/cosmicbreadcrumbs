@@ -356,38 +356,77 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-300">
-      {/* Top Banner & Sanctuary Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-purple-900/50 pb-5">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-400">
-            <BookMarked className="h-4 w-4" />
-            <span>Sacred Intuition Diary & Saved Readings</span>
-          </div>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-100 mt-1">
-            Daily Log/Journal
-          </h1>
-          <p className="text-xs text-purple-300/80 mt-1">
-            Log unlimited personal reflections, track daily intuitive accuracy, and cherish your saved readings & cosmic guidance.
-          </p>
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in duration-300 pb-16">
+      <div className="border-b border-purple-900/50 pb-5">
+        <div className="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-400">
+          <BookMarked className="h-4 w-4" />
+          <span>Sacred Intuition Diary & Saved Readings</span>
+        </div>
+        <h1 className="font-serif text-2xl sm:text-3xl font-bold text-slate-100 mt-1">
+          Daily Log/Journal
+        </h1>
+        <p className="text-xs text-purple-300/80 mt-1">
+          Log unlimited personal reflections, track daily intuitive accuracy, and cherish your saved readings & cosmic guidance.
+        </p>
+      </div>
+
+      {/* PERMANENT FEATURED JOURNAL ARTWORK BANNER - Directly under the subtitle */}
+      <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-black/50">
+        <img
+          src="/assets/journal.jpg"
+          onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/journal.jpg'; }}
+          alt="Daily Log and Mystic Journal"
+          className="w-full h-auto object-cover rounded-3xl select-none"
+        />
+      </div>
+
+      {/* Security & Action buttons - Positioned under the photo */}
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-purple-700/60 bg-slate-900/90 p-2 sm:p-2.5 shadow-xl">
+        {/* Main Sub-Navigation Tabs */}
+        <div className="flex rounded-xl border border-purple-700/60 bg-slate-900/90 p-1 shadow-md">
+          <button
+            id="tab-view-private-diary"
+            onClick={() => setActiveTab('diary')}
+            className={`flex items-center space-x-1.5 rounded-lg px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'diary'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
+                : 'text-purple-100 hover:text-white hover:bg-purple-950/60'
+            }`}
+          >
+            <BookMarked className="h-3.5 w-3.5 text-amber-300" />
+            <span>Private Diary ({entries.length})</span>
+          </button>
+
+          <button
+            id="tab-view-mystic-keepsakes"
+            onClick={() => setActiveTab('keepsakes')}
+            className={`flex items-center space-x-1.5 rounded-lg px-3.5 py-2 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'keepsakes'
+                ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
+                : 'text-purple-100 hover:text-white hover:bg-purple-950/60'
+            }`}
+          >
+            <Sparkles className="h-3.5 w-3.5 text-rose-300" />
+            <span>Saved Readings ({journalEntries.length})</span>
+          </button>
         </div>
 
-        {/* Security & Action buttons */}
-        <div className="flex items-center space-x-2 self-start sm:self-auto flex-wrap gap-y-2">
+        {/* Action buttons */}
+        <div className="flex items-center space-x-2 flex-wrap gap-2">
           {/* Dedicated Search Previous Thoughts Button */}
           <button
             onClick={() => setShowSearchModal(true)}
-            className="flex items-center space-x-1.5 rounded-xl border border-amber-400/50 bg-amber-500/10 px-3.5 py-1.5 text-xs font-bold text-amber-300 hover:bg-amber-500/20 hover:border-amber-400 transition-all shadow-sm"
+            className="flex items-center space-x-1.5 rounded-xl border border-amber-400/50 bg-amber-500/10 px-3.5 py-2 text-xs font-bold text-amber-300 hover:bg-amber-500/20 hover:border-amber-400 transition-all shadow-sm cursor-pointer"
             title="Search previous thoughts and journal chronicles"
           >
             <Search className="h-3.5 w-3.5 text-amber-400" />
-            <span>Search Previous Thoughts</span>
+            <span>Search Thoughts</span>
           </button>
 
           {/* Calendar Toggle Button */}
           <button
             onClick={() => setShowCalendar(!showCalendar)}
-            className={`flex items-center space-x-1.5 rounded-xl border px-3 py-1.5 text-xs font-semibold transition-all ${
+            className={`flex items-center space-x-1.5 rounded-xl border px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
               showCalendar
                 ? 'border-purple-600 bg-purple-950/90 text-purple-200 shadow-sm'
                 : 'border-purple-800/60 bg-slate-900/80 text-purple-300 hover:text-white'
@@ -395,16 +434,16 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
             title="Toggle Calendar Navigation View"
           >
             <Calendar className="h-3.5 w-3.5 text-purple-400" />
-            <span>{showCalendar ? 'Hide Calendar' : 'Show Calendar'}</span>
+            <span>{showCalendar ? 'Hide Calendar' : 'Calendar'}</span>
           </button>
 
           <button
             onClick={() => setShowPinModal(true)}
-            className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all"
+            className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3.5 py-2 text-xs font-semibold text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all cursor-pointer"
             title="Configure 4-Digit PIN Protection"
           >
             <KeyRound className="h-3.5 w-3.5 text-amber-400" />
-            <span>{storedPin ? 'PIN Security' : 'Set 4-Digit PIN'}</span>
+            <span>{storedPin ? 'PIN' : 'Set PIN'}</span>
           </button>
 
           {storedPin && (
@@ -412,63 +451,34 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
               onClick={() => {
                 setIsLocked(true);
               }}
-              className="flex items-center space-x-1.5 rounded-xl bg-purple-900/80 border border-purple-600/50 px-3 py-1.5 text-xs font-bold text-purple-100 hover:bg-purple-800 transition-all shadow-sm"
+              className="flex items-center space-x-1.5 rounded-xl bg-purple-900/80 border border-purple-600/50 px-3.5 py-2 text-xs font-bold text-purple-100 hover:bg-purple-800 transition-all shadow-sm cursor-pointer"
               title="Immediately lock sanctuary from view"
             >
               <Lock className="h-3.5 w-3.5 text-amber-300" />
-              <span>Lock Now</span>
+              <span>Lock</span>
             </button>
           )}
 
           {activeTab === 'diary' && entries.length > 0 && (
             <button
               onClick={handleExportDiary}
-              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all"
+              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3.5 py-2 text-xs font-semibold text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all cursor-pointer"
             >
               <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Export Diary (.md)</span>
+              <span className="hidden md:inline">Export Diary</span>
             </button>
           )}
 
           {activeTab === 'keepsakes' && journalEntries.length > 0 && (
             <button
               onClick={handleExportKeepsakes}
-              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3 py-1.5 text-xs font-semibold text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all"
+              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/60 bg-slate-900/80 px-3.5 py-2 text-xs font-semibold text-purple-200 hover:border-amber-400 hover:text-amber-300 transition-all cursor-pointer"
             >
               <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">Export Readings & Guidance (.md)</span>
+              <span className="hidden md:inline">Export Readings</span>
             </button>
           )}
         </div>
-      </div>
-
-      {/* Main Sub-Navigation Tabs */}
-      <div className="flex items-center space-x-2 rounded-2xl border border-purple-700/60 bg-slate-900/90 p-1.5 shadow-lg w-fit">
-        <button
-          id="tab-view-private-diary"
-          onClick={() => setActiveTab('diary')}
-          className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-            activeTab === 'diary'
-              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
-              : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-          }`}
-        >
-          <BookMarked className="h-4 w-4 text-amber-300" />
-          <span>Private Diary & Intuition Log ({entries.length})</span>
-        </button>
-
-        <button
-          id="tab-view-mystic-keepsakes"
-          onClick={() => setActiveTab('keepsakes')}
-          className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all ${
-            activeTab === 'keepsakes'
-              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md border border-amber-400/50'
-              : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-          }`}
-        >
-          <Sparkles className="h-4 w-4 text-rose-300" />
-          <span>Saved readings and Guidance ({journalEntries.length})</span>
-        </button>
       </div>
 
       {/* TAB 1: PRIVATE DIARY & INTUITION LOG */}

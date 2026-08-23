@@ -7,6 +7,7 @@ import {
   ShieldCheck, 
   X, 
   Heart, 
+  Play, 
   Compass, 
   Moon, 
   Hash, 
@@ -50,6 +51,7 @@ interface WelcomeLetterModalProps {
   onMembershipUpdated: (newStatus: MembershipStatus) => void;
   initialTab?: 'letter' | 'plans' | 'guide';
   requestedFeatureName?: string;
+  onPlayWelcomeVideo?: () => void;
 }
 
 export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
@@ -59,6 +61,7 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
   onMembershipUpdated,
   initialTab = 'letter',
   requestedFeatureName,
+  onPlayWelcomeVideo,
 }) => {
   const [activeTab, setActiveTab] = useState<'letter' | 'plans' | 'guide'>(initialTab);
   const [selectedPlanId, setSelectedPlanId] = useState<'weekly' | 'monthly' | 'lifetime'>('monthly');
@@ -103,12 +106,10 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
       const updated = activateThreeDayTrial();
       onMembershipUpdated(updated);
       setIsProcessing(false);
-
-      setCheckoutSuccessMessage('🌟 Welcome to the Sanctuary Club! Your 3-Day Free Trial ($0 Upfront) is now active. All dimensions of the sanctuary are unlocked for you.');
-      setTimeout(() => {
-        setCheckoutSuccessMessage(null);
-        onClose();
-      }, 1900);
+      onClose();
+      if (onPlayWelcomeVideo) {
+        onPlayWelcomeVideo();
+      }
     }, 400);
   };
 
@@ -139,19 +140,11 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
         const updated = activateSubscription(selectedPlanId);
         onMembershipUpdated(updated);
         setIsProcessing(false);
-
-        const planLabel = selectedPlanId === 'weekly' 
-          ? 'Sanctuary Club Weekly Pass ($3/week)' 
-          : selectedPlanId === 'monthly' 
-          ? 'Sanctuary Club Monthly Pass ($11/month)' 
-          : 'Sanctuary Club Lifetime VIP ($33 one-time)';
-
-        setCheckoutSuccessMessage(`🌟 A Grand Welcome to the Sanctuary Club! Your ${planLabel} is now active with full lifetime privileges.`);
-        setTimeout(() => {
-          setCheckoutSuccessMessage(null);
-          onClose();
-        }, 2400);
-      }, 600);
+        onClose();
+        if (onPlayWelcomeVideo) {
+          onPlayWelcomeVideo();
+        }
+      }, 500);
     } catch (err) {
       console.error('Payment checkout error:', err);
       // Fallback instant activation
@@ -159,6 +152,9 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
       onMembershipUpdated(updated);
       setIsProcessing(false);
       onClose();
+      if (onPlayWelcomeVideo) {
+        onPlayWelcomeVideo();
+      }
     }
   };
 
@@ -285,7 +281,7 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
               <div className="relative overflow-hidden rounded-3xl border border-amber-400/50 bg-gradient-to-r from-amber-500/20 via-purple-900/40 to-indigo-950/60 p-5 sm:p-6 shadow-xl shadow-amber-500/10">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-3 sm:space-y-0 sm:space-x-4">
                   <div className="relative shrink-0">
-                    <SanctuaryEmblem size="lg" isUnlocked={membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime'} tier={membership.tier} />
+                    <SanctuaryEmblem size="lg" isUnlocked={Boolean(membership.isActive)} tier={membership.tier} />
                   </div>
                   <div className="text-center sm:text-left space-y-1">
                     <div className="inline-flex items-center space-x-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 px-3 py-0.5 text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">
@@ -298,25 +294,41 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                     <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed max-w-xl">
                       We are thrilled and honored to welcome you into our sacred circle of intuitive seekers. Your presence enriches the collective vibration of our celestial sanctuary.
                     </p>
+
+                    {onPlayWelcomeVideo && (
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onClose();
+                            onPlayWelcomeVideo();
+                          }}
+                          className="inline-flex items-center space-x-2 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 px-4 py-2 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/20 hover:brightness-110 transition-all cursor-pointer"
+                        >
+                          <Play className="h-3.5 w-3.5 fill-slate-950 text-slate-950" />
+                          <span>Watch Sanctuary Welcome Video</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Official Sanctuary Emblem Showcase Box */}
               <div className="rounded-2xl border border-purple-900/80 bg-[#070814] p-4 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                <SanctuaryEmblem size="lg" isUnlocked={membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime'} tier={membership.tier} interactive={true} />
+                <SanctuaryEmblem size="lg" isUnlocked={Boolean(membership.isActive)} tier={membership.tier} interactive={true} />
                 <div className="text-center sm:text-left space-y-1">
                   <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                     <span className="font-mono text-xs font-bold text-white uppercase tracking-wider">
                       The Sanctuary Emblem
                     </span>
-                    {(membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime') ? (
+                    {membership.isActive ? (
                       <span className="rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[9px] font-mono font-bold px-2 py-0.5">
                         ACTIVE MEMBER SEAL
                       </span>
                     ) : (
                       <span className="rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-mono font-bold px-2 py-0.5">
-                        FOR PAID MEMBERS ONLY
+                        FOR MEMBERS & TRIAL ACCESS
                       </span>
                     )}
                   </div>
