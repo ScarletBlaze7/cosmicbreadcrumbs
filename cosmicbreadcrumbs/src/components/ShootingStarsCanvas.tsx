@@ -101,24 +101,20 @@ export const ShootingStarsCanvas: React.FC<{ intensity?: 'low' | 'medium' | 'hig
     const render = () => {
       ctx.clearRect(0, 0, width, height);
 
-      // Draw Twinkling Stars
+      // Draw Twinkling Stars (Clean, highly optimized for mobile GPU)
       for (let i = 0; i < stars.length; i++) {
         const star = stars[i];
         star.alpha += star.twinkleSpeed;
-        if (star.alpha > 0.9 || star.alpha < 0.15) {
+        if (star.alpha > 0.85 || star.alpha < 0.2) {
           star.twinkleSpeed = -star.twinkleSpeed;
         }
 
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fillStyle = star.color;
-        ctx.globalAlpha = Math.max(0.1, Math.min(1, star.alpha));
-        ctx.shadowBlur = star.radius > 1.2 ? 6 : 0;
-        ctx.shadowColor = star.color;
+        ctx.globalAlpha = Math.max(0.15, Math.min(0.9, star.alpha));
         ctx.fill();
       }
-
-      ctx.shadowBlur = 0;
 
       // Spawn periodic shooting stars
       const now = Date.now();
@@ -127,7 +123,7 @@ export const ShootingStarsCanvas: React.FC<{ intensity?: 'low' | 'medium' | 'hig
         lastSpawnTime = now;
       }
 
-      // Update & Draw Shooting Stars
+      // Update & Draw Shooting Stars (Optimized trail)
       for (let i = shootingStars.length - 1; i >= 0; i--) {
         const meteor = shootingStars[i];
 
@@ -141,10 +137,9 @@ export const ShootingStarsCanvas: React.FC<{ intensity?: 'low' | 'medium' | 'hig
 
         // Gradient for meteor trail
         const gradient = ctx.createLinearGradient(meteor.x, meteor.y, tailX, tailY);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-        gradient.addColorStop(0.1, 'rgba(192, 132, 252, 0.9)'); // Purple neon
-        gradient.addColorStop(0.4, 'rgba(56, 189, 248, 0.6)'); // Cyan
-        gradient.addColorStop(0.8, 'rgba(251, 191, 36, 0.3)'); // Amber
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+        gradient.addColorStop(0.2, 'rgba(192, 132, 252, 0.7)'); // Purple neon
+        gradient.addColorStop(0.6, 'rgba(56, 189, 248, 0.4)'); // Cyan
         gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
 
         ctx.beginPath();
@@ -154,21 +149,17 @@ export const ShootingStarsCanvas: React.FC<{ intensity?: 'low' | 'medium' | 'hig
         ctx.lineWidth = meteor.size;
         ctx.lineCap = 'round';
         ctx.globalAlpha = meteor.alpha;
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = '#c084fc';
         ctx.stroke();
 
         // Meteor Head Sparkle
         ctx.beginPath();
-        ctx.arc(meteor.x, meteor.y, meteor.size * 1.4, 0, Math.PI * 2);
+        ctx.arc(meteor.x, meteor.y, meteor.size * 1.3, 0, Math.PI * 2);
         ctx.fillStyle = '#ffffff';
-        ctx.shadowBlur = 16;
-        ctx.shadowColor = '#ffffff';
         ctx.fill();
 
         // Fade out as it travels
         if (meteor.x > width + 100 || meteor.y > height + 100) {
-          meteor.alpha -= 0.05;
+          meteor.alpha -= 0.08;
         }
 
         if (meteor.alpha <= 0) {
@@ -177,7 +168,6 @@ export const ShootingStarsCanvas: React.FC<{ intensity?: 'low' | 'medium' | 'hig
       }
 
       ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
       animationFrameId = requestAnimationFrame(render);
     };
 

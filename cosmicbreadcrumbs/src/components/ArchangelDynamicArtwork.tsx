@@ -35,16 +35,14 @@ export const ArchangelDynamicArtwork: React.FC<ArchangelDynamicArtworkProps> = (
   const normalizedKey = targetName.toLowerCase().replace(/[^a-z]/g, '').replace('archangel', '');
   const primarySrc = ARCHANGEL_ASSET_MAP[normalizedKey] || `/assets/angels/${normalizedKey}.png`;
 
+  const [triedFallback, setTriedFallback] = useState(false);
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.currentTarget;
-    if (target.src.includes('/assets/angels/')) {
-      target.src = `./assets/angels/${primarySrc.replace('/assets/angels/', '')}`;
-    } else if (target.src.includes('./assets/angels/')) {
-      target.src = `/assets/ArchAngel.${normalizedKey}.png.jpg`;
-    } else if (target.src.includes('ArchAngel.')) {
+    if (!triedFallback) {
+      setTriedFallback(true);
+      const target = e.currentTarget;
+      // Try alternate asset location or root assets
       target.src = `/assets/angel.${normalizedKey}.jpg`;
-    } else if (target.src.includes('angel.')) {
-      target.src = '/assets/tarotback.jpg';
     } else {
       setImageError(true);
     }

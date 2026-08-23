@@ -21,14 +21,13 @@ export const CosmicLogo: React.FC<Props> = ({ className = '', size = 'md' }) => 
 
   const currentSrc = customLogoUrl || '/assets/logo.png';
 
+  const [triedAlt, setTriedAlt] = useState(false);
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    const target = e.currentTarget;
-    if (target.src.includes('/assets/logo.png')) {
-      target.src = './assets/logo.png';
-    } else if (target.src.includes('./assets/logo.png')) {
+    if (!triedAlt) {
+      setTriedAlt(true);
+      const target = e.currentTarget;
       target.src = '/assets/logo.photo.png';
-    } else if (target.src.includes('/assets/logo.photo.png')) {
-      target.src = '/assets/sanctuary_emblem.png';
     } else {
       setImageFailed(true);
     }

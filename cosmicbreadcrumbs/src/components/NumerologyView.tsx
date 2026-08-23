@@ -253,12 +253,14 @@ export const NumerologyView: React.FC<NumerologyViewProps> = ({
       </div>
 
       {/* PERMANENT FEATURED NUMEROLOGY ARTWORK BANNER */}
-      <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-black/50">
+      <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-slate-950 aspect-[16/9] min-h-[180px]">
         <img
           src="/assets/numerologyart.jpg"
           onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/numerologyart.jpg'; }}
           alt="Sacred Numerology Matrix"
-          className="w-full h-auto object-cover rounded-3xl select-none"
+          className="w-full h-full object-cover rounded-3xl select-none"
+          loading="eager"
+          decoding="async"
         />
       </div>
 
