@@ -23,6 +23,7 @@ import { UserProfile } from '../types';
 interface FirstLaunchOnboardingModalProps {
   isOpen: boolean;
   onComplete: (profile: UserProfile) => void;
+  onOpenSignIn?: () => void;
 }
 
 const MONTHS = [
@@ -43,6 +44,7 @@ const MONTHS = [
 export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProps> = ({
   isOpen,
   onComplete,
+  onOpenSignIn,
 }) => {
   const [name, setName] = useState('Universal Seeker');
   const [selectedMonth, setSelectedMonth] = useState('07');
@@ -209,11 +211,26 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
               {/* Action Button */}
               <button
                 type="submit"
-                className="w-full flex items-center justify-center space-x-2 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 px-6 font-serif text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/25 hover:from-amber-300 hover:to-amber-500 transition-all active:scale-[0.99]"
+                className="w-full flex items-center justify-center space-x-2 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 py-3.5 px-6 font-serif text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/25 hover:from-amber-300 hover:to-amber-500 transition-all active:scale-[0.99] cursor-pointer"
               >
                 <Compass className="h-4 w-4" />
                 <span>Find My Zodiac Sign Now</span>
               </button>
+
+              {onOpenSignIn && (
+                <div className="text-center pt-2">
+                  <p className="text-xs text-purple-300/90">
+                    Already registered?{' '}
+                    <button
+                      type="button"
+                      onClick={onOpenSignIn}
+                      className="text-amber-300 font-bold hover:underline"
+                    >
+                      Sign In with Email & Password
+                    </button>
+                  </p>
+                </div>
+              )}
             </form>
           ) : (
             /* Reveal Step: Calculated Sign & Initiation Card */

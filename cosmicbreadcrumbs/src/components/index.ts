@@ -7,4 +7,5 @@ export * from './TarotCardVisual';
 export * from './CosmicTarotCardBack';
 export * from './ArchangelDynamicArtwork';
 export * from './PermissionsRequestModal';
+export * from './SignInModal';
 

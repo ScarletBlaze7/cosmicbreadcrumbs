@@ -223,12 +223,17 @@ export const DailyDashboard: React.FC<DailyDashboardProps> = ({
 
             <p className="text-xs text-purple-200/80">
               {sunSign.symbol} {sunSign.name} • Life Path #{lifePath}
-              {userProfile.birthPlace && ` • ${userProfile.birthPlace}`}
+              {userProfile.email && ` • ${userProfile.email}`}
+              {!userProfile.email && userProfile.birthPlace && ` • ${userProfile.birthPlace}`}
             </p>
 
             {membership.tier === 'trial' && membership.isActive ? (
               <span className="text-[11px] font-mono font-semibold text-amber-300 block leading-tight">
                 ⏳ Trial Countdown: {trialTime.days}d {trialTime.hours}h {trialTime.minutes}m remaining
+              </span>
+            ) : !userProfile.email ? (
+              <span className="text-[11px] text-amber-300/90 font-medium block leading-tight">
+                Tap to Sign In with Email & Password / Manage Account
               </span>
             ) : !membership.isActive ? (
               <span className="text-[11px] text-amber-300/90 font-medium block leading-tight">

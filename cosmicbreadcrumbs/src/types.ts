@@ -40,8 +40,25 @@ export interface AppPermissionsState {
   lastPromptedAt?: string;
 }
 
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  createdAt: string;
+  lastLoginAt: string;
+}
+
+export interface AuthState {
+  isAuthenticated: boolean;
+  user: AuthUser | null;
+  token?: string;
+}
+
 export interface UserProfile {
   name: string;
+  email?: string;
+  userId?: string;
+  isAuthenticated?: boolean;
   birthDate: string; // YYYY-MM-DD
   birthTime?: string; // HH:MM
   birthPlace?: string;

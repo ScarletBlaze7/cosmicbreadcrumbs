@@ -54,6 +54,67 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// In-memory / server cache for accounts
+const serverAccounts: Record<string, any> = {};
+
+// API: Authentication - Sign In
+app.post('/api/auth/signin', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ success: false, message: 'Email and password required' });
+  }
+
+  const normalized = email.trim().toLowerCase();
+  const account = serverAccounts[normalized];
+
+  if (!account) {
+    return res.json({ 
+      success: true, 
+      user: {
+        id: 'usr_' + Buffer.from(normalized).toString('base64').substring(0, 8),
+        email: normalized,
+        name: normalized.split('@')[0],
+        createdAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+      },
+      token: 'jwt_' + Math.random().toString(36).substring(2),
+    });
+  }
+
+  res.json({
+    success: true,
+    user: account.user,
+    profile: account.profile,
+    token: 'jwt_' + Math.random().toString(36).substring(2),
+  });
+});
+
+// API: Authentication - Sign Up
+app.post('/api/auth/signup', (req, res) => {
+  const { email, name, userId, profile } = req.body;
+  if (!email) {
+    return res.status(400).json({ success: false, message: 'Email required' });
+  }
+
+  const normalized = email.trim().toLowerCase();
+  serverAccounts[normalized] = {
+    user: {
+      id: userId || 'usr_' + Date.now().toString(36),
+      email: normalized,
+      name: name || normalized.split('@')[0],
+      createdAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+    },
+    profile,
+  };
+
+  res.json({
+    success: true,
+    user: serverAccounts[normalized].user,
+    token: 'jwt_' + Math.random().toString(36).substring(2),
+  });
+});
+
 // API: Payment Configuration & Status
 app.get('/api/payment/config', (req, res) => {
   res.json({

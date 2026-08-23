@@ -14,6 +14,7 @@ import { CosmicLogo } from './components/CosmicLogo';
 import { WelcomeLetterModal } from './components/WelcomeLetterModal';
 import { FirstLaunchOnboardingModal } from './components/FirstLaunchOnboardingModal';
 import { PermissionsRequestModal } from './components/PermissionsRequestModal';
+import { SignInModal } from './components/SignInModal';
 import { SanctuaryWelcomeVideoModal } from './components/SanctuaryWelcomeVideoModal';
 import { ShootingStarsCanvas } from './components/ShootingStarsCanvas';
 import { getSunSignFromDate } from './utils/astrologyCalc';
@@ -21,6 +22,7 @@ import { calculateLifePath, calculateDestinyNumber } from './utils/numerologyCal
 import { getStoredMembership, isFeatureUnlocked, activateSubscription } from './utils/membership';
 import { initFontSize } from './utils/fontSizePreference';
 import { initCelestialNotificationService, getStoredPermissionsState } from './utils/permissionManager';
+import { getStoredAuthState, signOutUser } from './utils/authManager';
 import { Sparkles, Moon, Compass, Hash, Feather, Heart, Lock, Gift, Crown } from 'lucide-react';
 
 const INITIAL_PROFILE: UserProfile = {
@@ -110,6 +112,40 @@ export default function App() {
   const [requestedLockedFeature, setRequestedLockedFeature] = useState<string | undefined>(undefined);
   const [welcomeModalTab, setWelcomeModalTab] = useState<'letter' | 'plans' | 'guide'>('letter');
   const [isWelcomeVideoOpen, setIsWelcomeVideoOpen] = useState<boolean>(false);
+
+  // Authentication & Sign In Modal State (Email & Password)
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState<boolean>(false);
+  const [signInModalTab, setSignInModalTab] = useState<'signin' | 'signup'>('signin');
+
+  const handleOpenSignIn = (tab: 'signin' | 'signup' = 'signin') => {
+    setSignInModalTab(tab);
+    setIsSignInModalOpen(true);
+  };
+
+  const handleAuthSuccess = (newProfile: UserProfile, authUser: any) => {
+    const updated: UserProfile = {
+      ...userProfile,
+      ...newProfile,
+      email: authUser.email,
+      userId: authUser.id,
+      isAuthenticated: true,
+      hasCompletedOnboarding: true,
+    };
+    handleSaveProfile(updated);
+    setIsSignInModalOpen(false);
+    setIsFirstLaunchModalOpen(false);
+  };
+
+  const handleSignOut = () => {
+    signOutUser();
+    const updated: UserProfile = {
+      ...userProfile,
+      email: undefined,
+      userId: undefined,
+      isAuthenticated: false,
+    };
+    handleSaveProfile(updated);
+  };
 
   // Check URL params for Stripe checkout redirect return & init background celestial services
   useEffect(() => {
@@ -417,6 +453,8 @@ export default function App() {
         onOpenMembership={() => handleOpenWelcomeModal(undefined, 'plans')}
         onMembershipUpdated={(newStatus) => setMembership(newStatus)}
         onPlayWelcomeVideo={() => setIsWelcomeVideoOpen(true)}
+        onOpenSignIn={() => handleOpenSignIn('signin')}
+        onSignOut={handleSignOut}
       />
 
       {/* Live AI Oracle Chat Modal */}
@@ -431,6 +469,7 @@ export default function App() {
       {/* First Download Onboarding Modal: Find Your Zodiac Sign */}
       <FirstLaunchOnboardingModal
         isOpen={isFirstLaunchModalOpen}
+        onOpenSignIn={() => handleOpenSignIn('signin')}
         onComplete={(newProfile) => {
           handleSaveProfile(newProfile);
           setIsFirstLaunchModalOpen(false);
@@ -491,6 +530,14 @@ export default function App() {
       <SanctuaryWelcomeVideoModal
         isOpen={isWelcomeVideoOpen}
         onClose={() => setIsWelcomeVideoOpen(false)}
+      />
+
+      {/* Sanctuary Sign In & Registration Modal (Email & Password) */}
+      <SignInModal
+        isOpen={isSignInModalOpen}
+        onClose={() => setIsSignInModalOpen(false)}
+        onSuccess={handleAuthSuccess}
+        initialTab={signInModalTab}
       />
     </div>
   );

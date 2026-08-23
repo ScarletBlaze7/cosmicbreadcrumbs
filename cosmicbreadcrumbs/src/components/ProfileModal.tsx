@@ -78,6 +78,8 @@ interface ProfileModalProps {
   onOpenMembership?: () => void;
   onMembershipUpdated?: (newStatus: MembershipStatus) => void;
   onPlayWelcomeVideo?: () => void;
+  onOpenSignIn?: () => void;
+  onSignOut?: () => void;
 }
 
 const MAX_BIRTHDATE_CHANGES = 2;
@@ -91,6 +93,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   onOpenMembership,
   onMembershipUpdated,
   onPlayWelcomeVideo,
+  onOpenSignIn,
+  onSignOut,
 }) => {
   const [formData, setFormData] = useState<UserProfile>({ ...userProfile });
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -399,7 +403,92 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           </div>
 
           {/* ========================================================================= */}
-          {/* 2. USER CREDENTIALS (GIVEN AFTER DOWNLOADING THE APP) */}
+          {/* 2. SANCTUARY ACCOUNT AUTHENTICATION (EMAIL & PASSWORD) */}
+          {/* ========================================================================= */}
+          <div className="rounded-2xl border border-purple-800/60 bg-gradient-to-r from-purple-950/50 via-slate-900 to-indigo-950/40 p-4 space-y-2.5 shadow-md">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Mail className="h-4 w-4 text-amber-400" />
+                <span className="font-serif text-xs font-bold text-slate-100 uppercase tracking-wider">
+                  Sanctuary Account Security
+                </span>
+              </div>
+
+              {userProfile.email ? (
+                <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono font-bold px-2 py-0.5 flex items-center space-x-1">
+                  <Check className="h-3 w-3" />
+                  <span>Authenticated</span>
+                </span>
+              ) : (
+                <span className="rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold px-2 py-0.5">
+                  Guest Seeker
+                </span>
+              )}
+            </div>
+
+            {userProfile.email ? (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+                <div className="space-y-0.5">
+                  <div className="text-xs font-bold text-amber-200">
+                    {userProfile.email}
+                  </div>
+                  <p className="text-[11px] text-purple-300/80">
+                    Your cosmic profile, readings, and encrypted diary are synced with this account.
+                  </p>
+                </div>
+
+                <div className="flex items-center space-x-2 shrink-0">
+                  {onOpenSignIn && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenSignIn();
+                      }}
+                      className="rounded-xl border border-purple-600/60 bg-purple-950/60 px-3 py-1.5 text-xs font-semibold text-purple-200 hover:bg-purple-900/60 hover:text-white transition-all"
+                    >
+                      Switch Account
+                    </button>
+                  )}
+
+                  {onSignOut && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onSignOut();
+                        onClose();
+                      }}
+                      className="rounded-xl border border-rose-500/40 bg-rose-950/30 px-3 py-1.5 text-xs font-semibold text-rose-300 hover:bg-rose-900/40 transition-all"
+                    >
+                      Sign Out
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                <p className="text-xs text-purple-200/90 leading-relaxed">
+                  Sign in or register with your email and password to secure your personal readings, custom settings, and lockable diary across devices.
+                </p>
+
+                {onOpenSignIn && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenSignIn();
+                    }}
+                    className="rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 border border-purple-500/50 px-4 py-2 text-xs font-bold text-white shadow-md hover:from-purple-500 hover:to-indigo-500 active:scale-95 transition-all shrink-0"
+                  >
+                    Sign In with Email & Password
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ========================================================================= */}
+          {/* 3. USER CREDENTIALS (GIVEN AFTER DOWNLOADING THE APP) */}
           {/* ========================================================================= */}
           <form onSubmit={handleSave} className="space-y-4">
             <div className="flex items-center space-x-2 border-b border-purple-800/50 pb-2">
