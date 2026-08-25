@@ -11,12 +11,14 @@ import {
   Moon, 
   User, 
   Clock, 
-  MapPin 
+  MapPin,
+  Radio
 } from 'lucide-react';
 import { CosmicLogo } from './CosmicLogo';
 import { ZodiacSymbolIcon } from './ZodiacSymbolIcon';
 import { getSunSignFromDate } from '../utils/astrologyCalc';
 import { calculateLifePath, calculateDestinyNumber } from '../utils/numerologyCalc';
+import { requestLocationPermission } from '../utils/permissionManager';
 import { triggerFireworks } from '../utils/fireworks';
 import { UserProfile } from '../types';
 
@@ -50,8 +52,9 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
   const [selectedMonth, setSelectedMonth] = useState('07');
   const [selectedDay, setSelectedDay] = useState('22');
   const [birthYear, setBirthYear] = useState('1996');
-  const [birthTime, setBirthTime] = useState('11:11');
+  const [birthTime, setBirthTime] = useState('');
   const [birthPlace, setBirthPlace] = useState('Sedona, Arizona');
+  const [isDetectingLoc, setIsDetectingLoc] = useState(false);
   const [isCalculated, setIsCalculated] = useState(false);
 
   if (!isOpen) return null;
@@ -62,6 +65,21 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
   const calculatedLifePath = calculateLifePath(birthDateStr);
   const calculatedDestiny = calculateDestinyNumber(name || 'Universal Seeker');
 
+  const handleDetectGPS = async () => {
+    setIsDetectingLoc(true);
+    try {
+      const loc = await requestLocationPermission();
+      if (loc.city || loc.region) {
+        const placeStr = [loc.city, loc.region, loc.country].filter(Boolean).join(', ');
+        setBirthPlace(placeStr);
+      }
+    } catch {
+      // Ignored
+    } finally {
+      setIsDetectingLoc(false);
+    }
+  };
+
   const handleDiscoverSign = (e: React.FormEvent) => {
     e.preventDefault();
     setIsCalculated(true);
@@ -71,7 +89,7 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
     const newProfile: UserProfile = {
       name: name.trim() || 'Universal Seeker',
       birthDate: birthDateStr,
-      birthTime: birthTime || '11:11',
+      birthTime: birthTime || '',
       birthPlace: birthPlace || '',
       sunSign: calculatedSign.name,
       lifePathNumber: calculatedLifePath,
@@ -105,7 +123,7 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
             Find Your Zodiac Sign
           </h2>
           <p className="text-xs sm:text-sm text-purple-200/90 max-w-md mx-auto leading-relaxed">
-            Enter your birthday below to instantly discover your exact Sun Sign, Chaldean root frequency, and cosmic blueprint.
+            Enter your birth details below to instantly discover your exact Sun Sign, Chaldean root frequency, and cosmic blueprint.
           </p>
         </div>
 
@@ -133,15 +151,15 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
               <div>
                 <label className="block text-xs font-semibold text-purple-200 mb-1 flex items-center space-x-1.5">
                   <Calendar className="h-3.5 w-3.5 text-amber-400" />
-                  <span>Your Birth Date (Month & Day)</span>
+                  <span>Your Birth Date (Month, Day & Year)</span>
                 </label>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-2.5">
                   {/* Month */}
-                  <div className="relative">
+                  <div className="relative col-span-1">
                     <select
                       value={selectedMonth}
                       onChange={(e) => setSelectedMonth(e.target.value)}
-                      className="w-full appearance-none rounded-2xl border border-purple-800/70 bg-slate-900 px-4 py-3 text-sm font-medium text-slate-100 focus:border-amber-400 focus:outline-none"
+                      className="w-full appearance-none rounded-2xl border border-purple-800/70 bg-slate-900 px-3 py-2.5 text-xs font-medium text-slate-100 focus:border-amber-400 focus:outline-none"
                     >
                       {MONTHS.map((m) => (
                         <option key={m.value} value={m.value} className="bg-slate-900 text-slate-100">
@@ -149,13 +167,13 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
                         </option>
                       ))}
                     </select>
-                    <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-purple-400 text-xs">
+                    <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-purple-400 text-xs">
                       ▼
                     </div>
                   </div>
 
                   {/* Day */}
-                  <div>
+                  <div className="col-span-1">
                     <input
                       type="number"
                       min="1"
@@ -164,38 +182,67 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
                       value={selectedDay}
                       onChange={(e) => setSelectedDay(e.target.value)}
                       placeholder="Day (1-31)"
-                      className="w-full rounded-2xl border border-purple-800/70 bg-slate-900 px-4 py-3 text-sm font-medium text-slate-100 placeholder-purple-400/40 focus:border-amber-400 focus:outline-none"
+                      className="w-full rounded-2xl border border-purple-800/70 bg-slate-900 px-3 py-2.5 text-xs font-medium text-slate-100 placeholder-purple-400/40 focus:border-amber-400 focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Year */}
+                  <div className="col-span-1">
+                    <input
+                      type="number"
+                      min="1920"
+                      max="2030"
+                      value={birthYear}
+                      onChange={(e) => setBirthYear(e.target.value)}
+                      placeholder="Year (e.g. 1996)"
+                      className="w-full rounded-2xl border border-purple-800/70 bg-slate-900 px-3 py-2.5 text-xs font-medium text-slate-100 placeholder-purple-400/40 focus:border-amber-400 focus:outline-none"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Optional Year & Time for Full Matrix Accuracy */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-purple-300 mb-1">
-                    Birth Year (Optional)
+              {/* Time of Birth & Birth City */}
+              <div className="space-y-3 pt-1 border-t border-purple-900/40">
+                {/* Time of Birth */}
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-purple-200 flex items-center space-x-1.5">
+                    <Clock className="h-3.5 w-3.5 text-amber-400" />
+                    <span>Time of Birth (Optional if known to give optimal readings)</span>
                   </label>
                   <input
-                    type="number"
-                    min="1920"
-                    max="2030"
-                    value={birthYear}
-                    onChange={(e) => setBirthYear(e.target.value)}
-                    placeholder="1996"
-                    className="w-full rounded-2xl border border-purple-900/70 bg-slate-900/80 px-3.5 py-2.5 text-xs text-slate-100 focus:border-amber-400 focus:outline-none"
+                    type="time"
+                    value={birthTime}
+                    onChange={(e) => setBirthTime(e.target.value)}
+                    className="w-full rounded-2xl border border-purple-800/70 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 focus:border-amber-400 focus:outline-none"
                   />
+                  <p className="text-[11px] text-purple-300/80 italic">
+                    * Optional if known to give optimal readings (calibrates Rising Sign & Houses).
+                  </p>
                 </div>
-                <div>
-                  <label className="block text-xs font-medium text-purple-300 mb-1">
-                    Birth City (Optional)
-                  </label>
+
+                {/* Place of Birth */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-semibold text-purple-200 flex items-center space-x-1.5">
+                      <MapPin className="h-3.5 w-3.5 text-amber-400" />
+                      <span>Place of Birth (City & State)</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={handleDetectGPS}
+                      disabled={isDetectingLoc}
+                      className="text-[10px] text-cyan-400 hover:text-cyan-300 font-mono flex items-center space-x-1 cursor-pointer"
+                    >
+                      <Radio className="h-3 w-3" />
+                      <span>{isDetectingLoc ? 'Detecting...' : 'Detect GPS'}</span>
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={birthPlace}
                     onChange={(e) => setBirthPlace(e.target.value)}
-                    placeholder="e.g. Sedona, AZ"
-                    className="w-full rounded-2xl border border-purple-900/70 bg-slate-900/80 px-3.5 py-2.5 text-xs text-slate-100 placeholder-purple-400/40 focus:border-amber-400 focus:outline-none"
+                    placeholder="e.g. Sedona, Arizona"
+                    className="w-full rounded-2xl border border-purple-800/70 bg-slate-900 px-4 py-2.5 text-sm text-slate-100 placeholder-purple-400/40 focus:border-amber-400 focus:outline-none"
                   />
                 </div>
               </div>
@@ -224,7 +271,7 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
                     <button
                       type="button"
                       onClick={onOpenSignIn}
-                      className="text-amber-300 font-bold hover:underline"
+                      className="text-amber-300 font-bold hover:underline cursor-pointer"
                     >
                       Sign In with Email & Password
                     </button>

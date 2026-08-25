@@ -658,8 +658,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-purple-200 mb-1.5 flex items-center space-x-1.5">
-                  <Clock className="h-3.5 w-3.5 text-purple-400" />
-                  <span>Time of Birth (Optional / If Known)</span>
+                  <Clock className="h-3.5 w-3.5 text-amber-400" />
+                  <span>Time of Birth (Optional if known to give optimal readings)</span>
                 </label>
                 <input
                   type="time"

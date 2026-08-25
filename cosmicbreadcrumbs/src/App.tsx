@@ -74,17 +74,20 @@ export default function App() {
     return INITIAL_PROFILE;
   });
 
-  // First Download / First Launch Onboarding: "Find your Zodiac Sign"
-  const [isFirstLaunchModalOpen, setIsFirstLaunchModalOpen] = useState<boolean>(() => {
+  // Authentication & Sign In / Sign Up Modal State (Opens FIRST before asking for birth details)
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState<boolean>(() => {
+    const authState = getStoredAuthState();
     const saved = localStorage.getItem('auranova_profile');
-    if (!saved) return true;
-    try {
-      const parsed = JSON.parse(saved);
-      return !parsed.hasCompletedOnboarding;
-    } catch {
+    if (!authState.isAuthenticated && (!saved || !JSON.parse(saved)?.hasCompletedOnboarding)) {
       return true;
     }
+    return false;
   });
+  const [signInModalTab, setSignInModalTab] = useState<'signin' | 'signup'>('signin');
+
+  // First Download / First Launch Onboarding: "Find your Zodiac Sign" (Name, Birthday, Time of Birth, Place of Birth)
+  // Opens when guest mode is chosen or when explicitly triggered
+  const [isFirstLaunchModalOpen, setIsFirstLaunchModalOpen] = useState<boolean>(false);
 
   // First Download / Permission Request Modal for Location Grounding & Notifications
   const [isPermissionsModalOpen, setIsPermissionsModalOpen] = useState<boolean>(() => {
@@ -113,13 +116,23 @@ export default function App() {
   const [welcomeModalTab, setWelcomeModalTab] = useState<'letter' | 'plans' | 'guide'>('letter');
   const [isWelcomeVideoOpen, setIsWelcomeVideoOpen] = useState<boolean>(false);
 
-  // Authentication & Sign In Modal State (Email & Password)
-  const [isSignInModalOpen, setIsSignInModalOpen] = useState<boolean>(false);
-  const [signInModalTab, setSignInModalTab] = useState<'signin' | 'signup'>('signin');
-
   const handleOpenSignIn = (tab: 'signin' | 'signup' = 'signin') => {
     setSignInModalTab(tab);
     setIsSignInModalOpen(true);
+  };
+
+  const handleCloseSignInModal = () => {
+    setIsSignInModalOpen(false);
+    const saved = localStorage.getItem('auranova_profile');
+    let hasCompleted = false;
+    if (saved) {
+      try {
+        hasCompleted = JSON.parse(saved)?.hasCompletedOnboarding;
+      } catch {}
+    }
+    if (!hasCompleted) {
+      setIsFirstLaunchModalOpen(true);
+    }
   };
 
   const handleAuthSuccess = (newProfile: UserProfile, authUser: any) => {
@@ -134,6 +147,15 @@ export default function App() {
     handleSaveProfile(updated);
     setIsSignInModalOpen(false);
     setIsFirstLaunchModalOpen(false);
+    setCurrentView('dashboard'); // Skip straight to Cosmic Hub
+
+    // Prompt permissions if needed
+    const permState = getStoredPermissionsState();
+    if (!permState.hasRequestedPermissions) {
+      setIsPermissionsModalOpen(true);
+    } else if (!membership.hasSeenWelcomeLetter) {
+      setIsWelcomeModalOpen(true);
+    }
   };
 
   const handleSignOut = () => {
@@ -469,7 +491,10 @@ export default function App() {
       {/* First Download Onboarding Modal: Find Your Zodiac Sign */}
       <FirstLaunchOnboardingModal
         isOpen={isFirstLaunchModalOpen}
-        onOpenSignIn={() => handleOpenSignIn('signin')}
+        onOpenSignIn={() => {
+          setIsFirstLaunchModalOpen(false);
+          handleOpenSignIn('signin');
+        }}
         onComplete={(newProfile) => {
           handleSaveProfile(newProfile);
           setIsFirstLaunchModalOpen(false);
@@ -535,7 +560,7 @@ export default function App() {
       {/* Sanctuary Sign In & Registration Modal (Email & Password) */}
       <SignInModal
         isOpen={isSignInModalOpen}
-        onClose={() => setIsSignInModalOpen(false)}
+        onClose={handleCloseSignInModal}
         onSuccess={handleAuthSuccess}
         initialTab={signInModalTab}
       />

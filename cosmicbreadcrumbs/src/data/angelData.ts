@@ -448,6 +448,48 @@ export const ARCHANGEL_ROSTER: ArchangelInfo[] = [
     howToInvoke: 'Call Haniel during full and new moons to honor emotional cycles and feminine intuition.',
     prayer: 'Archangel Haniel, wrap me in your silver moonbeam ray. Grant me grace, poise, and intuitive serenity.',
   },
+  {
+    name: 'Archangel Jeremiel',
+    domain: 'Life Review, Compassionate Realignment & Spiritual Vision',
+    colorRay: 'Deep Royal Purple & Golden Topaz',
+    howToInvoke: 'Call upon Jeremiel to evaluate your past with mercy, heal old regrets, and chart your highest future timeline.',
+    prayer: 'Archangel Jeremiel, open my vision to compassionate truth. Guide my soul with gentle wisdom and sacred realignment.',
+  },
+  {
+    name: 'Archangel Raguel',
+    domain: 'Harmonizer of Relationships, Justice & Divine Order',
+    colorRay: 'Pale Cyan & Aquamarine Blue',
+    howToInvoke: 'Call upon Raguel to resolve misunderstandings, restore fairness in disputes, and heal friendships and partnerships.',
+    prayer: 'Archangel Raguel, bring peace and divine harmony to all my connections. Dissolve all discord in holy justice and love.',
+  },
+  {
+    name: 'Archangel Azrael',
+    domain: 'Angel of Comfort, Grief Healing & Peaceful Transitions',
+    colorRay: 'Creamy Pearl & Soft Vanilla Light',
+    howToInvoke: 'Invoke Azrael whenever grieving a loss, undergoing deep life transitions, or comforting loved ones in need of peace.',
+    prayer: 'Archangel Azrael, wrap my heart in your gentle wings of peace. Heal my sorrow and infuse my spirit with radiant celestial comfort.',
+  },
+  {
+    name: 'Archangel Orion',
+    domain: 'Cosmic Stargates, Multidimensional Wisdom & Energy Shielding',
+    colorRay: 'Midnight Navy & Starlight Diamond',
+    howToInvoke: 'Invoke Orion during deep meditation, cosmic energy work, astral protection, and connection with stellar wisdom.',
+    prayer: 'Archangel Orion, anchor my soul in cosmic starlight. Shield my aura and illuminate the grand tapestry of my divine destiny.',
+  },
+  {
+    name: 'Archangel Nathaniel',
+    domain: 'Passionate Spiritual Fire, Rapid Acceleration & Breakthroughs',
+    colorRay: 'Blazing Crimson, Garnet & Sun Gold',
+    howToInvoke: 'Call upon Nathaniel when you need unstoppable motivation, rapid life purpose momentum, and bold courage.',
+    prayer: 'Archangel Nathaniel, ignite the divine fire within my heart. Propel me forward into my highest purpose with celestial speed and power.',
+  },
+  {
+    name: 'Archangel Muriel',
+    domain: 'Peaceful Sanctuary, Kindness, Emotional Harmony & Plants',
+    colorRay: 'Pale Lavender & Soft Apricot',
+    howToInvoke: 'Call Muriel to soften harsh energy, invite everyday gentleness, and bless home sanctuary gardens and spaces.',
+    prayer: 'Archangel Muriel, fill my space with sweet peace and tender compassion. Help me walk in gentle grace and kindness every day.',
+  },
 ];
 
 export function getDailyArchangelCard(dateString?: string): ArchangelCard {
