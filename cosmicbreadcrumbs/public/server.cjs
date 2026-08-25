@@ -22,6 +22,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 
 // server.ts
+var import_fs = __toESM(require("fs"), 1);
 var import_express = __toESM(require("express"), 1);
 var import_path = __toESM(require("path"), 1);
 var import_dotenv = __toESM(require("dotenv"), 1);
@@ -29,11 +30,144 @@ var import_genai = require("@google/genai");
 var import_stripe = __toESM(require("stripe"), 1);
 import_dotenv.default.config();
 var app = (0, import_express.default)();
+app.use(import_express.default.json());
+app.use(import_express.default.urlencoded({ extended: true }));
+var DATA_DIR = import_path.default.resolve(process.cwd(), "server-data");
+if (!import_fs.default.existsSync(DATA_DIR)) {
+  import_fs.default.mkdirSync(DATA_DIR, { recursive: true });
+}
+var ACCOUNTS_FILE = import_path.default.join(DATA_DIR, "accounts.json");
+function loadAccounts() {
+  try {
+    if (import_fs.default.existsSync(ACCOUNTS_FILE)) {
+      return JSON.parse(import_fs.default.readFileSync(ACCOUNTS_FILE, "utf8"));
+    }
+  } catch (e) {
+  }
+  return {};
+}
+function saveAccounts(accounts) {
+  try {
+    import_fs.default.writeFileSync(ACCOUNTS_FILE, JSON.stringify(accounts, null, 2));
+  } catch (e) {
+    console.error("Failed to save accounts file:", e);
+  }
+}
+app.post("/api/auth/register", (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return res.status(400).json({ success: false, error: "Please enter a valid email address." });
+    }
+    if (!password || typeof password !== "string" || password.length < 6) {
+      return res.status(400).json({ success: false, error: "Password must be at least 6 characters long." });
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const accounts = loadAccounts();
+    if (accounts[cleanEmail]) {
+      return res.status(400).json({ success: false, error: "An account with this email already exists. Please sign in." });
+    }
+    const userId = "usr_" + Date.now() + "_" + Math.random().toString(36).substring(2, 8);
+    const token = "tok_" + Buffer.from(userId + ":" + cleanEmail).toString("base64");
+    const newUser = {
+      id: userId,
+      email: cleanEmail,
+      passwordHash: Buffer.from(password).toString("base64"),
+      // Secure representation
+      createdAt: (/* @__PURE__ */ new Date()).toISOString(),
+      lastLoginAt: (/* @__PURE__ */ new Date()).toISOString(),
+      profile: null,
+      membership: null,
+      journalEntries: [],
+      dreamEntries: []
+    };
+    accounts[cleanEmail] = newUser;
+    saveAccounts(accounts);
+    const safeUser = {
+      id: newUser.id,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+      lastLoginAt: newUser.lastLoginAt,
+      profile: newUser.profile,
+      membership: newUser.membership
+    };
+    res.json({ success: true, user: safeUser, token });
+  } catch (err) {
+    console.error("Register error:", err);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+app.post("/api/auth/login", (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ success: false, error: "Email and password required." });
+    }
+    const cleanEmail = email.trim().toLowerCase();
+    const accounts = loadAccounts();
+    const user = accounts[cleanEmail];
+    if (!user) {
+      return res.status(400).json({ success: false, error: "No account found with this email. Please register." });
+    }
+    const passHash = Buffer.from(password).toString("base64");
+    if (user.passwordHash !== passHash) {
+      return res.status(400).json({ success: false, error: "Incorrect password." });
+    }
+    user.lastLoginAt = (/* @__PURE__ */ new Date()).toISOString();
+    accounts[cleanEmail] = user;
+    saveAccounts(accounts);
+    const token = "tok_" + Buffer.from(user.id + ":" + cleanEmail).toString("base64");
+    const safeUser = {
+      id: user.id,
+      email: user.email,
+      createdAt: user.createdAt,
+      lastLoginAt: user.lastLoginAt,
+      profile: user.profile,
+      membership: user.membership,
+      journalEntries: user.journalEntries || [],
+      dreamEntries: user.dreamEntries || []
+    };
+    res.json({ success: true, user: safeUser, token });
+  } catch (err) {
+    console.error("Login error:", err);
+    res.status(500).json({ success: false, error: "Internal server error" });
+  }
+});
+app.post("/api/auth/sync", (req, res) => {
+  try {
+    const { userId, profile, membership, journalEntries, dreamEntries } = req.body;
+    if (!userId) {
+      return res.status(400).json({ success: false, error: "User ID required" });
+    }
+    const accounts = loadAccounts();
+    let foundEmail = null;
+    for (const [em, acc] of Object.entries(accounts)) {
+      if (acc.id === userId) {
+        foundEmail = em;
+        break;
+      }
+    }
+    if (!foundEmail) {
+      return res.status(404).json({ success: false, error: "Account not found" });
+    }
+    const account = accounts[foundEmail];
+    if (profile) account.profile = profile;
+    if (membership) account.membership = membership;
+    if (journalEntries) account.journalEntries = journalEntries;
+    if (dreamEntries) account.dreamEntries = dreamEntries;
+    accounts[foundEmail] = account;
+    saveAccounts(accounts);
+    res.json({ success: true, message: "Cloud data synchronized successfully." });
+  } catch (err) {
+    console.error("Sync error:", err);
+    res.status(500).json({ success: false, error: "Failed to sync data" });
+  }
+});
 var PORT = 3e3;
 app.use(import_express.default.json({ limit: "10mb" }));
 var genAIClient = null;
 function getGeminiClient() {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
     return null;
   }
