@@ -1,0 +1,33 @@
+{
+  "traveler_1787538454275@cosmic.com": {
+    "id": "usr_1787538454793_tsw3rn",
+    "email": "traveler_1787538454275@cosmic.com",
+    "passwordHash": "Y29zbWljcGFzczEyMw==",
+    "createdAt": "2026-08-24T02:27:34.793Z",
+    "lastLoginAt": "2026-08-24T02:27:34.854Z",
+    "profile": {
+      "name": "Cosmic Traveler",
+      "sunSign": "Virgo",
+      "lifePathNumber": 7
+    },
+    "membership": null,
+    "journalEntries": [
+      {
+        "title": "First Alignment",
+        "date": "2026-08-24T02:27:34.896Z"
+      }
+    ],
+    "dreamEntries": []
+  },
+  "tiffanycarver6782@gmail.com": {
+    "id": "usr_1787548526515_lgwzeq",
+    "email": "tiffanycarver6782@gmail.com",
+    "passwordHash": "MjUyNEphZGU=",
+    "createdAt": "2026-08-24T05:15:26.515Z",
+    "lastLoginAt": "2026-08-26T06:39:50.374Z",
+    "profile": null,
+    "membership": null,
+    "journalEntries": [],
+    "dreamEntries": []
+  }
+}

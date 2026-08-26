@@ -1,0 +1,7 @@
+*.apk
+*.aab
+*.idsig
+scratch/
+dist/
+node_modules/
+.env
