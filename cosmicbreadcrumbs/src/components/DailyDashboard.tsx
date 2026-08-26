@@ -38,7 +38,6 @@ import { CosmicTitleVideo } from './CosmicTitleVideo';
 import { NasaAstrologyRadar } from './NasaAstrologyRadar';
 import { ZodiacSymbolIcon } from './ZodiacSymbolIcon';
 import { TarotCardVisual } from './TarotCardVisual';
-import { SanctuaryEmblem } from './SanctuaryEmblem';
 import { getTrialTimeRemaining, isFeatureUnlocked } from '../utils/membership';
 import { getStoredDailyTarot, saveDailyPrimaryCard, getTimeUntilMidnight } from '../utils/dailyTarotStorage';
 
@@ -59,12 +58,12 @@ export const DailyDashboard: React.FC<DailyDashboardProps> = ({
   onOpenWelcomeModal,
   onOpenProfile,
 }) => {
-  const sunSign = getSunSignFromDate(userProfile.birthDate);
+  const sunSign = getSunSignFromDate(userProfile?.birthDate || '1996-07-22');
   const moonInfo = getMoonPhaseInfo();
   const transits = getDailyPlanetaryTransits();
-  const lifePath = calculateLifePath(userProfile.birthDate);
-  const personalYear = calculatePersonalYear(userProfile.birthDate);
-  const trialTime = getTrialTimeRemaining(membership.trialExpiryDate);
+  const lifePath = calculateLifePath(userProfile?.birthDate || '1996-07-22');
+  const personalYear = calculatePersonalYear(userProfile?.birthDate || '1996-07-22');
+  const trialTime = getTrialTimeRemaining(membership?.trialExpiryDate);
 
   // Daily Quick Tarot Pull State (1 card per day with midnight reset)
   const [dailyRecord, setDailyRecord] = useState(() => getStoredDailyTarot());
@@ -156,99 +155,44 @@ export const DailyDashboard: React.FC<DailyDashboardProps> = ({
   return (
     <div className="mx-auto max-w-xl sm:max-w-2xl px-3 py-4 sm:py-6 space-y-5 animate-in fade-in duration-300 pb-20">
 
-      {/* CENTERPIECE MAIN TITLE: EXACT ANIMATED COSMIC BREADCRUMBS VIDEO TITLE */}
-      <div className="space-y-4 pt-1">
+      {/* CENTERPIECE HERO VIDEO */}
+      <div className="pt-1">
         <CosmicTitleVideo variant="hero" />
+      </div>
 
-        {/* PERMANENT FEATURED PHOTO UNDER VIDEO */}
-        <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-500/40 shadow-2xl bg-slate-950 aspect-[16/9] min-h-[180px]">
-          <img
-            src="/assets/Screenshot_20260821-045128_Chrome.png"
-            onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/Screenshot_20260821-045128_Chrome.png'; }}
-            alt="Cosmic Breadcrumbs Featured Artwork"
-            className="w-full h-full object-cover rounded-3xl select-none"
-            loading="eager"
-            decoding="async"
-          />
+      {/* WELCOME CARD EXACT TO NEWLAYOUT.JPG */}
+      <div 
+        onClick={onOpenProfile}
+        className="relative overflow-hidden rounded-3xl border border-purple-800/80 bg-gradient-to-r from-[#200e3f] via-[#1a0c36] to-[#120727] p-4 sm:p-5 shadow-2xl text-left hover:border-purple-500/80 transition-all cursor-pointer group active:scale-[0.99]"
+      >
+        <div className="flex items-center space-x-4">
+          {/* Left: Glowing Blue Zodiac Sign Badge */}
+          <div className="relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full border-2 border-blue-400/90 bg-[#060a22] shadow-[0_0_16px_rgba(59,130,246,0.7)] shrink-0 group-hover:scale-105 transition-transform duration-300">
+            <div className="flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full border border-blue-400/60 bg-blue-950/70">
+              <ZodiacSymbolIcon sign={sunSign.name} className="h-6 w-6 sm:h-7 sm:w-7 text-white drop-shadow-[0_0_8px_rgba(147,197,253,0.95)]" />
+            </div>
+          </div>
+
+          {/* Right: Welcome Title & Details */}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-sans font-bold text-base sm:text-lg text-white tracking-wide truncate">
+              Welcome, {userProfile?.name || 'Universal Seeker'}
+            </h3>
+            <p className="text-xs sm:text-sm text-purple-200/90 font-sans mt-0.5 leading-snug">
+              {sunSign.name} • Life Path #{lifePath} • Universal Alignment Active
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* SEEKER ACCOUNT & SANCTUARY MEMBERSHIP BADGE CARD */}
-      <div 
-        onClick={onOpenProfile}
-        id="card-dashboard-account-badge"
-        className={`group cursor-pointer rounded-3xl border-2 p-4 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-2xl ${
-          membership.isActive || membership.tier !== 'free'
-            ? 'border-amber-400/80 bg-gradient-to-r from-amber-950/40 via-purple-950/60 to-slate-950 shadow-amber-500/10'
-            : 'border-purple-700/80 bg-gradient-to-r from-purple-950/40 via-slate-900 to-slate-950'
-        }`}
-      >
-        <div className="flex items-center space-x-3 sm:space-x-4">
-          {/* Badge Image: sanctemb.jpg for Member / seeker.png for Free */}
-          <div className={`relative flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-2xl overflow-hidden border-2 shrink-0 shadow-lg ${
-            membership.isActive || membership.tier !== 'free'
-              ? 'border-amber-400 drop-shadow-[0_0_12px_rgba(212,175,55,0.5)] bg-slate-950'
-              : 'border-purple-600/80 shadow-purple-950/50 bg-slate-950'
-          }`}>
-            <img
-              src={membership.isActive || membership.tier !== 'free' ? '/assets/sanctemb.jpg' : '/assets/seeker.png'}
-              onError={(e) => {
-                const target = e.currentTarget as HTMLImageElement;
-                if (membership.isActive || membership.tier !== 'free') {
-                  target.src = target.src.includes('sanctuaryemb') ? './assets/sanctemb.jpg' : './assets/sanctuaryemb.jpg';
-                } else {
-                  target.src = target.src.includes('seeker.png') ? './assets/seeker.png' : './assets/freeseeker.jpg';
-                }
-              }}
-              alt={membership.isActive || membership.tier !== 'free' ? 'Sanctuary Member Emblem (sanctemb.jpg)' : 'Free Seeker Badge (seeker.png)'}
-              className="h-full w-full object-cover select-none"
-            />
-          </div>
-
-          <div className="text-left space-y-0.5">
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-              <span className="font-serif text-sm sm:text-base font-bold text-slate-100 group-hover:text-amber-200 transition-colors">
-                {userProfile.name}'s Account
-              </span>
-              <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
-                membership.isActive || membership.tier !== 'free'
-                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
-                  : 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-              }`}>
-                {membership.tier === 'trial' && membership.isActive
-                  ? 'Sanctuary Trial'
-                  : membership.isActive
-                  ? (membership.planName || 'Sanctuary Member')
-                  : 'Free Seeker'}
-              </span>
-            </div>
-
-            <p className="text-xs text-purple-200/80">
-              {sunSign.symbol} {sunSign.name} • Life Path #{lifePath}
-              {userProfile.email && ` • ${userProfile.email}`}
-              {!userProfile.email && userProfile.birthPlace && ` • ${userProfile.birthPlace}`}
-            </p>
-
-            {membership.tier === 'trial' && membership.isActive ? (
-              <span className="text-[11px] font-mono font-semibold text-amber-300 block leading-tight">
-                ⏳ Trial Countdown: {trialTime.days}d {trialTime.hours}h {trialTime.minutes}m remaining
-              </span>
-            ) : !userProfile.email ? (
-              <span className="text-[11px] text-amber-300/90 font-medium block leading-tight">
-                Tap to Sign In with Email & Password / Manage Account
-              </span>
-            ) : !membership.isActive ? (
-              <span className="text-[11px] text-amber-300/90 font-medium block leading-tight">
-                Tap to view Credentials & Unlock Sanctuary Club ($0 Free Trial)
-              </span>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="hidden sm:flex items-center space-x-1.5 rounded-2xl border border-amber-400/50 bg-amber-400/10 px-3.5 py-2 text-xs font-semibold text-amber-200 shrink-0 group-hover:bg-amber-400/20 transition-all">
-          <span>Open Account Area</span>
-          <span className="text-amber-400">→</span>
-        </div>
+      {/* COSMIC HUB PLANET CENTERPIECE CARD */}
+      <div className="relative w-full max-w-xl mx-auto rounded-3xl overflow-hidden border border-purple-900/60 shadow-2xl bg-[#060511] aspect-square flex items-center justify-center">
+        <img
+          src="/cosmic-hub-centerpiece.png"
+          alt="Cosmic Hub Celestial Portal"
+          className="w-full h-full object-cover rounded-3xl select-none"
+          loading="eager"
+        />
       </div>
 
       {/* CARD 1: TODAY'S FORECAST */}
@@ -397,99 +341,7 @@ export const DailyDashboard: React.FC<DailyDashboardProps> = ({
         )}
       </div>
 
-      {/* CARD 3: FREE 3-DAY TRIAL & SANCTUARY CLUB MEMBERSHIP BANNER */}
-      <div className="rounded-3xl border border-purple-950/80 bg-[#0b0c16] p-6 sm:p-7 shadow-2xl space-y-4">
-        <div className="flex items-start space-x-3.5">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#14162a] border border-purple-800/70 text-purple-200">
-            <Crown className="h-6 w-6" />
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex items-center space-x-2.5">
-              <span className="font-sans text-sm sm:text-base font-bold text-white uppercase tracking-wide">
-                The Sanctuary Club Access & Membership
-              </span>
-              <span className="rounded-full bg-purple-900/80 border border-purple-500/80 px-2.5 py-0.5 text-xs font-bold text-white uppercase">
-                Free 3 Days
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-              You <strong className="text-amber-200 font-bold">must have the free trial activated or a Sanctuary Club membership</strong> to access all features. The free app gives access to your <strong className="text-white">daily horoscope</strong>, <strong className="text-white">daily tarot card pull</strong>, and <strong className="text-white">Life Path number calculation</strong>.
-            </p>
-          </div>
-        </div>
-
-        {/* Free Seeker Missing Features Teaser Banner */}
-        {!membership.isActive && (
-          <div className="rounded-2xl border border-purple-950/80 bg-[#0e1020] p-4 space-y-2.5">
-            <div className="flex items-center justify-between text-xs sm:text-sm text-purple-200 font-bold">
-              <span className="flex items-center space-x-2">
-                <AlertCircle className="h-4 w-4 text-purple-300" />
-                <span>What You're Missing on the Free Tier:</span>
-              </span>
-              <span className="text-xs text-amber-300 font-semibold">$0 to Unlock All for 3 Days</span>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs sm:text-sm text-slate-200">
-              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
-                <span className="text-purple-300 font-bold">🔒</span>
-                <span className="truncate">Chaldean Destiny Matrix</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
-                <span className="text-purple-300 font-bold">🔒</span>
-                <span className="truncate">Loved Ones Synastry</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
-                <span className="text-purple-300 font-bold">🔒</span>
-                <span className="truncate">Archangel Oracle & Temple</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
-                <span className="text-purple-300 font-bold">🔒</span>
-                <span className="truncate">Dream Sanctuary Decoder</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
-                <span className="text-purple-300 font-bold">🔒</span>
-                <span className="truncate">PIN-Locked Private Diary</span>
-              </div>
-              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
-                <span className="text-purple-300 font-bold">🔒</span>
-                <span className="truncate">AI Cosmic Oracle Guidance</span>
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-purple-950/60">
-          <div className="text-xs sm:text-sm text-slate-200 font-medium">
-            $3/week • $11/month • Or Only $33 for Lifetime Sanctuary Club
-          </div>
-
-          <div className="flex items-center space-x-2.5 w-full sm:w-auto">
-            {!membership.isActive ? (
-              <button
-                type="button"
-                onClick={() => onOpenWelcomeModal(undefined, 'letter')}
-                className="flex-1 sm:flex-initial rounded-2xl bg-purple-900 border border-purple-500/80 px-5 py-2.5 text-xs sm:text-sm font-sans font-bold tracking-wide uppercase text-white shadow-md hover:bg-purple-800 transition-all"
-              >
-                Join Club (Free 3-Day Trial)
-              </button>
-            ) : (
-              <span className="text-xs sm:text-sm font-bold text-emerald-300 flex items-center space-x-1.5">
-                <Check className="h-4 w-4" />
-                <span>Sanctuary Club Unlocked</span>
-              </span>
-            )}
-
-            <button
-              type="button"
-              onClick={() => onOpenWelcomeModal(undefined, 'plans')}
-              className="rounded-2xl border border-purple-800/90 bg-[#120f26] px-4 py-2.5 text-xs sm:text-sm font-sans font-bold tracking-wide uppercase text-white hover:border-purple-400 hover:bg-purple-950 transition-all"
-            >
-              Club Plans
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* CARD 4: DAILY BREADCRUMBS (1-Card Tarot Pull & Quick Modules) */}
+      {/* CARD 3: DAILY BREADCRUMBS (1-Card Tarot Pull & Quick Modules) */}
       <div className="rounded-3xl border border-purple-950/80 bg-[#0b0c16] p-6 sm:p-7 shadow-2xl backdrop-blur-md space-y-4">
         <div className="flex items-center justify-between border-b border-purple-950/60 pb-3">
           <div className="text-xs sm:text-sm font-sans font-bold tracking-wider text-purple-200 uppercase">
@@ -603,72 +455,94 @@ export const DailyDashboard: React.FC<DailyDashboardProps> = ({
         </div>
       </div>
 
-      {/* CARD 5: THE SANCTUARY EMBLEM & CLUB STATUS */}
-      <div className="rounded-3xl border border-purple-950/80 bg-[#0b0c16] p-6 sm:p-7 shadow-2xl backdrop-blur-md space-y-4">
-        <div className="flex items-center justify-between border-b border-purple-950/60 pb-3">
-          <div className="text-xs sm:text-sm font-sans font-bold tracking-wider text-purple-200 uppercase flex items-center space-x-2">
-            <Crown className="h-4 w-4 text-amber-400" />
-            <span>THE SANCTUARY EMBLEM</span>
+      {/* CARD 4: FREE 3-DAY TRIAL & SANCTUARY CLUB MEMBERSHIP BANNER */}
+      <div className="rounded-3xl border border-purple-950/80 bg-[#0b0c16] p-6 sm:p-7 shadow-2xl space-y-4">
+        <div className="flex items-start space-x-3.5">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#14162a] border border-purple-800/70 text-purple-200">
+            <Crown className="h-6 w-6" />
           </div>
-
-          {(membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime') ? (
-            <span className="text-xs font-sans font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-500/60 rounded-full px-3 py-1">
-              MEMBER SEAL ACTIVE
-            </span>
-          ) : (
-            <span className="text-xs font-sans font-bold text-slate-300 bg-slate-900 border border-slate-700 rounded-full px-3 py-1">
-              PAID CLUB EXCLUSIVE
-            </span>
-          )}
+          <div className="space-y-1.5">
+            <div className="flex items-center space-x-2.5">
+              <span className="font-sans text-sm sm:text-base font-bold text-white uppercase tracking-wide">
+                The Sanctuary Club Access & Membership
+              </span>
+              <span className="rounded-full bg-purple-900/80 border border-purple-500/80 px-2.5 py-0.5 text-xs font-bold text-white uppercase">
+                Free 3 Days
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
+              You <strong className="text-amber-200 font-bold">must have the free trial activated or a Sanctuary Club membership</strong> to access all features. The free app gives access to your <strong className="text-white">daily horoscope</strong>, <strong className="text-white">daily tarot card pull</strong>, and <strong className="text-white">Life Path number calculation</strong>.
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-5 py-1">
-          <div className="shrink-0">
-            <SanctuaryEmblem
-              size="lg"
-              tier={membership.tier}
-              isUnlocked={membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime'}
-              interactive={true}
-              onUpgradeClick={() => onOpenWelcomeModal(undefined, 'plans')}
-            />
+        {/* Free Seeker Missing Features Teaser Banner */}
+        {!membership.isActive && (
+          <div className="rounded-2xl border border-purple-950/80 bg-[#0e1020] p-4 space-y-2.5">
+            <div className="flex items-center justify-between text-xs sm:text-sm text-purple-200 font-bold">
+              <span className="flex items-center space-x-2">
+                <AlertCircle className="h-4 w-4 text-purple-300" />
+                <span>What You're Missing on the Free Tier:</span>
+              </span>
+              <span className="text-xs text-amber-300 font-semibold">$0 to Unlock All for 3 Days</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs sm:text-sm text-slate-200">
+              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
+                <span className="text-purple-300 font-bold">🔒</span>
+                <span className="truncate">Chaldean Destiny Matrix</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
+                <span className="text-purple-300 font-bold">🔒</span>
+                <span className="truncate">Loved Ones Synastry</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
+                <span className="text-purple-300 font-bold">🔒</span>
+                <span className="truncate">Archangel Oracle & Temple</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
+                <span className="text-purple-300 font-bold">🔒</span>
+                <span className="truncate">Dream Sanctuary Decoder</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
+                <span className="text-purple-300 font-bold">🔒</span>
+                <span className="truncate">PIN-Locked Private Diary</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-[#14162a] rounded-xl p-2 border border-purple-950/70">
+                <span className="text-purple-300 font-bold">🔒</span>
+                <span className="truncate">AI Cosmic Oracle Guidance</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-purple-950/60">
+          <div className="text-xs sm:text-sm text-slate-200 font-medium">
+            $3/week • $11/month • Or Only $33 for Lifetime Sanctuary Club
           </div>
 
-          <div className="text-center sm:text-left space-y-2 flex-1">
-            <h4 className="font-sans font-bold text-base sm:text-lg text-white">
-              {(membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime')
-                ? 'Sacred Celestial Member Emblem Unlocked'
-                : 'The Sanctuary Club Sacred Insignia'}
-            </h4>
-            <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-normal">
-              {(membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime')
-                ? 'Your account is sanctified with the sacred emblem of wisdom, intuition, and cosmic harmony. Click to view high-resolution insignia or upload your exact photo.'
-                : 'This sacred seal is awarded exclusively to seekers who join The Sanctuary Club on a paid membership ($3/wk, $11/mo, $33 Lifetime). Not included on free accounts or the 3-day trial.'}
-            </p>
-
-            {(membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime') ? (
-              <div className="pt-1 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    const emblemElement = document.querySelector('.group .cursor-pointer') as HTMLElement;
-                    emblemElement?.click();
-                  }}
-                  className="rounded-2xl border border-purple-500/80 bg-purple-900/80 hover:bg-purple-800 px-4 py-2 text-xs sm:text-sm font-sans font-bold uppercase tracking-wider text-purple-100 transition-all"
-                >
-                  View / Upload Photo →
-                </button>
-              </div>
+          <div className="flex items-center space-x-2.5 w-full sm:w-auto">
+            {!membership.isActive ? (
+              <button
+                type="button"
+                onClick={() => onOpenWelcomeModal(undefined, 'letter')}
+                className="flex-1 sm:flex-initial rounded-2xl bg-purple-900 border border-purple-500/80 px-5 py-2.5 text-xs sm:text-sm font-sans font-bold tracking-wide uppercase text-white shadow-md hover:bg-purple-800 transition-all"
+              >
+                Join Club (Free 3-Day Trial)
+              </button>
             ) : (
-              <div className="pt-1">
-                <button
-                  type="button"
-                  onClick={() => onOpenWelcomeModal(undefined, 'plans')}
-                  className="rounded-2xl border border-amber-500/60 bg-amber-500/15 hover:bg-amber-500/25 px-5 py-2.5 text-xs sm:text-sm font-sans font-bold uppercase tracking-wider text-amber-200 transition-all"
-                >
-                  Join Sanctuary Club to Unlock Emblem ($3, $11, $33) →
-                </button>
-              </div>
+              <span className="text-xs sm:text-sm font-bold text-emerald-300 flex items-center space-x-1.5">
+                <Check className="h-4 w-4" />
+                <span>Sanctuary Club Unlocked</span>
+              </span>
             )}
+
+            <button
+              type="button"
+              onClick={() => onOpenWelcomeModal(undefined, 'plans')}
+              className="rounded-2xl border border-purple-800/90 bg-[#120f26] px-4 py-2.5 text-xs sm:text-sm font-sans font-bold tracking-wide uppercase text-white hover:border-purple-400 hover:bg-purple-950 transition-all"
+            >
+              Club Plans
+            </button>
           </div>
         </div>
       </div>

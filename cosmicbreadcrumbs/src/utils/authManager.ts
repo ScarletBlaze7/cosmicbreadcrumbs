@@ -75,12 +75,20 @@ export interface SignInResult {
   message?: string;
 }
 
+// Normalize username or email
+export function normalizeUserIdentifier(identifier: string): string {
+  const clean = identifier.trim().toLowerCase();
+  if (!clean) return '';
+  if (clean.includes('@')) return clean;
+  return `${clean.replace(/[^a-z0-9_.-]/g, '')}@cosmicbreadcrumbs.com`;
+}
+
 // Sign In with Email and Password
-export async function signInWithEmailPassword(email: string, password: string): Promise<SignInResult> {
-  const normalizedEmail = email.trim().toLowerCase();
+export async function signInWithEmailPassword(emailOrUsername: string, password: string): Promise<SignInResult> {
+  const normalizedEmail = normalizeUserIdentifier(emailOrUsername);
   
   if (!normalizedEmail || !password) {
-    return { success: false, message: 'Please enter both your email and password.' };
+    return { success: false, message: 'Please enter both your username/email and password.' };
   }
 
   // Attempt backend API verification first if server is running
@@ -162,16 +170,12 @@ export interface SignUpParams {
   birthPlace?: string;
 }
 
-// Sign Up / Create new account
 export async function signUpWithEmailPassword(params: SignUpParams): Promise<SignInResult> {
-  const normalizedEmail = params.email.trim().toLowerCase();
-  const name = params.name.trim();
+  const normalizedEmail = normalizeUserIdentifier(params.email);
+  const name = params.name.trim() || 'Celestial Seeker';
 
-  if (!name) {
-    return { success: false, message: 'Please provide your name.' };
-  }
-  if (!normalizedEmail || !normalizedEmail.includes('@')) {
-    return { success: false, message: 'Please enter a valid email address.' };
+  if (!normalizedEmail) {
+    return { success: false, message: 'Please enter a valid username or email address.' };
   }
   if (!params.password || params.password.length < 6) {
     return { success: false, message: 'Password must be at least 6 characters long.' };

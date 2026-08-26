@@ -283,7 +283,7 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                   <div className="relative shrink-0">
                     <SanctuaryEmblem size="lg" isUnlocked={Boolean(membership.isActive)} tier={membership.tier} />
                   </div>
-                  <div className="text-center sm:text-left space-y-1">
+                  <div className="text-center sm:text-left space-y-1.5">
                     <div className="inline-flex items-center space-x-1.5 rounded-full bg-amber-400/20 border border-amber-400/40 px-3 py-0.5 text-[10px] font-extrabold text-amber-300 uppercase tracking-wider">
                       <Sparkles className="h-3 w-3 text-amber-300" />
                       <span>A Big Celestial Welcome</span>
@@ -292,24 +292,8 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                       Welcome to the Sanctuary Club!
                     </h3>
                     <p className="text-xs sm:text-sm text-purple-200/90 leading-relaxed max-w-xl">
-                      We are thrilled and honored to welcome you into our sacred circle of intuitive seekers. Your presence enriches the collective vibration of our celestial sanctuary.
+                      Welcome to your daily sanctuary for universal insights. As our special welcome gift, enjoy a <strong className="text-amber-300">Free 3-Day Sanctuary Club Trial ($0 Upfront)</strong> with all celestial features, Archangel guidance, dream decoders, and intuitive tools completely unlocked!
                     </p>
-
-                    {onPlayWelcomeVideo && (
-                      <div className="pt-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            onClose();
-                            onPlayWelcomeVideo();
-                          }}
-                          className="inline-flex items-center space-x-2 rounded-xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 px-4 py-2 text-xs font-bold text-slate-950 shadow-md shadow-amber-500/20 hover:brightness-110 transition-all cursor-pointer"
-                        >
-                          <Play className="h-3.5 w-3.5 fill-slate-950 text-slate-950" />
-                          <span>Watch Sanctuary Welcome Video</span>
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>

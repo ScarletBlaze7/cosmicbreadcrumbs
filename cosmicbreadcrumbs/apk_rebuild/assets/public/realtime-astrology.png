@@ -1,0 +1,242 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' width='1000' height='1000'>
+  <defs>
+    <!-- Background Gradient -->
+    <radialGradient id='spaceBg' cx='50%' cy='50%' r='50%'>
+      <stop offset='0%' stop-color='#0a0a20'/>
+      <stop offset='45%' stop-color='#04040d'/>
+      <stop offset='85%' stop-color='#000000'/>
+      <stop offset='100%' stop-color='#000000'/>
+    </radialGradient>
+
+    <!-- Earth Atmosphere Glow -->
+    <radialGradient id='earthAtmo' cx='50%' cy='42%' r='30%'>
+      <stop offset='0%' stop-color='#60a5fa' stop-opacity='0.9'/>
+      <stop offset='50%' stop-color='#0284c7' stop-opacity='0.4'/>
+      <stop offset='85%' stop-color='#0369a1' stop-opacity='0.1'/>
+      <stop offset='100%' stop-color='#000000' stop-opacity='0'/>
+    </radialGradient>
+
+    <!-- Earth Body -->
+    <radialGradient id='earthBody' cx='35%' cy='35%' r='50%'>
+      <stop offset='0%' stop-color='#93c5fd'/>
+      <stop offset='25%' stop-color='#2563eb'/>
+      <stop offset='60%' stop-color='#1e3a8a'/>
+      <stop offset='85%' stop-color='#090d26'/>
+      <stop offset='100%' stop-color='#02040a'/>
+    </radialGradient>
+
+    <!-- Galaxy Swirl Gradient -->
+    <radialGradient id='galaxyCore' cx='52%' cy='74%' r='35%'>
+      <stop offset='0%' stop-color='#ffffff'/>
+      <stop offset='15%' stop-color='#fdf4ff'/>
+      <stop offset='30%' stop-color='#d946ef' stop-opacity='0.8'/>
+      <stop offset='55%' stop-color='#8b5cf6' stop-opacity='0.5'/>
+      <stop offset='80%' stop-color='#3b0764' stop-opacity='0.2'/>
+      <stop offset='100%' stop-color='#000000' stop-opacity='0'/>
+    </radialGradient>
+
+    <!-- Cyan Ring Gradient -->
+    <linearGradient id='cyanRing' x1='0%' y1='0%' x2='100%' y2='100%'>
+      <stop offset='0%' stop-color='#38bdf8' stop-opacity='0.95'/>
+      <stop offset='30%' stop-color='#0284c7' stop-opacity='0.6'/>
+      <stop offset='70%' stop-color='#0369a1' stop-opacity='0.4'/>
+      <stop offset='85%' stop-color='#38bdf8' stop-opacity='0.9'/>
+      <stop offset='100%' stop-color='#e0f2fe' stop-opacity='1'/>
+    </linearGradient>
+
+    <!-- Metallic Text Shimmer -->
+    <linearGradient id='metalText' x1='0%' y1='0%' x2='0%' y2='100%'>
+      <stop offset='0%' stop-color='#ffffff'/>
+      <stop offset='35%' stop-color='#f1f5f9'/>
+      <stop offset='50%' stop-color='#cbd5e1'/>
+      <stop offset='70%' stop-color='#e2e8f0'/>
+      <stop offset='100%' stop-color='#ffffff'/>
+    </linearGradient>
+
+    <!-- HUB Cyan Glow Text -->
+    <linearGradient id='cyanText' x1='0%' y1='0%' x2='0%' y2='100%'>
+      <stop offset='0%' stop-color='#7dd3fc'/>
+      <stop offset='50%' stop-color='#38bdf8'/>
+      <stop offset='100%' stop-color='#0284c7'/>
+    </linearGradient>
+
+    <filter id='strongGlow' x='-30%' y='-30%' width='160%' height='160%'>
+      <feGaussianBlur stdDeviation='8' result='blur1'/>
+      <feGaussianBlur stdDeviation='20' result='blur2'/>
+      <feMerge>
+        <feMergeNode in='blur2'/>
+        <feMergeNode in='blur1'/>
+        <feMergeNode in='SourceGraphic'/>
+      </feMerge>
+    </filter>
+
+    <filter id='flareGlow' x='-50%' y='-50%' width='200%' height='200%'>
+      <feGaussianBlur stdDeviation='14' result='blur'/>
+      <feMerge>
+        <feMergeNode in='blur'/>
+        <feMergeNode in='SourceGraphic'/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Deep Black Square Base -->
+  <rect width='1000' height='1000' fill='#000000'/>
+
+  <!-- Outer Circular Boundary -->
+  <clipPath id='circleClip'>
+    <circle cx='500' cy='500' r='488'/>
+  </clipPath>
+
+  <g clip-path='url(#circleClip)'>
+    <!-- Space Background -->
+    <rect width='1000' height='1000' fill='url(#spaceBg)'/>
+
+    <!-- Starfield -->
+    <g opacity='0.85'>
+      <!-- Distant Stars -->
+      <circle cx='180' cy='120' r='1.5' fill='#ffffff' opacity='0.9'/>
+      <circle cx='290' cy='220' r='1' fill='#93c5fd' opacity='0.8'/>
+      <circle cx='420' cy='90' r='2' fill='#ffffff' opacity='0.95'/>
+      <circle cx='610' cy='130' r='1.5' fill='#ffffff' opacity='0.8'/>
+      <circle cx='780' cy='160' r='1.5' fill='#bfdbfe' opacity='0.7'/>
+      <circle cx='860' cy='290' r='2' fill='#ffffff' opacity='0.9'/>
+      <circle cx='120' cy='380' r='1' fill='#ffffff' opacity='0.6'/>
+      <circle cx='150' cy='620' r='1.5' fill='#e9d5ff' opacity='0.8'/>
+      <circle cx='230' cy='820' r='2' fill='#ffffff' opacity='0.9'/>
+      <circle cx='360' cy='910' r='1' fill='#c084fc' opacity='0.7'/>
+      <circle cx='680' cy='890' r='1.5' fill='#ffffff' opacity='0.8'/>
+      <circle cx='820' cy='810' r='2' fill='#93c5fd' opacity='0.85'/>
+      <circle cx='890' cy='670' r='1.5' fill='#ffffff' opacity='0.9'/>
+      <circle cx='740' cy='120' r='3' fill='#ffffff' filter='url(#flareGlow)'/>
+      <circle cx='280' cy='230' r='2' fill='#38bdf8' filter='url(#flareGlow)'/>
+    </g>
+
+    <!-- Top Right 4-Point Star Flare -->
+    <g transform='translate(740, 120)' filter='url(#flareGlow)' opacity='0.95'>
+      <line x1='-22' y1='0' x2='22' y2='0' stroke='#ffffff' stroke-width='2.5'/>
+      <line x1='0' y1='-22' x2='0' y2='22' stroke='#ffffff' stroke-width='2.5'/>
+      <line x1='-10' y1='-10' x2='10' y2='10' stroke='#7dd3fc' stroke-width='1.2'/>
+      <line x1='-10' y1='10' x2='10' y2='-10' stroke='#7dd3fc' stroke-width='1.2'/>
+      <circle cx='0' cy='0' r='3.5' fill='#ffffff'/>
+    </g>
+
+    <!-- Upper Left Nebula / Milky Way Dust -->
+    <path d='M80,420 Q200,240 380,140 Q480,90 600,60' fill='none' stroke='#818cf8' stroke-width='90' opacity='0.15' filter='url(#strongGlow)'/>
+    <path d='M100,400 Q220,230 390,130 Q490,80 610,50' fill='none' stroke='#c084fc' stroke-width='60' opacity='0.22' filter='url(#strongGlow)'/>
+
+    <!-- Bottom Spiral Galaxy Nebula -->
+    <ellipse cx='520' cy='740' rx='280' ry='140' transform='rotate(-18 520 740)' fill='url(#galaxyCore)' filter='url(#strongGlow)' opacity='0.95'/>
+    <g transform='translate(520, 740) rotate(-22)' opacity='0.85'>
+      <!-- Spiral Arm 1 -->
+      <path d='M0,0 Q60,-40 140,-30 Q220,-10 260,30 Q280,60 250,90' fill='none' stroke='#e879f9' stroke-width='22' opacity='0.6' filter='url(#strongGlow)' stroke-linecap='round'/>
+      <path d='M0,0 Q60,-40 140,-30 Q220,-10 260,30 Q280,60 250,90' fill='none' stroke='#fdf4ff' stroke-width='8' opacity='0.9' filter='url(#strongGlow)' stroke-linecap='round'/>
+      <!-- Spiral Arm 2 -->
+      <path d='M0,0 Q-60,40 -140,30 Q-220,10 -260,-30 Q-280,-60 -250,-90' fill='none' stroke='#a855f7' stroke-width='24' opacity='0.6' filter='url(#strongGlow)' stroke-linecap='round'/>
+      <path d='M0,0 Q-60,40 -140,30 Q-220,10 -260,-30 Q-280,-60 -250,-90' fill='none' stroke='#c084fc' stroke-width='10' opacity='0.85' filter='url(#strongGlow)' stroke-linecap='round'/>
+      <!-- Galaxy Center Core Bright Spot -->
+      <circle cx='0' cy='0' r='26' fill='#ffffff' filter='url(#flareGlow)'/>
+      <circle cx='0' cy='0' r='14' fill='#ffffff'/>
+    </g>
+
+    <!-- Planetary Body: EARTH (Upper Center) -->
+    <g filter='url(#flareGlow)'>
+      <!-- Outer Blue Atmosphere Glow -->
+      <circle cx='500' cy='430' r='255' fill='url(#earthAtmo)'/>
+    </g>
+    <!-- Earth Globe -->
+    <circle cx='500' cy='430' r='240' fill='url(#earthBody)'/>
+
+    <!-- Earth Continents & Swirling Cloud Formations -->
+    <g clip-path='url(#earthClip)'>
+      <clipPath id='earthClip'>
+        <circle cx='500' cy='430' r='240'/>
+      </clipPath>
+      <!-- Atmospheric Rim Light on Top-Right -->
+      <path d='M350,200 Q500,185 640,240 Q740,320 740,460 Q660,300 500,240 Z' fill='#93c5fd' opacity='0.75' filter='url(#strongGlow)'/>
+      <!-- Continents Silhouette -->
+      <path d='M420,270 Q480,260 520,300 Q560,340 500,380 Q450,400 410,350 Z' fill='#15803d' opacity='0.35'/>
+      <path d='M560,260 Q640,280 670,360 Q640,410 590,390 Q540,340 560,260 Z' fill='#166534' opacity='0.4'/>
+      <!-- Swirling White Atmospheric Weather Clouds -->
+      <path d='M320,330 Q440,290 560,310 Q680,340 730,410 Q630,360 480,350 Q360,370 320,330 Z' fill='#ffffff' opacity='0.65' filter='url(#strongGlow)'/>
+      <path d='M380,240 Q490,220 590,260 Q520,270 430,265 Z' fill='#ffffff' opacity='0.85'/>
+      <path d='M450,400 Q540,410 630,460 Q530,440 450,400 Z' fill='#ffffff' opacity='0.5'/>
+      <!-- Night Shadow (Lower Hemisphere Fade) -->
+      <radialGradient id='earthShadow' cx='48%' cy='35%' r='55%'>
+        <stop offset='0%' stop-color='#000000' stop-opacity='0'/>
+        <stop offset='65%' stop-color='#000000' stop-opacity='0.4'/>
+        <stop offset='90%' stop-color='#000000' stop-opacity='0.92'/>
+        <stop offset='100%' stop-color='#000000' stop-opacity='0.98'/>
+      </radialGradient>
+      <circle cx='500' cy='430' r='240' fill='url(#earthShadow)'/>
+    </g>
+
+    <!-- Back Half of Planetary Cyan Rings (Behind Earth) -->
+    <!-- (Covered mostly by globe) -->
+
+    <!-- Orbiting Moon / Satellite on Left Ring -->
+    <g transform='translate(178, 628)' filter='url(#strongGlow)'>
+      <circle cx='0' cy='0' r='26' fill='#1e293b'/>
+      <!-- Moon Crescent / Light -->
+      <path d='M-18,-18 A26,26 0 0,1 18,18 A22,22 0 0,0 -18,-18 Z' fill='#94a3b8' opacity='0.95'/>
+      <circle cx='-4' cy='-4' r='26' fill='#000000' opacity='0.65'/>
+    </g>
+
+    <!-- Front Half of Glowing Cyan Planetary Ring System (Spanning Left to Right) -->
+    <g filter='url(#flareGlow)'>
+      <!-- Outer Ring Beam -->
+      <path d='M50,580 C110,650 300,685 520,655 C740,625 910,530 960,440 C910,500 730,600 520,635 C300,665 110,630 50,580 Z' fill='url(#cyanRing)' opacity='0.95'/>
+      <!-- Inner Thin High-Intensity Ray -->
+      <path d='M60,585 C140,655 330,680 520,652 C710,625 890,525 940,450' fill='none' stroke='#ffffff' stroke-width='4.5' opacity='0.95'/>
+      <path d='M80,598 C160,660 340,682 520,656 C700,630 870,535 920,465' fill='none' stroke='#38bdf8' stroke-width='8' opacity='0.75'/>
+    </g>
+
+    <!-- Lens Flare on Right Ring Horizon -->
+    <g transform='translate(860, 565)' filter='url(#flareGlow)' opacity='0.95'>
+      <line x1='-45' y1='-12' x2='45' y2='12' stroke='#ffffff' stroke-width='3.5'/>
+      <line x1='-15' y1='25' x2='15' y2='-25' stroke='#7dd3fc' stroke-width='2'/>
+      <circle cx='0' cy='0' r='7' fill='#ffffff'/>
+      <circle cx='0' cy='0' r='16' fill='#38bdf8' opacity='0.6'/>
+    </g>
+
+    <!-- Lens Flare on Left Ring Horizon -->
+    <g transform='translate(100, 580)' filter='url(#flareGlow)' opacity='0.85'>
+      <circle cx='0' cy='0' r='5' fill='#ffffff'/>
+      <circle cx='0' cy='0' r='12' fill='#38bdf8' opacity='0.7'/>
+    </g>
+
+    <!-- CENTER EMBLEM: 'COSMIC HUB' -->
+    <g transform='translate(500, 510)'>
+      <!-- Dark contrast backdrop plate for pristine legibility -->
+      <ellipse cx='0' cy='-4' rx='340' ry='75' fill='#000000' opacity='0.6' filter='url(#strongGlow)'/>
+
+      <!-- 'COSMIC' Master Sci-Fi Heading -->
+      <text x='0' y='0' text-anchor='middle' font-family='system-ui, -apple-system, sans-serif' font-size='86' font-weight='900' letter-spacing='18' fill='url(#metalText)' filter='drop-shadow(0px 8px 16px rgba(0,0,0,0.95))'>
+        COSMIC
+      </text>
+      <!-- Subtle top metallic glow overlay -->
+      <text x='0' y='0' text-anchor='middle' font-family='system-ui, -apple-system, sans-serif' font-size='86' font-weight='900' letter-spacing='18' fill='none' stroke='#ffffff' stroke-width='1.2' opacity='0.75'>
+        COSMIC
+      </text>
+
+      <!-- Center Flanking Silver Lines & 'HUB' -->
+      <!-- Left Horizontal Accent Line -->
+      <line x1='-220' y1='48' x2='-90' y2='48' stroke='url(#metalText)' stroke-width='3' stroke-linecap='round' filter='url(#strongGlow)'/>
+      <line x1='-220' y1='48' x2='-90' y2='48' stroke='#ffffff' stroke-width='1.5' stroke-linecap='round'/>
+
+      <!-- 'HUB' Glowing Cyan Text -->
+      <text x='0' y='59' text-anchor='middle' font-family='system-ui, -apple-system, sans-serif' font-size='42' font-weight='800' letter-spacing='22' fill='url(#cyanText)' filter='url(#strongGlow)'>
+        HUB
+      </text>
+      <text x='0' y='59' text-anchor='middle' font-family='system-ui, -apple-system, sans-serif' font-size='42' font-weight='800' letter-spacing='22' fill='#e0f2fe' opacity='0.9'>
+        HUB
+      </text>
+
+      <!-- Right Horizontal Accent Line -->
+      <line x1='90' y1='48' x2='220' y2='48' stroke='url(#metalText)' stroke-width='3' stroke-linecap='round' filter='url(#strongGlow)'/>
+      <line x1='90' y1='48' x2='220' y2='48' stroke='#ffffff' stroke-width='1.5' stroke-linecap='round'/>
+    </g>
+
+    <!-- Outer Circular Rim Stroke -->
+    <circle cx='500' cy='500' r='488' fill='none' stroke='#1e293b' stroke-width='3.5' opacity='0.4'/>
+  </g>
+</svg>

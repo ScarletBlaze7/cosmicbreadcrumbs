@@ -4,6 +4,7 @@ export const APP_ASSETS = {
     sanctuaryAlt: '/assets/sanctuary_emblem.png',
     logo: '/assets/logo.png',
     seeker: '/assets/seeker.png',
+    cosmicInsights: '/cosmicinsights.png',
   },
   tarot: {
     cardBack: '/assets/tarotback.jpg',

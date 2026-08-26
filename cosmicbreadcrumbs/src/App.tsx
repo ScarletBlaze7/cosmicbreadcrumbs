@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CosmicView, UserProfile, JournalEntry, MembershipStatus } from './types';
 import { Header } from './components/Header';
+import { BottomNavBar } from './components/BottomNavBar';
 import { DailyDashboard } from './components/DailyDashboard';
 import { HoroscopeView } from './components/HoroscopeView';
 import { NumerologyView } from './components/NumerologyView';
@@ -76,12 +77,22 @@ export default function App() {
 
   // Authentication & Sign In / Sign Up Modal State (Opens FIRST before asking for birth details)
   const [isSignInModalOpen, setIsSignInModalOpen] = useState<boolean>(() => {
-    const authState = getStoredAuthState();
-    const saved = localStorage.getItem('auranova_profile');
-    if (!authState.isAuthenticated && (!saved || !JSON.parse(saved)?.hasCompletedOnboarding)) {
-      return true;
+    try {
+      const authState = getStoredAuthState();
+      const saved = localStorage.getItem('auranova_profile');
+      let hasCompleted = false;
+      if (saved) {
+        try {
+          hasCompleted = Boolean(JSON.parse(saved)?.hasCompletedOnboarding);
+        } catch (e) {}
+      }
+      if (!authState.isAuthenticated && !hasCompleted) {
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
     }
-    return false;
   });
   const [signInModalTab, setSignInModalTab] = useState<'signin' | 'signup'>('signin');
 
@@ -328,7 +339,7 @@ export default function App() {
         />
 
         {/* View Content */}
-        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 flex-1">
+        <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 pb-28 sm:pb-32 flex-1">
           {currentView === 'dashboard' && (
             <DailyDashboard
               userProfile={userProfile}
@@ -463,6 +474,13 @@ export default function App() {
             </div>
           </div>
         </footer>
+
+        {/* Fixed Bottom Navigation Dock for Cosmic Hub, Zodiac, Tarot, Angels, and Numbers */}
+        <BottomNavBar
+          currentView={currentView}
+          onViewChange={handleNavigate}
+          membership={membership}
+        />
       </div>
 
       {/* Profile Modal */}

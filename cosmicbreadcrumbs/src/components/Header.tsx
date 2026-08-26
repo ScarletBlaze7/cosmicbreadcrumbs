@@ -29,8 +29,6 @@ import { getTrialTimeRemaining, isFeatureUnlocked } from '../utils/membership';
 import { getStoredFontSize, applyFontSize, FontSizeSetting } from '../utils/fontSizePreference';
 import { CosmicLogo } from './CosmicLogo';
 import { ZodiacSymbolIcon } from './ZodiacSymbolIcon';
-import { SanctuaryEmblem } from './SanctuaryEmblem';
-import { SanctuaryProfileBadge } from './SanctuaryProfileBadge';
 
 interface HeaderProps {
   currentView: CosmicView;
@@ -160,134 +158,130 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-purple-950/80 bg-[#060710]/95 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-3 py-2 sm:px-6 sm:py-3 gap-2">
-        {/* Logo & Brand */}
-        <div 
-          onClick={() => onViewChange('dashboard')}
-          className="group flex cursor-pointer items-center space-x-1.5 sm:space-x-3 min-w-0 shrink"
-          id="app-brand-logo"
-        >
-          <CosmicLogo size="md" showUploadTrigger={true} />
-          <div className="flex flex-col text-left min-w-0">
-            <span className="font-flavors text-lg sm:text-2xl md:text-3xl lg:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 tracking-wide drop-shadow-sm leading-tight py-0.5 truncate max-w-[140px] xs:max-w-[180px] sm:max-w-none">
-              Cosmic Breadcrumbs
-            </span>
-            <span className="text-[9px] sm:text-xs font-revalia tracking-wider text-amber-200 uppercase hidden sm:block font-bold">
-              YOUR PERSONALIZED COSMIC ALIGNMENT
-            </span>
-          </div>
+      <div className="mx-auto max-w-7xl px-3 pt-2 pb-2 sm:px-6">
+        {/* Main Title Centered */}
+        <div className="flex flex-col items-center justify-center text-center">
+          <h1 
+            onClick={() => onViewChange('dashboard')}
+            className="font-flavors text-2xl xs:text-3xl sm:text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 tracking-wide drop-shadow-md cursor-pointer select-none leading-none py-1 hover:brightness-110 transition-all"
+          >
+            Cosmic Breadcrumbs
+          </h1>
         </div>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden xl:flex items-center space-x-1.5 rounded-2xl border border-purple-950/80 bg-[#090715] p-2 shadow-lg backdrop-blur-md">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            const isUnlocked = isFeatureUnlocked(item.id, membership);
-
-            return (
-              <button
-                key={item.id}
-                id={`nav-link-${item.id}`}
-                onClick={() => onViewChange(item.id)}
-                className={`flex items-center space-x-2 rounded-xl px-4 py-2.5 text-sm font-sans font-bold tracking-wide transition-all ${
-                  isActive
-                    ? 'bg-purple-900 border border-purple-500/90 text-white shadow-lg shadow-purple-950/80'
-                    : 'text-purple-100 hover:bg-[#1a1334] hover:text-white border border-transparent'
-                }`}
-              >
-                <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-purple-300'}`} />
-                <span>{item.label}</span>
-                {!isUnlocked && (
-                  <Lock className="h-3.5 w-3.5 text-purple-300/80" />
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Medium Screen Navigation (lg to xl) */}
-        <nav className="hidden lg:flex xl:hidden items-center space-x-1 rounded-xl border border-purple-950/80 bg-[#090715] p-1.5 shadow-md">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            const isUnlocked = isFeatureUnlocked(item.id, membership);
-
-            return (
-              <button
-                key={item.id}
-                id={`nav-link-med-${item.id}`}
-                onClick={() => onViewChange(item.id)}
-                className={`flex items-center space-x-1.5 rounded-lg px-3 py-2 text-xs font-sans font-bold tracking-wide transition-all ${
-                  isActive
-                    ? 'bg-purple-900 border border-purple-500/80 text-white'
-                    : 'text-purple-200 hover:bg-[#1a1334] hover:text-white'
-                }`}
-              >
-                <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-white' : 'text-purple-300'}`} />
-                <span>{item.label}</span>
-                {!isUnlocked && (
-                  <Lock className="h-3 w-3 text-purple-300/70" />
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* Right Controls */}
-        <div className="flex items-center space-x-1.5 sm:space-x-2.5 shrink-0">
-          
-          {/* Font Size Quick Toggle Button (Accessibility) */}
+        {/* 3 Icons Row */}
+        <div className="relative flex items-center justify-between mt-1 px-1 sm:px-4">
+          {/* Left: Profile Picture (of their choosing) / Zodiac Sign Button */}
           <button
-            id="btn-toggle-font-size"
-            onClick={handleCycleFontSize}
-            title={`Font Size: ${fontSize.toUpperCase()} • Tap to enlarge fonts for reading comfort`}
-            className="hidden lg:flex items-center space-x-1.5 rounded-2xl border border-purple-800/80 bg-[#120f26] px-2.5 sm:px-3 py-2 text-xs sm:text-sm font-bold text-amber-200 hover:border-amber-400 hover:bg-purple-950 transition-all shadow-sm"
+            type="button"
+            id="btn-header-profile-zodiac"
+            onClick={onOpenProfile}
+            className="relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-full border-2 border-blue-400/90 bg-[#060a22] shadow-[0_0_14px_rgba(59,130,246,0.65)] hover:shadow-[0_0_22px_rgba(59,130,246,0.9)] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer shrink-0"
+            title={`${userProfile.name || 'Seeker'}'s Profile (${sunSign.name}) • Tap to open Profile & Sanctuary Badge`}
           >
-            <Type className="h-4 w-4 text-amber-300" />
-            <span className="font-mono text-xs hidden sm:inline">
-              {fontSize === 'comfortable' ? 'Text Aa' : fontSize === 'large' ? 'Text Aa+' : 'Text Aa++'}
-            </span>
+            <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-full overflow-hidden border border-blue-400/60 bg-blue-950/70">
+              {userProfile.avatarUrl ? (
+                <img
+                  src={userProfile.avatarUrl}
+                  alt={userProfile.name || 'Seeker Profile'}
+                  className="h-full w-full object-cover rounded-full"
+                />
+              ) : (
+                <ZodiacSymbolIcon sign={sunSign.name} className="h-5 w-5 sm:h-6 sm:w-6 text-white drop-shadow-[0_0_6px_rgba(147,197,253,0.95)]" />
+              )}
+            </div>
           </button>
 
-          {/* Share */}
+          {/* Center: Glowing Stardust Astrology Wheel - Blends seamlessly into header */}
           <button
-            id="btn-share-app"
-            onClick={handleShareApp}
-            title="Share Sanctuary"
-            className="hidden md:flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-2xl border border-purple-800/80 bg-[#120f26] text-purple-200 hover:border-purple-400 hover:text-white transition-all"
+            type="button"
+            id="btn-header-astrology-wheel"
+            onClick={() => onViewChange('dashboard')}
+            className="relative flex items-center justify-center cursor-pointer group focus:outline-none bg-transparent"
+            title="Cosmic Hub • Alignment Portal"
           >
-            <Share2 className="h-4 w-4" />
+            <img
+              src="/cosmic-wheel-center.png"
+              alt="Cosmic Alignment Portal"
+              className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 object-contain filter drop-shadow-[0_0_18px_rgba(56,189,248,0.7)] transition-transform duration-300 group-hover:scale-105 active:scale-95 mix-blend-screen select-none pointer-events-auto"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = '/assets/astrology-wheel.png';
+              }}
+            />
           </button>
 
-          {/* Chat with Cosmic AI for Guidance Button (Next to Badge) */}
+          {/* Right: Glowing / Pulsating Feather Icon */}
           <button
+            type="button"
             id="btn-ask-oracle"
             onClick={onOpenOracleChat}
-            className="flex items-center space-x-1 sm:space-x-1.5 rounded-2xl border border-purple-600/80 bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-sans font-bold tracking-wide text-white hover:border-amber-400 hover:bg-purple-900 transition-all shadow-md active:scale-95 shrink-0"
-            title="Chat with Cosmic AI for Guidance"
+            className="relative flex h-11 w-11 sm:h-13 sm:w-13 items-center justify-center rounded-2xl p-0.5 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer shrink-0"
+            title="Cosmic Insights Guidance & Messaging • Tap to Chat"
           >
-            <MessageSquareQuote className="h-4 w-4 text-amber-300 shrink-0" />
-            <span className="hidden xs:inline">Cosmic AI</span>
-            <span className="xs:hidden inline">AI</span>
-            {!membership.isActive && <Lock className="h-3 w-3 text-amber-300/80 shrink-0" />}
+            <img
+              src="/cosmicinsights.png"
+              alt="Cosmic Insights Feather"
+              className="h-full w-full object-contain animate-cosmic-glow drop-shadow-[0_0_14px_rgba(192,132,252,0.85)]"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/assets/cosmicinsights.png';
+              }}
+            />
           </button>
+        </div>
 
-          {/* OFFICIAL MEMBERSHIP BADGE BUTTON (Replaces "Club Trial" button & opens Account Area) */}
-          <SanctuaryProfileBadge
-            isMember={Boolean(membership.isActive || membership.tier !== 'free')}
-            username={userProfile.name}
-            size="header"
-            countdownText={
-              membership.tier === 'trial' && membership.isActive
-                ? `${trialTime.days}d ${trialTime.hours}h ${trialTime.minutes}m`
-                : membership.isActive
-                ? (membership.planName || 'VIP Member')
-                : 'Account'
-            }
-            onClick={onOpenProfile}
-            className="shrink-0"
-          />
+        {/* Sub-header Bar: Quote on Left, [Journal] [Dreams] on Right */}
+        <div className="w-full flex items-center justify-between gap-2 pt-2 border-t border-purple-950/60 mt-2 px-1 sm:px-2">
+          <span className="italic font-serif text-xs sm:text-sm md:text-base text-amber-200/90 tracking-wide drop-shadow-sm truncate">
+            'Awaken the Universe Within"
+          </span>
+
+          <div className="flex items-center space-x-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => onViewChange('diary')}
+              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/80 bg-[#120f26] px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-xs sm:text-sm font-sans font-bold text-slate-100 hover:border-amber-400 hover:bg-purple-900 transition-all shadow-md active:scale-95 cursor-pointer"
+              title="Open Daily Log & Journal"
+            >
+              <BookMarked className="h-3.5 w-3.5 text-amber-300" />
+              <span>Journal</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => onViewChange('dreams')}
+              className="flex items-center space-x-1.5 rounded-xl border border-purple-800/80 bg-[#120f26] px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-xs sm:text-sm font-sans font-bold text-slate-100 hover:border-amber-400 hover:bg-purple-900 transition-all shadow-md active:scale-95 cursor-pointer"
+              title="Open Dream Sanctuary"
+            >
+              <CloudMoon className="h-3.5 w-3.5 text-purple-300" />
+              <span>Dreams</span>
+            </button>
+
+            {/* Quick Tools for Accessibility & Profile */}
+            <div className="hidden md:flex items-center space-x-1.5 pl-2 border-l border-purple-900/60">
+              <button
+                onClick={handleCycleFontSize}
+                title={`Font Size: ${fontSize.toUpperCase()}`}
+                className="flex h-8 w-8 items-center justify-center rounded-xl border border-purple-800/70 bg-[#120f26] text-amber-200 hover:border-amber-400 text-xs cursor-pointer"
+              >
+                <Type className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={handleShareApp}
+                title="Share Sanctuary"
+                className="flex h-8 w-8 items-center justify-center rounded-xl border border-purple-800/70 bg-[#120f26] text-purple-200 hover:text-white text-xs cursor-pointer"
+              >
+                <Share2 className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={onOpenProfile}
+                title={`${userProfile.name || 'Seeker'}'s Profile`}
+                className="flex items-center space-x-1.5 rounded-xl border border-purple-700/70 bg-[#120f26] hover:border-purple-400 px-2.5 py-1 text-xs font-bold text-slate-100 cursor-pointer"
+              >
+                <User className="h-3.5 w-3.5 text-purple-200" />
+                <span className="max-w-[70px] truncate">{userProfile.name || 'Account'}</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -297,77 +291,6 @@ export const Header: React.FC<HeaderProps> = ({
           {fontToast}
         </div>
       )}
-
-      {/* Mobile Sub-Navigation Bar with Scroll Chevrons & Swipe Cues */}
-      <div className="relative lg:hidden border-t border-purple-950/80 bg-[#080614]">
-        {/* Left Scroll Button */}
-        {canScrollLeft && (
-          <button
-            type="button"
-            onClick={handleScrollLeft}
-            aria-label="Scroll navigation tabs left"
-            className="absolute left-1 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-lg bg-purple-950/95 text-amber-300 border border-purple-800 shadow-md backdrop-blur-xs transition-transform active:scale-95"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-        )}
-
-        {/* Right Scroll Button */}
-        {canScrollRight && (
-          <button
-            type="button"
-            onClick={handleScrollRight}
-            aria-label="Scroll navigation tabs right"
-            className="absolute right-1 top-2.5 z-20 flex h-8 w-8 items-center justify-center rounded-lg bg-purple-950/95 text-amber-300 border border-purple-800 shadow-md backdrop-blur-xs transition-transform active:scale-95 animate-pulse"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
-        )}
-
-        {/* Scrollable Tabs Row */}
-        <div 
-          ref={mobileNavRef}
-          onScroll={checkScrollState}
-          className="flex overflow-x-auto no-scrollbar px-3 py-2.5 space-x-2 shadow-inner scroll-smooth"
-        >
-          {navItems.map((item, index) => {
-            const Icon = item.icon;
-            const isActive = currentView === item.id;
-            const isUnlocked = isFeatureUnlocked(item.id, membership);
-            const isAfterNumerology = index >= 4; // Archangels, Dreams, Diary
-
-            return (
-              <button
-                key={item.id}
-                data-nav-id={item.id}
-                onClick={() => onViewChange(item.id)}
-                className={`flex shrink-0 items-center space-x-2 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-sans font-bold tracking-wide transition-all ${
-                  isActive
-                    ? 'bg-purple-900 text-white border border-purple-500/90 shadow-md'
-                    : 'bg-[#120f26] text-purple-100 border border-purple-950/80 hover:bg-purple-950 hover:text-white'
-                } ${isAfterNumerology ? 'ring-1 ring-amber-400/30' : ''}`}
-              >
-                <Icon className={`h-4 w-4 ${isActive ? 'text-white' : 'text-purple-300'}`} />
-                <span>{item.label}</span>
-                {!isUnlocked && (
-                  <Lock className="h-3 w-3 text-purple-300/80" />
-                )}
-              </button>
-            );
-          })}
-
-          {/* Direct My Account Tab */}
-          <button
-            type="button"
-            onClick={onOpenProfile}
-            id="btn-mobile-nav-account"
-            className="flex shrink-0 items-center space-x-1.5 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-sans font-bold tracking-wide transition-all bg-gradient-to-r from-amber-500/20 via-purple-900 to-indigo-950 text-amber-200 border border-amber-400/60 shadow-md ring-1 ring-amber-400/30"
-          >
-            <User className="h-4 w-4 text-amber-300" />
-            <span>My Account</span>
-          </button>
-        </div>
-      </div>
     </header>
   );
 };

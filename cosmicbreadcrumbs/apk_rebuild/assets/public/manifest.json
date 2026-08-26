@@ -1,0 +1,32 @@
+{
+  "name": "Cosmic Breadcrumbs",
+  "short_name": "CosmicBreadcrumbs",
+  "description": "Your daily guide to universal insights—designed to awaken your third eye, expand awareness, and unlock your intuitive power.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#06070f",
+  "theme_color": "#06070f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/sanctuary_emblem.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["lifestyle", "entertainment", "education"]
+}

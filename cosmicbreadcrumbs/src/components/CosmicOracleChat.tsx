@@ -142,12 +142,19 @@ export const CosmicOracleChat: React.FC<CosmicOracleChatProps> = ({
         {/* Chat Header */}
         <div className="flex items-center justify-between border-b border-purple-800/40 bg-gradient-to-r from-purple-950 via-slate-900 to-indigo-950 p-4 sm:p-5">
           <div className="flex items-center space-x-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-600/30 border border-purple-500/40 text-amber-300">
-              <MessageSquareQuote className="h-5 w-5" />
+            <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl bg-purple-950/80 border border-purple-500/60 p-1 shadow-md overflow-hidden shrink-0">
+              <img
+                src="/cosmicinsights.png"
+                alt="Cosmic Insights Oracle"
+                className="h-full w-full object-contain rounded-lg animate-cosmic-glow"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/assets/cosmicinsights.png';
+                }}
+              />
             </div>
             <div>
               <h3 className="font-serif text-base font-bold text-slate-100 flex items-center space-x-2">
-                <span>The Celestial Oracle</span>
+                <span>Cosmic Insights Oracle</span>
                 <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-[9px] font-mono text-amber-300">
                   ONLINE
                 </span>

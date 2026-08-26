@@ -109,17 +109,20 @@ export const FirstLaunchOnboardingModal: React.FC<FirstLaunchOnboardingModalProp
         <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-48 w-80 rounded-full bg-gradient-to-b from-amber-400/20 via-purple-600/25 to-transparent blur-3xl" />
 
         {/* Modal Header */}
-        <div className="relative border-b border-purple-800/50 bg-slate-950/80 px-6 py-5 text-center space-y-2">
+        <div className="relative border-b border-purple-800/50 bg-slate-950/80 px-6 py-5 text-center space-y-3">
           <div className="flex justify-center">
-            <CosmicLogo size="lg" showUploadTrigger={false} />
-          </div>
-          
-          <div className="inline-flex items-center space-x-1.5 rounded-full bg-amber-400/15 border border-amber-400/35 px-3 py-0.5 text-[10px] font-mono font-bold text-amber-300 uppercase tracking-wider">
-            <Sparkles className="h-3 w-3 text-amber-300" />
-            <span>Welcome to Cosmic Breadcrumbs</span>
+            <img
+              src="/welcometo.jpg"
+              alt="Welcome To Cosmic Breadcrumbs"
+              className="w-full max-w-[320px] sm:max-w-[380px] object-contain rounded-2xl drop-shadow-[0_0_20px_rgba(251,191,36,0.6)] mx-auto select-none"
+              onError={(e) => {
+                const target = e.currentTarget as HTMLImageElement;
+                target.src = '/assets/welcometo.jpg';
+              }}
+            />
           </div>
 
-          <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-100 to-purple-200">
+          <h2 className="font-serif text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-100 to-purple-200 pt-1">
             Find Your Zodiac Sign
           </h2>
           <p className="text-xs sm:text-sm text-purple-200/90 max-w-md mx-auto leading-relaxed">

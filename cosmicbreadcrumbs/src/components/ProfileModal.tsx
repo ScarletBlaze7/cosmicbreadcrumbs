@@ -31,7 +31,6 @@ import { getSunSignFromDate } from '../utils/astrologyCalc';
 import { calculateLifePath, calculateDestinyNumber } from '../utils/numerologyCalc';
 import { CosmicLogo } from './CosmicLogo';
 import { ZodiacSymbolIcon } from './ZodiacSymbolIcon';
-import { SanctuaryProfileBadge } from './SanctuaryProfileBadge';
 import { 
   getTrialTimeRemaining, 
   activateThreeDayTrial, 
@@ -302,34 +301,56 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           {/* ========================================================================= */}
           {/* 1. TOP OFFICIAL MEMBERSHIP BADGE & STATUS SHOWCASE */}
           {/* ========================================================================= */}
+          {/* ========================================================================= */}
+          {/* 1. TOP OFFICIAL MEMBERSHIP BADGE & STATUS SHOWCASE */}
+          {/* ========================================================================= */}
           <div className={`rounded-3xl border-2 p-5 flex flex-col sm:flex-row items-center gap-5 transition-all ${
             isMember 
               ? 'border-amber-400/80 bg-gradient-to-br from-amber-950/30 via-purple-950/40 to-slate-950 shadow-xl shadow-amber-500/10' 
-              : 'border-purple-800/60 bg-gradient-to-br from-purple-950/30 via-slate-900 to-slate-950 shadow-lg'
+              : 'border-purple-700/60 bg-gradient-to-br from-purple-950/40 via-[#100c24] to-[#080614] shadow-lg'
           }`}>
-            {/* Badge Image */}
+            {/* Badge / Avatar Display */}
             <div className="shrink-0 flex flex-col items-center">
               <div className={`relative flex h-24 w-24 sm:h-28 sm:w-28 items-center justify-center rounded-3xl overflow-hidden border-2 shadow-2xl ${
                 isMember
                   ? 'border-amber-400 drop-shadow-[0_0_18px_rgba(212,175,55,0.45)] bg-slate-950'
-                  : 'border-purple-600/70 shadow-purple-950/60 bg-slate-950'
+                  : 'border-purple-500/80 shadow-[0_0_20px_rgba(168,85,247,0.3)] bg-gradient-to-br from-[#1a1138] to-[#090616]'
               }`}>
-                <img
-                  src={isMember ? '/assets/sanctemb.jpg' : '/assets/seeker.png'}
-                  onError={(e) => { 
-                    const target = e.currentTarget as HTMLImageElement;
-                    if (isMember) {
+                {isMember ? (
+                  <img
+                    src="/assets/sanctemb.jpg"
+                    onError={(e) => { 
+                      const target = e.currentTarget as HTMLImageElement;
                       target.src = target.src.includes('sanctuaryemb') ? './assets/sanctemb.jpg' : './assets/sanctuaryemb.jpg';
-                    } else {
-                      target.src = target.src.includes('seeker.png') ? './assets/seeker.png' : './assets/freeseeker.jpg';
-                    }
-                  }}
-                  alt={isMember ? 'Sanctuary Member Emblem (sanctemb.jpg)' : 'Free Seeker Badge (seeker.png)'}
-                  className="h-full w-full object-cover select-none"
-                />
+                    }}
+                    alt="Sanctuary Member Emblem (sanctemb.jpg)"
+                    className="h-full w-full object-cover select-none"
+                  />
+                ) : (
+                  /* Unique Personal Celestial Portal Avatar */
+                  <div className="relative h-full w-full flex items-center justify-center p-2 bg-gradient-to-br from-[#0a0f2b] via-[#060a22] to-[#040614]">
+                    {previewAvatar ? (
+                      <img
+                        src={previewAvatar}
+                        alt={previewName || 'Seeker Avatar'}
+                        className="h-full w-full rounded-2xl object-cover"
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center justify-center text-center">
+                        <ZodiacSymbolIcon 
+                          sign={previewSunSign.name} 
+                          className="h-10 w-10 sm:h-12 sm:w-12 text-white drop-shadow-[0_0_10px_rgba(147,197,253,0.95)]" 
+                        />
+                        <span className="text-[10px] font-mono font-bold text-blue-200 mt-1">
+                          {previewSunSign.symbol} {previewSunSign.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
-              {/* Countdown under badge */}
+              {/* Countdown under badge for trial */}
               {membership.tier === 'trial' && membership.isActive && (
                 <span className="text-[10px] sm:text-xs font-mono font-bold text-amber-300 bg-amber-500/15 border border-amber-500/30 rounded-full px-2.5 py-0.5 mt-2 text-center drop-shadow-sm">
                   ⏳ {trialTime.days}d {trialTime.hours}h {trialTime.minutes}m left
@@ -341,7 +362,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
                 <span className="font-mono text-xs font-bold text-white uppercase tracking-wider">
-                  {isMember ? 'Official Sanctuary Member Seal' : 'Free Seeker Membership'}
+                  {isMember ? 'Official Sanctuary Member Seal' : '✨ Sacred Seeker Sanctuary'}
                 </span>
                 {isMember ? (
                   <span className="rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-mono font-bold px-2.5 py-0.5">
@@ -349,26 +370,26 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   </span>
                 ) : (
                   <span className="rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-mono font-bold px-2.5 py-0.5">
-                    FREE APP TIER
+                    FREE ACCESS TIER
                   </span>
                 )}
               </div>
 
-              <h4 className="font-serif text-lg font-bold text-slate-100">
+              <h4 className="font-flavors text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200">
                 {isMember 
-                  ? `${userProfile.name}'s Sanctuary Club Account` 
-                  : `${userProfile.name}'s Seeker Account`}
+                  ? `${userProfile.name}'s Sanctuary Account` 
+                  : `Welcome, ${userProfile.name || 'Celestial Seeker'} ✨`}
               </h4>
 
               <p className="text-xs text-purple-200/90 leading-relaxed">
                 {isMember ? (
                   membership.tier === 'trial' ? (
-                    <>You are currently experiencing the <strong>3-Day Sanctuary Club Free Trial ($0 upfront)</strong> with all features unlocked!</>
+                    <>You are currently experiencing the <strong>3-Day Sanctuary Club Free Trial ($0 upfront)</strong> with all sacred features unlocked!</>
                   ) : (
-                    <>You hold an active <strong>{membership.planName || 'Sanctuary Club Membership'}</strong>. All sacred tools and features are fully unlocked.</>
+                    <>You hold an active <strong>{membership.planName || 'Sanctuary Club Membership'}</strong>. All sacred tools and celestial portals are fully unlocked.</>
                   )
                 ) : (
-                  <>You are on the free tier. The free app includes your <strong>Daily Horoscope</strong>, <strong>Daily Tarot Card Pull</strong>, and <strong>Life Path Calculation</strong>. Unlock all remaining features with the free trial or club membership below.</>
+                  <>The universe has opened this sanctuary for your exploration. Your free tier includes your <strong>Daily Horoscope</strong>, <strong>Daily Tarot Card Pull</strong>, and <strong>Sacred Life Path Blueprint</strong>. Follow the cosmic breadcrumbs below.</>
                 )}
               </p>
 
