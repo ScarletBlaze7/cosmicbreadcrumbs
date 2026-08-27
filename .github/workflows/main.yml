@@ -1,0 +1,66 @@
+name: Build Release AAB
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Clean and Install Dependencies
+        run: |
+          cd cosmicbreadcrumbs
+          rm -rf node_modules package-lock.json
+          npm install
+          npm install --save @capacitor/core @capacitor/android @capacitor/cli
+
+      - name: Build Web Assets
+        run: |
+          cd cosmicbreadcrumbs
+          npm run build --if-present
+
+      - name: Clean Termux Gradle Config & Sync Capacitor
+        run: |
+          cd cosmicbreadcrumbs
+          if [ -f android/gradle.properties ]; then
+            sed -i '/android.aapt2FromMavenOverride/d' android/gradle.properties
+          fi
+          mkdir -p android/capacitor-cordova-android-plugins
+          touch android/capacitor-cordova-android-plugins/cordova.variables.gradle
+          npx cap sync android
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+
+      - name: Make Gradlew Executable
+        run: chmod +x cosmicbreadcrumbs/android/gradlew
+
+      - name: Build Android App Bundle (.aab)
+        run: |
+          cd cosmicbreadcrumbs/android
+          ./gradlew bundleRelease
+
+      - name: Sign App Bundle
+        run: |
+          cd cosmicbreadcrumbs/android/app/build/outputs/bundle/release
+          keytool -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 -storepass password123 -keypass password123 -dname "CN=CosmicBreadcrumbs, OU=App, O=Dev, L=City, S=State, C=US"
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore release.keystore -storepass password123 -keypass password123 app-release.aab release
+
+      - name: Upload Release AAB Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-bundle
+          path: cosmicbreadcrumbs/android/app/build/outputs/bundle/release/app-release.aab
