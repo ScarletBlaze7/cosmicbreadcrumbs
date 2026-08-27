@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Compass, 
   Sparkles, 
@@ -46,6 +46,7 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
   membership,
   onOpenWelcomeModal,
 }) => {
+  const readingRef = useRef<HTMLDivElement>(null);
   const isPaidMember = Boolean(membership?.isActive);
   const userSunSign = getSunSignFromDate(userProfile.birthDate);
   const [selectedSign, setSelectedSign] = useState<ZodiacSignInfo>(userSunSign);
@@ -67,6 +68,9 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
     if (targetPeriod === 'today') {
       setPeriod('today');
       setAiReading(null);
+      setTimeout(() => {
+        readingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 50);
       return;
     }
 
@@ -84,6 +88,9 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
 
     setPeriod(targetPeriod);
     setAiReading(null);
+    setTimeout(() => {
+      readingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
   const loveForecast = getLoveRelationshipForecast(selectedSign, loveCategory, period);
@@ -310,6 +317,9 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
                 onClick={() => {
                   setSelectedSign(sign);
                   setAiReading(null);
+                  setTimeout(() => {
+                    readingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }, 50);
                 }}
                 className={`flex shrink-0 flex-col items-center justify-center rounded-2xl border p-3.5 min-w-[88px] sm:min-w-[96px] transition-all cursor-pointer ${
                   isSelected
@@ -322,61 +332,6 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
                 </div>
                 <span className="font-serif text-xs sm:text-sm font-bold mt-1.5">{sign.name}</span>
                 <span className="text-[10px] text-purple-300 font-mono mt-0.5">{sign.element}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Time Period Navigation Bar (Daily, Tomorrow, Weekly, Monthly) - Above the Reading */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-2xl border border-purple-600/70 bg-gradient-to-r from-slate-900 via-purple-950/60 to-slate-900 p-3 sm:p-3.5 shadow-2xl">
-        <div className="flex items-center space-x-2 text-xs sm:text-sm font-bold text-amber-300 pl-1">
-          <Compass className="h-4 w-4 text-amber-400" />
-          <span className="uppercase tracking-wider">Forecast Horizon:</span>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
-          {(
-            [
-              { id: 'today', label: 'Daily', isFree: true },
-              { id: 'tomorrow', label: 'Tomorrow', isFree: false },
-              { id: 'weekly', label: 'Weekly', isFree: false },
-              { id: 'monthly', label: 'Monthly', isFree: false },
-            ] as const
-          ).map((p) => {
-            const isSelected = period === p.id;
-            const isLocked = !p.isFree && !isPaidMember;
-
-            return (
-              <button
-                key={p.id}
-                id={`btn-period-${p.id}`}
-                onClick={() => handleSelectPeriod(p.id)}
-                className={`flex shrink-0 items-center space-x-2 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-black tracking-wide transition-all cursor-pointer shadow-sm ${
-                  isSelected
-                    ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white shadow-lg shadow-purple-900/80 border-2 border-amber-400 scale-105'
-                    : isLocked
-                    ? 'bg-slate-950/80 border border-purple-900/60 text-purple-200 hover:border-amber-400/50 hover:text-amber-300'
-                    : 'bg-slate-950/80 border border-purple-900/60 text-slate-100 hover:border-purple-600 hover:text-white'
-                }`}
-              >
-                <span className={isSelected ? 'text-white font-extrabold drop-shadow' : 'text-slate-100 font-bold'}>
-                  {p.label}
-                </span>
-                {p.isFree ? (
-                  <span className={`rounded-md px-1.5 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider ${
-                    isSelected 
-                      ? 'bg-emerald-400 text-slate-950 shadow' 
-                      : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                  }`}>
-                    Free
-                  </span>
-                ) : isLocked ? (
-                  <span className="flex items-center space-x-0.5 rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[10px] sm:text-xs font-bold text-amber-300 border border-amber-500/40">
-                    <Lock className="h-3 w-3" />
-                    <span>PRO</span>
-                  </span>
-                ) : null}
               </button>
             );
           })}
@@ -482,8 +437,63 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
 
         {/* Right Side: Deep 4-Dimensional Forecast & AI Synthesis (8 Cols) */}
         <div className="lg:col-span-8 space-y-6">
+          {/* Time Period Navigation Bar (Daily, Tomorrow, Weekly, Monthly) - Directly Above Astrological Synthesis */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 rounded-3xl border border-purple-600/70 bg-gradient-to-r from-slate-900 via-purple-950/70 to-slate-900 p-3 sm:p-3.5 shadow-2xl">
+            <div className="flex items-center space-x-2 text-xs sm:text-sm font-bold text-amber-300 pl-1">
+              <Compass className="h-4 w-4 text-amber-400" />
+              <span className="uppercase tracking-wider">Forecast Horizon:</span>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 w-full sm:w-auto">
+              {(
+                [
+                  { id: 'today', label: 'Daily', isFree: true },
+                  { id: 'tomorrow', label: 'Tomorrow', isFree: false },
+                  { id: 'weekly', label: 'Weekly', isFree: false },
+                  { id: 'monthly', label: 'Monthly', isFree: false },
+                ] as const
+              ).map((p) => {
+                const isSelected = period === p.id;
+                const isLocked = !p.isFree && !isPaidMember;
+
+                return (
+                  <button
+                    key={p.id}
+                    id={`btn-period-${p.id}`}
+                    onClick={() => handleSelectPeriod(p.id)}
+                    className={`flex shrink-0 items-center space-x-2 rounded-xl px-3.5 sm:px-4 py-2 text-xs sm:text-sm font-black tracking-wide transition-all cursor-pointer shadow-sm ${
+                      isSelected
+                        ? 'bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white shadow-lg shadow-purple-900/80 border-2 border-amber-400 scale-105'
+                        : isLocked
+                        ? 'bg-slate-950/80 border border-purple-900/60 text-purple-200 hover:border-amber-400/50 hover:text-amber-300'
+                        : 'bg-slate-950/80 border border-purple-900/60 text-slate-100 hover:border-purple-600 hover:text-white'
+                    }`}
+                  >
+                    <span className={isSelected ? 'text-white font-extrabold drop-shadow' : 'text-slate-100 font-bold'}>
+                      {p.label}
+                    </span>
+                    {p.isFree ? (
+                      <span className={`rounded-md px-1.5 py-0.5 text-[10px] sm:text-xs font-black uppercase tracking-wider ${
+                        isSelected 
+                          ? 'bg-emerald-400 text-slate-950 shadow' 
+                          : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                      }`}>
+                        Free
+                      </span>
+                    ) : isLocked ? (
+                      <span className="flex items-center space-x-0.5 rounded-md bg-amber-500/20 px-1.5 py-0.5 text-[10px] sm:text-xs font-bold text-amber-300 border border-amber-500/40">
+                        <Lock className="h-3 w-3" />
+                        <span>PRO</span>
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* AI Astrologer Deep Synthesis Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-purple-700/50 bg-gradient-to-br from-purple-950/70 via-slate-900 to-slate-950 p-6 shadow-xl">
+          <div id="astrological-synthesis-card" ref={readingRef} className="scroll-mt-6 relative overflow-hidden rounded-3xl border border-purple-700/50 bg-gradient-to-br from-purple-950/70 via-slate-900 to-slate-950 p-6 shadow-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-800/40 pb-4">
               <div className="flex items-center space-x-2.5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300">

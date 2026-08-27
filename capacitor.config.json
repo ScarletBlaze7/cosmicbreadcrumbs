@@ -1,0 +1,6 @@
+{
+  "appId": "com.cosmicbreadcrumbs.app",
+  "appName": "Cosmic Breadcrumbs",
+  "webDir": "dist",
+  "bundledWebRuntime": false
+}

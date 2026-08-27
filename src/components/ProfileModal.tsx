@@ -425,8 +425,8 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-purple-200 mb-1.5 flex items-center space-x-1.5">
-                <Clock className="h-3.5 w-3.5 text-purple-400" />
-                <span>Exact Birth Time (Optional)</span>
+                <Clock className="h-3.5 w-3.5 text-amber-400" />
+                <span>Time of Birth</span>
               </label>
               <input
                 type="time"
@@ -435,11 +435,14 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
                 className="w-full rounded-xl border border-purple-900/60 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none transition-all"
               />
+              <span className="block text-[10px] text-amber-300/90 mt-1 font-medium italic">
+                (optional if known for optimal numerology readings)
+              </span>
             </div>
             <div>
               <label className="block text-xs font-medium text-purple-200 mb-1.5 flex items-center space-x-1.5">
-                <MapPin className="h-3.5 w-3.5 text-purple-400" />
-                <span>Birth City / Location</span>
+                <MapPin className="h-3.5 w-3.5 text-amber-400" />
+                <span>Place of Birth</span>
               </label>
               <input
                 type="text"

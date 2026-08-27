@@ -295,7 +295,7 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                       We are thrilled and honored to welcome you into our sacred circle of intuitive seekers. Your presence enriches the collective vibration of our celestial sanctuary.
                     </p>
 
-                    {onPlayWelcomeVideo && (
+                    {membership.isActive && onPlayWelcomeVideo && (
                       <div className="pt-2">
                         <button
                           type="button"

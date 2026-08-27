@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Feather, 
   Sparkles, 
@@ -23,7 +23,8 @@ import {
   Sparkle,
   Film,
   Image as ImageIcon,
-  Play
+  Play,
+  ArrowDownCircle
 } from 'lucide-react';
 import { triggerFireworks } from '../utils/fireworks';
 import { UserProfile, ArchangelCard, DrawnArchangelCard } from '../types';
@@ -40,6 +41,9 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
   userProfile,
   onSaveJournal,
 }) => {
+  const readingRef = useRef<HTMLDivElement>(null);
+  const clarificationRef = useRef<HTMLDivElement>(null);
+
   // Primary Daily Card
   const [primaryCard, setPrimaryCard] = useState<DrawnArchangelCard | null>(() => {
     const saved = localStorage.getItem('auranova_daily_archangel_card');
@@ -68,7 +72,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
 
   const [isDrawingPrimary, setIsDrawingPrimary] = useState(false);
   const [isDrawingClarification, setIsDrawingClarification] = useState(false);
-  const [activeTab, setActiveTab] = useState<'archangel-temple' | 'daily-guidance'>('archangel-temple');
+  const [activeTab, setActiveTab] = useState<'daily-guidance' | 'archangel-temple'>('daily-guidance');
 
   // AI Channeling State
   const [customQuestion, setCustomQuestion] = useState('');
@@ -91,7 +95,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
     }
   }, [clarificationCard]);
 
-  // Pull / Shuffle Primary Daily Guidance Card
+  // Pull / Shuffle Primary Daily Guidance Card -> Jump directly to video & reading
   const handleDrawPrimaryCard = () => {
     if (isDrawingPrimary) return;
     setIsDrawingPrimary(true);
@@ -109,9 +113,38 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
       setClarificationCard(null);
       setAiGuidance(null);
       setPrimaryMediaMode('video'); // Auto-play video on draw!
+      setActiveTab('daily-guidance');
       setIsDrawingPrimary(false);
       triggerFireworks();
-    }, 600);
+
+      setTimeout(() => {
+        readingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }, 500);
+  };
+
+  // Pull specific Archangel card from Temple roster -> Jump directly to video & reading
+  const handleSelectArchangelCard = (archangelName: string) => {
+    const matched = ARCHANGEL_CARDS.find((c) => 
+      c.archangel.toLowerCase().includes(archangelName.toLowerCase()) || 
+      archangelName.toLowerCase().includes(c.archangel.toLowerCase())
+    ) || ARCHANGEL_CARDS[0];
+
+    const newCard: DrawnArchangelCard = {
+      ...matched,
+      drawnAt: new Date().toISOString(),
+    };
+
+    setPrimaryCard(newCard);
+    setClarificationCard(null);
+    setAiGuidance(null);
+    setPrimaryMediaMode('video');
+    setActiveTab('daily-guidance');
+    triggerFireworks();
+
+    setTimeout(() => {
+      readingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
   };
 
   // Pull Clarification Card (Only 1 extra card)
@@ -132,7 +165,11 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
       setClarificationMediaMode('video'); // Auto-play video on clarification draw!
       setIsDrawingClarification(false);
       triggerFireworks();
-    }, 700);
+
+      setTimeout(() => {
+        clarificationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    }, 600);
   };
 
   const handleResetClarification = () => {
@@ -217,18 +254,6 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
         {/* Tab Controls */}
         <div className="flex items-center space-x-1.5 rounded-2xl border border-purple-700/60 bg-slate-900/90 p-1.5 self-start sm:self-auto shadow-md">
           <button
-            id="tab-archangel-temple"
-            onClick={() => setActiveTab('archangel-temple')}
-            className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
-              activeTab === 'archangel-temple'
-                ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-md border border-rose-300/40'
-                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
-            }`}
-          >
-            <Crown className="h-4 w-4 text-amber-300" />
-            <span>Archangel Temple</span>
-          </button>
-          <button
             id="tab-daily-guidance"
             onClick={() => setActiveTab('daily-guidance')}
             className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
@@ -238,28 +263,43 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
             }`}
           >
             <Sparkles className="h-4 w-4 text-rose-300" />
-            <span>Daily Guidance Pull</span>
+            <span>Card Reading & Video</span>
+          </button>
+          <button
+            id="tab-archangel-temple"
+            onClick={() => setActiveTab('archangel-temple')}
+            className={`flex items-center space-x-2 rounded-xl px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
+              activeTab === 'archangel-temple'
+                ? 'bg-gradient-to-r from-rose-600 to-purple-600 text-white shadow-md border border-rose-300/40'
+                : 'text-purple-100 hover:bg-purple-950/60 hover:text-white'
+            }`}
+          >
+            <Crown className="h-4 w-4 text-amber-300" />
+            <span>18 Guardians Temple</span>
           </button>
         </div>
       </div>
 
-      {/* TAB 1: Daily Guidance Card Pull with Clarification Card */}
+      {/* TAB 1: Daily Guidance Card Pull with Video, Card Reading & Clarification Card */}
       {activeTab === 'daily-guidance' && (
-        <div className="space-y-8">
+        <div ref={readingRef} className="space-y-8 scroll-mt-6">
           {/* Top Quick Actions Bar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/60 border border-purple-900/40 rounded-2xl p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/80 border border-purple-900/50 rounded-3xl p-4 shadow-xl">
             <div className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-inner">
                 <Feather className="h-5 w-5 animate-pulse" />
               </div>
               <div>
-                <div className="text-xs font-serif font-bold text-slate-100">
-                  {clarificationCard ? 'Dual Archangel Spread Active' : 'Daily Archangel Transmission'}
+                <div className="text-xs font-serif font-bold text-slate-100 flex items-center gap-1.5">
+                  <span>{clarificationCard ? 'Dual Archangel Spread Active' : 'Daily Archangel Transmission'}</span>
+                  <span className="rounded-full bg-rose-500/20 border border-rose-400/40 text-[10px] text-rose-300 px-2 py-0.2">
+                    Living Video Active
+                  </span>
                 </div>
-                <div className="text-[11px] text-purple-300/80">
+                <div className="text-[11px] text-purple-300/90">
                   {clarificationCard 
-                    ? 'Primary guidance + 1 clarification card drawn for deeper context' 
-                    : 'Draw an extra card whenever you seek deeper clarity or confirmation'}
+                    ? 'Primary reading + 1 clarification card drawn for deeper context' 
+                    : 'Draw a card to jump directly to sacred angelic video and guidance'}
                 </div>
               </div>
             </div>
@@ -270,10 +310,10 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                 id="btn-shuffle-archangel-primary"
                 onClick={handleDrawPrimaryCard}
                 disabled={isDrawingPrimary}
-                className="flex items-center space-x-1.5 rounded-xl border border-purple-700 bg-purple-950/60 px-3 py-2 text-xs font-semibold text-purple-200 hover:bg-purple-900/70 transition-all disabled:opacity-50"
+                className="flex items-center space-x-1.5 rounded-xl border border-purple-600 bg-purple-950/80 px-3.5 py-2 text-xs font-bold text-purple-100 hover:bg-purple-900/80 hover:text-white shadow-sm transition-all disabled:opacity-50 cursor-pointer"
               >
                 <RotateCw className={`h-3.5 w-3.5 ${isDrawingPrimary ? 'animate-spin' : ''}`} />
-                <span>{isDrawingPrimary ? 'Shuffling Deck...' : 'Draw New Daily Card'}</span>
+                <span>{isDrawingPrimary ? 'Drawing Card...' : 'Draw New Angel Card'}</span>
               </button>
 
               {!clarificationCard ? (
@@ -282,7 +322,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                   id="btn-draw-archangel-clarification"
                   onClick={handleDrawClarificationCard}
                   disabled={isDrawingClarification || !primaryCard}
-                  className="flex items-center space-x-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-amber-500/20 hover:opacity-90 transition-all disabled:opacity-50"
+                  className="flex items-center space-x-1.5 rounded-xl bg-gradient-to-r from-amber-500 via-rose-500 to-purple-600 px-4 py-2 text-xs font-bold text-white shadow-lg shadow-amber-500/20 hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   <PlusCircle className={`h-3.5 w-3.5 ${isDrawingClarification ? 'animate-spin' : ''}`} />
                   <span>{isDrawingClarification ? 'Drawing Clarification...' : 'Draw Clarification Card (+1)'}</span>
@@ -292,7 +332,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                   type="button"
                   id="btn-clear-clarification"
                   onClick={handleResetClarification}
-                  className="flex items-center space-x-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-all"
+                  className="flex items-center space-x-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer"
                 >
                   <RotateCw className="h-3.5 w-3.5" />
                   <span>Reset Clarification</span>
@@ -301,19 +341,19 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
             </div>
           </div>
 
-          {/* Cards Display Grid: 1 or 2 Cards */}
+          {/* Cards Display Grid: Primary Guidance Card + (Optional) Clarification Card */}
           <div className={`grid grid-cols-1 ${clarificationCard ? 'lg:grid-cols-2' : 'max-w-3xl mx-auto'} gap-6`}>
             {/* PRIMARY GUIDANCE CARD */}
             {primaryCard && (
-              <div className="relative overflow-hidden rounded-3xl border-2 border-rose-500/40 bg-gradient-to-br from-slate-900 via-rose-950/20 to-slate-950 p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-300">
+              <div className="relative overflow-hidden rounded-3xl border-2 border-rose-500/50 bg-gradient-to-br from-slate-900 via-rose-950/25 to-slate-950 p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-300">
                 {/* Header Tag & Media Mode Toggle */}
                 <div className="flex items-center justify-between border-b border-rose-900/40 pb-3">
                   <div className="flex items-center space-x-2">
-                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/20 text-rose-300 font-bold text-[10px]">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-full bg-rose-500/20 text-rose-300 font-bold text-[10px] border border-rose-400/40">
                       1
                     </span>
                     <span className="text-[11px] font-bold uppercase tracking-wider text-rose-300">
-                      Daily Guidance Card
+                      Primary Angel Guidance Card
                     </span>
                   </div>
 
@@ -322,7 +362,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setPrimaryMediaMode('video')}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
                         primaryMediaMode === 'video'
                           ? 'bg-rose-600 text-white shadow-sm'
                           : 'text-purple-300 hover:text-white'
@@ -334,7 +374,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setPrimaryMediaMode('artwork')}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
                         primaryMediaMode === 'artwork'
                           ? 'bg-rose-600 text-white shadow-sm'
                           : 'text-purple-300 hover:text-white'
@@ -346,8 +386,32 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                   </div>
                 </div>
 
+                {/* Primary Card Vision Video / Portrait Display (Front & Center) */}
+                <div className="rounded-2xl overflow-hidden shadow-2xl border border-rose-900/50 bg-slate-950">
+                  {primaryMediaMode === 'video' ? (
+                    <ArchangelVideoPlayer
+                      archangel={primaryCard.archangel}
+                      autoPlay={true}
+                      className="w-full h-64 sm:h-72"
+                      fallbackArtwork={
+                        <ArchangelDynamicArtwork
+                          archangel={primaryCard.archangel}
+                          variant="card-banner"
+                          className="w-full shadow-2xl"
+                        />
+                      }
+                    />
+                  ) : (
+                    <ArchangelDynamicArtwork
+                      archangel={primaryCard.archangel}
+                      variant="card-banner"
+                      className="w-full shadow-2xl"
+                    />
+                  )}
+                </div>
+
                 {/* Archangel Title & Visual Atmosphere */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 pt-1">
                   <div className="text-xs font-serif font-bold text-amber-300 uppercase tracking-wide">
                     {primaryCard.archangel}
                   </div>
@@ -356,35 +420,13 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                   </h2>
                   <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-purple-300/90">
                     <span className="rounded-md bg-slate-950/60 px-2 py-0.5 border border-purple-900/50">
-                      Theme: <strong>{primaryCard.theme}</strong>
+                      Theme: <strong className="text-purple-100">{primaryCard.theme}</strong>
                     </span>
                     <span className="rounded-md bg-slate-950/60 px-2 py-0.5 border border-purple-900/50">
-                      Crystal: <strong>{primaryCard.crystalResonance}</strong>
+                      Crystal: <strong className="text-amber-200">{primaryCard.crystalResonance}</strong>
                     </span>
                   </div>
                 </div>
-
-                {/* Primary Card Video or Artwork */}
-                {primaryMediaMode === 'video' ? (
-                  <ArchangelVideoPlayer
-                    archangel={primaryCard.archangel}
-                    autoPlay={true}
-                    className="w-full h-64 sm:h-72"
-                    fallbackArtwork={
-                      <ArchangelDynamicArtwork
-                        archangel={primaryCard.archangel}
-                        variant="card-banner"
-                        className="w-full shadow-2xl"
-                      />
-                    }
-                  />
-                ) : (
-                  <ArchangelDynamicArtwork
-                    archangel={primaryCard.archangel}
-                    variant="card-banner"
-                    className="w-full shadow-2xl"
-                  />
-                )}
 
                 {/* Wings of Light Atmosphere */}
                 <div className="rounded-2xl border border-rose-900/30 bg-rose-950/30 p-3 text-xs text-rose-200/90 italic flex items-start space-x-2">
@@ -393,9 +435,9 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                 </div>
 
                 {/* Divine Message */}
-                <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">
-                    Divine Transmission
+                <div className="space-y-1.5 bg-slate-950/60 p-4 rounded-2xl border border-purple-900/40">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">
+                    Divine Transmission & Guidance
                   </span>
                   <p className="text-xs sm:text-sm text-slate-100 leading-relaxed">
                     {primaryCard.divineMessage}
@@ -438,8 +480,8 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
             )}
 
             {/* CLARIFICATION CARD (CARD 2) */}
-            {clarificationCard ? (
-              <div className="relative overflow-hidden rounded-3xl border-2 border-amber-400/60 bg-gradient-to-br from-slate-900 via-amber-950/20 to-slate-950 p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-300">
+            {clarificationCard && (
+              <div ref={clarificationRef} className="relative overflow-hidden rounded-3xl border-2 border-amber-400/60 bg-gradient-to-br from-slate-900 via-amber-950/25 to-slate-950 p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95 duration-300 scroll-mt-6">
                 {/* Header Tag & Media Mode Toggle */}
                 <div className="flex items-center justify-between border-b border-amber-900/40 pb-3">
                   <div className="flex items-center space-x-2">
@@ -456,7 +498,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setClarificationMediaMode('video')}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
                         clarificationMediaMode === 'video'
                           ? 'bg-amber-600 text-white shadow-sm'
                           : 'text-amber-200 hover:text-white'
@@ -468,7 +510,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                     <button
                       type="button"
                       onClick={() => setClarificationMediaMode('artwork')}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all ${
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all cursor-pointer ${
                         clarificationMediaMode === 'artwork'
                           ? 'bg-amber-600 text-white shadow-sm'
                           : 'text-amber-200 hover:text-white'
@@ -480,8 +522,32 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                   </div>
                 </div>
 
+                {/* Clarification Card Video or Artwork */}
+                <div className="rounded-2xl overflow-hidden shadow-2xl border border-amber-500/30 bg-slate-950">
+                  {clarificationMediaMode === 'video' ? (
+                    <ArchangelVideoPlayer
+                      archangel={clarificationCard.archangel}
+                      autoPlay={true}
+                      className="w-full h-64 sm:h-72"
+                      fallbackArtwork={
+                        <ArchangelDynamicArtwork
+                          archangel={clarificationCard.archangel}
+                          variant="card-banner"
+                          className="w-full shadow-2xl"
+                        />
+                      }
+                    />
+                  ) : (
+                    <ArchangelDynamicArtwork
+                      archangel={clarificationCard.archangel}
+                      variant="card-banner"
+                      className="w-full shadow-2xl"
+                    />
+                  )}
+                </div>
+
                 {/* Archangel Title & Visual Atmosphere */}
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 pt-1">
                   <div className="text-xs font-serif font-bold text-amber-300 uppercase tracking-wide">
                     {clarificationCard.archangel}
                   </div>
@@ -490,35 +556,13 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                   </h2>
                   <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-amber-200/80">
                     <span className="rounded-md bg-slate-950/60 px-2 py-0.5 border border-amber-900/50">
-                      Theme: <strong>{clarificationCard.theme}</strong>
+                      Theme: <strong className="text-amber-100">{clarificationCard.theme}</strong>
                     </span>
                     <span className="rounded-md bg-slate-950/60 px-2 py-0.5 border border-amber-900/50">
-                      Crystal: <strong>{clarificationCard.crystalResonance}</strong>
+                      Crystal: <strong className="text-amber-200">{clarificationCard.crystalResonance}</strong>
                     </span>
                   </div>
                 </div>
-
-                {/* Clarification Card Video or Artwork */}
-                {clarificationMediaMode === 'video' ? (
-                  <ArchangelVideoPlayer
-                    archangel={clarificationCard.archangel}
-                    autoPlay={true}
-                    className="w-full h-64 sm:h-72"
-                    fallbackArtwork={
-                      <ArchangelDynamicArtwork
-                        archangel={clarificationCard.archangel}
-                        variant="card-banner"
-                        className="w-full shadow-2xl"
-                      />
-                    }
-                  />
-                ) : (
-                  <ArchangelDynamicArtwork
-                    archangel={clarificationCard.archangel}
-                    variant="card-banner"
-                    className="w-full shadow-2xl"
-                  />
-                )}
 
                 {/* Clarification Spotlight Banner */}
                 <div className="rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/20 to-purple-950/40 p-4 space-y-1">
@@ -532,7 +576,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                 </div>
 
                 {/* Divine Message */}
-                <div className="space-y-1">
+                <div className="space-y-1.5 bg-slate-950/60 p-4 rounded-2xl border border-purple-900/40">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
                     Clarification Transmission
                   </span>
@@ -574,11 +618,47 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                   </p>
                 </div>
               </div>
-            ) : null}
+            )}
           </div>
 
+          {/* ========================================================= */}
+          {/* OFFER CLARIFICATION CARD PROMINENT BANNER (When Not Yet Drawn) */}
+          {/* ========================================================= */}
+          {!clarificationCard && primaryCard && (
+            <div className="rounded-3xl border-2 border-amber-400/50 bg-gradient-to-r from-[#170e28] via-[#1f1035] to-[#120a22] p-6 sm:p-7 shadow-2xl text-center space-y-4 max-w-3xl mx-auto">
+              <div className="inline-flex items-center space-x-2 rounded-full bg-amber-500/20 px-3.5 py-1 text-xs font-bold text-amber-300 border border-amber-500/40 shadow-sm">
+                <Sparkles className="h-3.5 w-3.5 animate-pulse" />
+                <span>Deeper Angelic Illumination</span>
+              </div>
+
+              <div className="space-y-1.5">
+                <h3 className="font-serif text-lg sm:text-xl font-bold text-slate-100">
+                  Seek Deeper Clarity or Confirmation?
+                </h3>
+                <p className="text-xs sm:text-sm text-purple-200/90 max-w-xl mx-auto leading-relaxed">
+                  Draw an extra <strong>Clarification Card</strong> to unveil hidden influences, underlying emotions, or additional celestial advice connecting with <strong>{primaryCard.archangel}</strong>.
+                </p>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  id="btn-offer-draw-clarification"
+                  onClick={handleDrawClarificationCard}
+                  disabled={isDrawingClarification}
+                  className="rounded-2xl bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 px-8 py-3.5 text-xs sm:text-sm font-bold text-white shadow-xl shadow-amber-500/25 hover:opacity-95 active:scale-95 transition-all cursor-pointer disabled:opacity-50"
+                >
+                  <span className="flex items-center justify-center space-x-2">
+                    <PlusCircle className={`h-4 w-4 ${isDrawingClarification ? 'animate-spin' : ''}`} />
+                    <span>{isDrawingClarification ? 'Drawing Clarification Card...' : '🕊️ Draw Clarification Card (+1 Extra)'}</span>
+                  </span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Dual Synthesis & Journal Log Bar */}
-          <div className="rounded-3xl border border-purple-800/40 bg-slate-900/80 p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="rounded-3xl border border-purple-800/40 bg-slate-900/80 p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 max-w-3xl mx-auto">
             <div className="space-y-1 text-center sm:text-left">
               <div className="flex items-center justify-center sm:justify-start space-x-2 text-xs font-bold text-amber-300">
                 <Crown className="h-4 w-4" />
@@ -597,7 +677,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
               type="button"
               id="btn-save-archangel-journal"
               onClick={handleSaveToJournal}
-              className={`flex items-center space-x-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all shrink-0 ${
+              className={`flex items-center space-x-2 rounded-xl px-5 py-2.5 text-xs font-semibold transition-all shrink-0 cursor-pointer ${
                 isSaved
                   ? 'bg-emerald-600 text-white'
                   : 'bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 text-white hover:opacity-90 shadow-md shadow-purple-600/30'
@@ -618,7 +698,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
           </div>
 
           {/* AI Archangel Channeling Portal */}
-          <div className="rounded-3xl border border-purple-700/50 bg-gradient-to-br from-purple-950/70 via-slate-900 to-slate-950 p-6 sm:p-7 shadow-xl space-y-4">
+          <div className="rounded-3xl border border-purple-700/50 bg-gradient-to-br from-purple-950/70 via-slate-900 to-slate-950 p-6 sm:p-7 shadow-xl space-y-4 max-w-3xl mx-auto">
             <div className="flex items-center space-x-3 border-b border-purple-800/40 pb-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 border border-amber-500/30">
                 <Sparkles className="h-5 w-5 animate-pulse" />
@@ -646,7 +726,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                 type="submit"
                 disabled={loadingAI || !primaryCard}
                 id="btn-channel-archangel-ai"
-                className="w-full flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 py-3 text-xs font-semibold text-white shadow-md hover:opacity-90 transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 py-3 text-xs font-semibold text-white shadow-md hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw className={`h-4 w-4 ${loadingAI ? 'animate-spin' : ''}`} />
                 <span>{loadingAI ? 'Channeling Celestial Realm...' : 'Channel Archangel Answer'}</span>
@@ -696,7 +776,7 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
         <div className="space-y-6">
           <div className="rounded-2xl bg-purple-950/30 border border-purple-800/40 p-4 text-xs text-purple-200 leading-relaxed">
             <p>
-              The Archangels are celestial overseers of divine rays, elements, and spiritual virtues. You may invoke them at any moment—simply speak their name or recite their sacred prayer with pure intention. Tap <strong>Vision Video</strong> on any guardian below to watch their living celestial transmission.
+              The Archangels are celestial overseers of divine rays, elements, and spiritual virtues. You may invoke them at any moment—simply tap <strong>Pull Card & Reading</strong> to jump directly to their living video and sacred transmission, or tap <strong>Vision Video</strong> to watch their living presence.
             </p>
           </div>
 
@@ -713,23 +793,9 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                       <span className="font-serif text-base sm:text-lg font-bold text-slate-100">
                         {arch.name}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setTempleActiveVideo(isVideoActive ? null : arch.name)}
-                          className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[10px] font-bold border transition-all ${
-                            isVideoActive
-                              ? 'bg-amber-500 text-slate-950 border-amber-300 shadow-md font-bold'
-                              : 'bg-slate-950/80 text-amber-300 border-amber-500/40 hover:bg-amber-500/20'
-                          }`}
-                        >
-                          <Film className="w-3 h-3" />
-                          <span>{isVideoActive ? 'Portrait' : 'Vision Video'}</span>
-                        </button>
-                        <span className="rounded-full bg-purple-950 border border-purple-700/50 px-2.5 py-0.5 text-[10px] text-amber-300 font-semibold">
-                          {arch.colorRay}
-                        </span>
-                      </div>
+                      <span className="rounded-full bg-purple-950 border border-purple-700/50 px-2.5 py-0.5 text-[10px] text-amber-300 font-semibold">
+                        {arch.colorRay}
+                      </span>
                     </div>
 
                     {/* Universal Dynamic Archangel Artwork or Video */}
@@ -763,8 +829,35 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
                     </p>
                   </div>
 
-                  <div className="rounded-xl border border-purple-900/50 bg-slate-950/60 p-3 text-[11px] text-amber-200/90 italic">
-                    "{arch.prayer}"
+                  <div className="space-y-3 pt-2">
+                    <div className="rounded-xl border border-purple-900/50 bg-slate-950/60 p-3 text-[11px] text-amber-200/90 italic">
+                      "{arch.prayer}"
+                    </div>
+
+                    {/* Action buttons for each Archangel */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSelectArchangelCard(arch.name)}
+                        className="flex items-center justify-center space-x-1 rounded-xl bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 px-3 py-2 text-xs font-bold text-white shadow-md hover:opacity-90 transition-all cursor-pointer"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                        <span>Pull & Read Card</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setTempleActiveVideo(isVideoActive ? null : arch.name)}
+                        className={`flex items-center justify-center space-x-1 rounded-xl px-3 py-2 text-xs font-bold border transition-all cursor-pointer ${
+                          isVideoActive
+                            ? 'bg-amber-500 text-slate-950 border-amber-300 font-bold'
+                            : 'bg-slate-950/80 text-amber-300 border-amber-500/40 hover:bg-amber-500/20'
+                        }`}
+                      >
+                        <Film className="w-3.5 h-3.5" />
+                        <span>{isVideoActive ? 'Portrait' : 'Vision Video'}</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -775,3 +868,4 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
     </div>
   );
 };
+

@@ -8,10 +8,14 @@
 *.cer
 *.zip
 *.tar.gz
+*.log
 scratch/
 dist/
+build/
+coverage/
 node_modules/
 .env*
+!.env.example
 .android/
 .cache/
 .config/
@@ -26,6 +30,7 @@ node_modules/
 .bash_history
 .python_history
 .gitignore.localbak
+.DS_Store
 downloads/
 android-sdk/
 apk_src/
@@ -41,5 +46,4 @@ lib/
 data/
 storage/
 store/
-ui/
 work/

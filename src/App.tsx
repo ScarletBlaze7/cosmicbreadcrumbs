@@ -477,7 +477,7 @@ export default function App() {
       />
 
       <SanctuaryWelcomeVideoModal
-        isOpen={isWelcomeVideoOpen}
+        isOpen={isWelcomeVideoOpen && Boolean(membership.isActive)}
         onClose={() => setIsWelcomeVideoOpen(false)}
       />
     
