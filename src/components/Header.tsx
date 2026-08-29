@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
   const isMemberOrTrial = Boolean(membership?.isActive);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-purple-950/80 bg-[#060710]/95 backdrop-blur-md px-3 sm:px-5 py-2">
+    <header className="sticky top-0 z-40 w-full border-b border-purple-950/80 bg-[#060710]/95 backdrop-blur-md px-3 sm:px-5 py-2 pt-[max(env(safe-area-inset-top),8px)]">
       <div className="mx-auto max-w-7xl relative flex items-center justify-between min-h-[54px] sm:min-h-[58px]">
         
         {/* ── LEFT SECTION: Title directly above Tagline ── */}

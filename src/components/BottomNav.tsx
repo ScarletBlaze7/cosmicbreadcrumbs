@@ -23,7 +23,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   return (
     <nav
       id="bottom-app-navigation"
-      className="fixed bottom-0 left-0 right-0 z-40 border-t border-purple-900/80 bg-[#070514]/95 backdrop-blur-xl shadow-2xl shadow-purple-950 py-2 px-2 sm:px-4"
+      className="fixed bottom-0 left-0 right-0 z-40 border-t border-purple-900/80 bg-[#070514]/95 backdrop-blur-xl shadow-2xl shadow-purple-950 py-2 px-2 sm:px-4 pb-[max(env(safe-area-inset-bottom),8px)]"
     >
       <div className="mx-auto flex max-w-lg items-center justify-around">
         {navButtons.map((item) => {
