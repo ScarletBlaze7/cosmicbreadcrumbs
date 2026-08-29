@@ -6,6 +6,16 @@
  * Synthesizes NASA physical telemetry with astrological aspect geometry.
  */
 
+export interface MoonPhaseDetail {
+  phaseName: string;
+  phaseIcon: string;
+  illumination: number; // 0 - 100%
+  phaseMeaning: string;
+  ritualAdvice: string;
+  intention: string;
+  isWaxing: boolean;
+}
+
 export interface PlanetaryPosition {
   id: string;
   name: string;
@@ -23,6 +33,7 @@ export interface PlanetaryPosition {
   rulingHouse: number;
   dignity: 'Ruler' | 'Exalted' | 'Fall' | 'Detriment' | 'Neutral';
   significance: string;
+  moonPhaseInfo?: MoonPhaseDetail;
 }
 
 export interface CelestialAspect {
@@ -126,6 +137,91 @@ export function degreeToZodiac(deg: number) {
   };
 }
 
+export function getMoonPhaseDetails(date: Date = new Date()): MoonPhaseDetail {
+  const lp = 2551443; // synodic month in seconds
+  const now = date.getTime();
+  const newMoonRef = new Date(Date.UTC(2000, 0, 6, 18, 14, 0)).getTime();
+  const phaseSeconds = ((now - newMoonRef) / 1000) % lp;
+  const fraction = phaseSeconds / lp;
+  const age = fraction * 29.53058867; // in days
+  const illumination = Math.round((1 - Math.cos(fraction * 2 * Math.PI)) * 50);
+
+  let phaseName = 'New Moon';
+  let phaseIcon = '🌑';
+  let isWaxing = true;
+  let phaseMeaning = 'The Moon aligns directly with the Sun, wiping the cosmic slate clean. A powerful reset point for planting new seeds and setting intentions.';
+  let ritualAdvice = 'Light a white candle, write down 3 core goals in your journal, and meditate on pure potential.';
+  let intention = 'New Beginnings & Intention Setting';
+
+  if (age < 1.84566) {
+    phaseName = 'New Moon';
+    phaseIcon = '🌑';
+    isWaxing = true;
+    phaseMeaning = 'The Moon aligns with the Sun, resetting the cosmic cycle. Pure potential and clean slate energy for planting fresh intentions.';
+    ritualAdvice = 'Light a white candle, write down 3 heartfelt intentions in your diary, and meditate on pure potential.';
+    intention = 'Manifestation Seed';
+  } else if (age < 5.53699) {
+    phaseName = 'Waxing Crescent';
+    phaseIcon = '🌒';
+    isWaxing = true;
+    phaseMeaning = 'A delicate sliver of light emerges in the sky. Cosmic energy is gaining momentum, calling you to take early bold action to nurture your goals.';
+    ritualAdvice = 'Take proactive, tangible steps toward the intentions you planted during the New Moon.';
+    intention = 'Momentum & Action';
+  } else if (age < 9.22831) {
+    phaseName = 'First Quarter';
+    phaseIcon = '🌓';
+    isWaxing = true;
+    phaseMeaning = 'Half illuminated, half in shadow. A cosmic checkpoint of strength and decision-making where obstacles are overcome through perseverance.';
+    ritualAdvice = 'Make decisive choices, overcome roadblocks with courage, and balance reflection with focused action.';
+    intention = 'Overcoming Challenges & Breakthrough';
+  } else if (age < 12.91963) {
+    phaseName = 'Waxing Gibbous';
+    phaseIcon = '🌔';
+    isWaxing = true;
+    phaseMeaning = 'The Moon is almost full and swelling with radiant energy. This phase calls for refining details, cultivating patience, and perfecting your craft.';
+    ritualAdvice = 'Fine-tune your craft, polish details, and stay steady as your desires reach full manifestation.';
+    intention = 'Refinement & Growth';
+  } else if (age < 16.61096) {
+    phaseName = 'Full Moon';
+    phaseIcon = '🌕';
+    isWaxing = false;
+    phaseMeaning = 'Peak cosmic illumination and emotional clarity. The Moon reflects maximum sunlight, revealing hidden truths, bringing projects to fruition, and amplifying psychic intuition.';
+    ritualAdvice = 'Charge your crystals under moonlight, express deep gratitude, celebrate your wins, and release what has completed.';
+    intention = 'Illumination & Celebration';
+  } else if (age < 20.30228) {
+    phaseName = 'Waning Gibbous (Disseminating)';
+    phaseIcon = '🌖';
+    isWaxing = false;
+    phaseMeaning = 'The light begins to gently recede. A sacred time for sharing wisdom, teaching, expressing appreciation, and giving back to your community.';
+    ritualAdvice = 'Share wisdom with others, mentor a peer, and practice deep forgiveness and gratitude.';
+    intention = 'Sharing & Release';
+  } else if (age < 23.99361) {
+    phaseName = 'Last Quarter';
+    phaseIcon = '🌗';
+    isWaxing = false;
+    phaseMeaning = 'A period of deliberate release and spiritual clearing. Shed old habits, clear stagnant energy, and let go of whatever no longer serves your peace.';
+    ritualAdvice = 'Declutter your living space, forgive past resentments, and release mental burdens into the cosmic flow.';
+    intention = 'Purification & Cleansing';
+  } else {
+    phaseName = 'Waning Crescent (Balsamic)';
+    phaseIcon = '🌘';
+    isWaxing = false;
+    phaseMeaning = 'The final sliver before the dark moon. A phase of deep spiritual surrender, rest, dream reflection, and psychic recuperation.';
+    ritualAdvice = 'Rest, take soothing warm baths, record your dreams, and recharge your psychic batteries in quiet solitude.';
+    intention = 'Restoration & Surrender';
+  }
+
+  return {
+    phaseName,
+    phaseIcon,
+    illumination,
+    phaseMeaning,
+    ritualAdvice,
+    intention,
+    isWaxing
+  };
+}
+
 /**
  * NASA JPL Keplerian Orbital Computation Engine
  * Computes mean orbital elements and derives heliocentric/geocentric ecliptic longitudes
@@ -159,6 +255,7 @@ export function calculatePlanetaryPositions(targetDate: Date = new Date()): Plan
     - 0.186 * Math.sin((M_sun * Math.PI) / 180)
   );
   const moonZodiac = degreeToZodiac(moonLong);
+  const moonPhase = getMoonPhaseDetails(targetDate);
 
   // 3. MERCURY
   const M_merc = normalizeDegrees(174.7948 + 4.09233445 * d);
@@ -218,20 +315,24 @@ export function calculatePlanetaryPositions(targetDate: Date = new Date()): Plan
   const uraZodiac = degreeToZodiac(uraLong);
 
   // 9. NEPTUNE
-  const L_nep_mean = normalizeDegrees(304.348 + 0.005981 * d);
+  const L_nep_mean = normalizeDegrees(304.88 + 0.005981 * d);
   const nepLong = normalizeDegrees(L_nep_mean - 1.8 * Math.sin(((sunTrueLong - L_nep_mean) * Math.PI) / 180));
   const nepZodiac = degreeToZodiac(nepLong);
 
   // 10. PLUTO
-  const L_plu_mean = normalizeDegrees(238.96 + 0.00397 * d);
-  const pluLong = normalizeDegrees(L_plu_mean - 1.5 * Math.sin(((sunTrueLong - L_plu_mean) * Math.PI) / 180));
+  const L_plu_mean = normalizeDegrees(238.9 + 0.00396 * d);
+  const pluLong = normalizeDegrees(L_plu_mean + 1.2 * Math.sin(((sunTrueLong - L_plu_mean) * Math.PI) / 180));
   const pluZodiac = degreeToZodiac(pluLong);
 
-  // 11. CHIRON (The Wounded Healer Archetype)
-  const L_chiron = normalizeDegrees(28.5 + 0.0195 * d);
-  const chironZodiac = degreeToZodiac(L_chiron);
+  // 11. NORTH NODE
+  const nodeLong = normalizeDegrees(125.0445 - 1934.136 * T + 0.002075 * T * T);
+  const nodeZodiac = degreeToZodiac(nodeLong);
 
-  const planets: PlanetaryPosition[] = [
+  // 12. CHIRON
+  const chironLong = normalizeDegrees(24.5 + 0.019 * d);
+  const chironZodiac = degreeToZodiac(chironLong);
+
+  return [
     {
       id: 'sun',
       name: 'Sun (Sol)',
@@ -244,7 +345,7 @@ export function calculatePlanetaryPositions(targetDate: Date = new Date()): Plan
       formattedPos: sunZodiac.formatted,
       isRetrograde: false,
       speed: 0.9856,
-      distanceAU: 1.012,
+      distanceAU: 1.0,
       element: sunZodiac.element,
       rulingHouse: 5,
       dignity: sunZodiac.sign === 'Leo' ? 'Ruler' : sunZodiac.sign === 'Aries' ? 'Exalted' : 'Neutral',
@@ -267,6 +368,7 @@ export function calculatePlanetaryPositions(targetDate: Date = new Date()): Plan
       rulingHouse: 4,
       dignity: moonZodiac.sign === 'Cancer' ? 'Ruler' : moonZodiac.sign === 'Taurus' ? 'Exalted' : 'Neutral',
       significance: 'Subconscious emotional landscape, psychic receptivity, instincts, and mother archetype.',
+      moonPhaseInfo: moonPhase,
     },
     {
       id: 'mercury',

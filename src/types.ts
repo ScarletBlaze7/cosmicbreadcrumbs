@@ -24,6 +24,7 @@ export interface MembershipStatus {
 
 export interface UserProfile {
   name: string;
+  email?: string;
   birthDate: string; // YYYY-MM-DD
   birthTime?: string; // HH:MM
   birthPlace?: string;

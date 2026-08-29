@@ -276,6 +276,7 @@ export default function App() {
               onSaveJournal={handleSaveJournal}
               membership={membership}
               onOpenWelcomeModal={handleOpenWelcomeModal}
+              onOpenProfile={() => setIsProfileOpen(true)}
             />
           )}
 

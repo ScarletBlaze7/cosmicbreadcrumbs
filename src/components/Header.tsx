@@ -33,29 +33,29 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-purple-950/80 bg-[#060710]/95 backdrop-blur-md px-3 sm:px-5 py-2">
-      <div className="mx-auto max-w-7xl relative flex items-center justify-between min-h-[58px]">
+      <div className="mx-auto max-w-7xl relative flex items-center justify-between min-h-[54px] sm:min-h-[58px]">
         
         {/* ── LEFT SECTION: Title directly above Tagline ── */}
         <div 
           onClick={() => onViewChange('dashboard')}
-          className="flex flex-col items-start z-10 cursor-pointer group"
+          className="flex flex-col items-start z-10 cursor-pointer group shrink-0"
           id="app-brand-logo"
           title="Return to Cosmic Hub"
         >
           {/* Title */}
-          <span className="font-flavors text-lg sm:text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 tracking-wide leading-tight drop-shadow-[0_0_8px_rgba(251,191,36,0.45)] group-hover:scale-[1.02] transition-transform">
+          <span className="font-flavors text-base sm:text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200 tracking-normal sm:tracking-wide leading-tight drop-shadow-[0_0_8px_rgba(251,191,36,0.45)] group-hover:scale-[1.02] transition-transform whitespace-nowrap">
             Cosmic Breadcrumbs
           </span>
           {/* Tagline directly below Title */}
-          <span className="font-sans text-[10px] sm:text-xs font-semibold tracking-wide text-amber-200/95 italic drop-shadow-sm -mt-0.5">
+          <span className="font-sans text-[9.5px] sm:text-xs font-semibold tracking-normal sm:tracking-wide text-amber-200/95 italic drop-shadow-sm -mt-0.5 whitespace-nowrap">
             "Awaken the Universe Within"
           </span>
         </div>
 
-        {/* ── CENTER SECTION: Astrological Compass (As Is) ── */}
+        {/* ── CENTER SECTION: Astrological Compass (Visible on md+ screens to avoid mobile overlap) ── */}
         <div 
           onClick={() => onViewChange('dashboard')}
-          className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 flex items-center justify-center cursor-pointer group z-20"
+          className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 items-center justify-center cursor-pointer group z-20"
           title="Cosmic Hub Navigation"
         >
           <div className="relative flex items-center justify-center pointer-events-none">
@@ -79,101 +79,84 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* ── RIGHT SECTION: Top (Feather + Birth Matrix Avatar) | Bottom (Journal & Dreams Tabs) ── */}
-        <div className="flex flex-col items-end space-y-1.5 z-10">
+        {/* ── RIGHT SECTION: Clean Single-Row Actions (AI Oracle, Journal, Dreams, Profile) ── */}
+        <div className="flex items-center space-x-1.5 sm:space-x-2 z-10 shrink-0">
           
-          {/* Top Row: Cosmic Insight Feather & Cosmic Birth Matrix Avatar side-by-side */}
-          <div className="flex items-center space-x-2">
-            
-            {/* 1. Cosmic Insight Feather Button */}
-            <button
-              id="btn-cosmic-insight-header"
-              onClick={onOpenOracleChat}
-              className="group relative flex items-center justify-center p-0.5 bg-transparent border-0 outline-none hover:scale-110 active:scale-95 transition-transform cursor-pointer"
-              title="Cosmic Insights - AI Celestial Oracle Guidance"
-            >
-              <div className="relative flex items-center justify-center">
-                {/* Pulsating Celestial Aura */}
-                <div className="absolute inset-0 rounded-full bg-amber-400/35 blur-md animate-pulse pointer-events-none" />
-                
-                <img
-                  src="/assets/cosmic-insights-quill.png"
-                  alt="Cosmic Insights"
-                  className="relative h-7 w-7 sm:h-8 sm:w-8 object-contain drop-shadow-[0_0_12px_rgba(251,191,36,0.95)] animate-pulse transition-transform group-hover:scale-110 select-none pointer-events-none"
-                  style={{
-                    mixBlendMode: 'screen',
-                    WebkitMaskImage: 'radial-gradient(circle at center, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
-                    maskImage: 'radial-gradient(circle at center, rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%)',
-                  }}
-                />
-                
-                {/* Star Ping Indicator */}
-                <span className="absolute -top-0.5 -right-0.5 flex h-1.5 w-1.5 pointer-events-none">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-80" />
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-amber-400" />
-                </span>
-              </div>
-            </button>
-
-            {/* 2. Cosmic Birth Matrix Profile / Zodiac Sign (To the Right of Feather) */}
-            <div 
-              onClick={onOpenProfile}
-              id="btn-account-profile-trigger"
-              className="flex items-center cursor-pointer rounded-xl p-0.5 border border-amber-400/80 bg-[#0d0d24] shadow-[0_0_10px_rgba(251,191,36,0.5)] hover:border-amber-300 hover:scale-105 transition-all"
-              title="Cosmic Birth Matrix & Player Profile"
-            >
-              <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-lg overflow-hidden bg-slate-950">
-                {userProfile.avatarUrl ? (
-                  <img
-                    src={userProfile.avatarUrl}
-                    alt={userProfile.name || 'User Avatar'}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <ZodiacSymbolIcon 
-                    sign={sunSign.name} 
-                    size="sm" 
-                    fallbackText={sunSign.symbol}
-                    className="text-amber-300 scale-90" 
-                  />
-                )}
-              </div>
+          {/* 1. Cosmic Insights AI Oracle Feather */}
+          <button
+            id="btn-cosmic-insight-header"
+            onClick={onOpenOracleChat}
+            className="group relative flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-xl bg-[#120f26] border border-amber-500/40 hover:border-amber-400 hover:bg-purple-950/80 transition-all cursor-pointer shadow-sm hover:scale-105 active:scale-95"
+            title="Cosmic Insights - AI Celestial Oracle"
+          >
+            <div className="relative flex items-center justify-center">
+              <img
+                src="/assets/cosmic-insights-quill.png"
+                alt="Cosmic Insights"
+                className="h-5 w-5 sm:h-6 sm:w-6 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] animate-pulse select-none pointer-events-none"
+                style={{
+                  mixBlendMode: 'screen',
+                }}
+              />
+              <span className="absolute -top-1 -right-1 flex h-2 w-2 pointer-events-none">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-300 opacity-80" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+              </span>
             </div>
+          </button>
 
-          </div>
+          {/* 2. Journal / Diary Shortcut */}
+          <button
+            id="nav-daily-journal"
+            onClick={() => onViewChange('diary')}
+            className={`flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-xl border transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+              currentView === 'diary'
+                ? 'bg-purple-900 border-amber-400 text-amber-300 shadow-md'
+                : 'bg-[#120f26] border-purple-900/70 text-purple-200 hover:text-white hover:border-purple-500'
+            }`}
+            title="Private Diary & Sacred Journal"
+          >
+            <BookMarked className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+          </button>
 
-          {/* Bottom Row: Journal & Dreams Tabs */}
-          <div className="flex items-center space-x-1 sm:space-x-1.5">
-            {/* Journal */}
-            <button
-              id="nav-daily-journal"
-              onClick={() => onViewChange('diary')}
-              className={`flex items-center space-x-1 rounded-lg px-2 py-0.5 text-[10px] sm:text-[11px] font-sans font-bold tracking-wide transition-all cursor-pointer ${
-                currentView === 'diary'
-                  ? 'bg-purple-900 border border-purple-400 text-amber-300 shadow-sm'
-                  : 'text-purple-200 bg-[#14102c]/90 hover:bg-purple-950 hover:text-white border border-purple-900/50'
-              }`}
-              title="Daily Journal & Log"
-            >
-              <BookMarked className="h-3 w-3 text-amber-300" />
-              <span>Journal</span>
-            </button>
+          {/* 3. Dream Sanctuary Shortcut */}
+          <button
+            id="nav-dreamscape"
+            onClick={() => onViewChange('dreams')}
+            className={`flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-xl border transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+              currentView === 'dreams'
+                ? 'bg-purple-900 border-amber-400 text-amber-300 shadow-md'
+                : 'bg-[#120f26] border-purple-900/70 text-purple-200 hover:text-white hover:border-purple-500'
+            }`}
+            title="Dream Sanctuary"
+          >
+            <CloudMoon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+          </button>
 
-            {/* Dreams */}
-            <button
-              id="nav-dreamscape"
-              onClick={() => onViewChange('dreams')}
-              className={`flex items-center space-x-1 rounded-lg px-2 py-0.5 text-[10px] sm:text-[11px] font-sans font-bold tracking-wide transition-all cursor-pointer ${
-                currentView === 'dreams'
-                  ? 'bg-purple-900 border border-purple-400 text-amber-300 shadow-sm'
-                  : 'text-purple-200 bg-[#14102c]/90 hover:bg-purple-950 hover:text-white border border-purple-900/50'
-              }`}
-              title="Dreamscape Subconscious Codex"
-            >
-              <CloudMoon className="h-3 w-3 text-purple-300" />
-              <span>Dreams</span>
-            </button>
-          </div>
+          {/* 4. Cosmic Birth Matrix Profile Avatar */}
+          <button 
+            onClick={onOpenProfile}
+            id="btn-account-profile-trigger"
+            className="flex items-center justify-center h-8 w-8 sm:h-9 sm:w-9 rounded-xl p-0.5 border border-amber-400/80 bg-[#0d0d24] shadow-[0_0_10px_rgba(251,191,36,0.35)] hover:border-amber-300 hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            title="Cosmic Birth Matrix & Profile"
+          >
+            <div className="flex h-full w-full items-center justify-center rounded-lg overflow-hidden bg-slate-950">
+              {userProfile.avatarUrl ? (
+                <img
+                  src={userProfile.avatarUrl}
+                  alt={userProfile.name || 'User Avatar'}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <ZodiacSymbolIcon 
+                  sign={sunSign.name} 
+                  size="sm" 
+                  fallbackText={sunSign.symbol}
+                  className="text-amber-300 scale-90" 
+                />
+              )}
+            </div>
+          </button>
 
         </div>
 

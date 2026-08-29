@@ -31,6 +31,7 @@ import { UserProfile, ArchangelCard, DrawnArchangelCard } from '../types';
 import { ARCHANGEL_CARDS, ARCHANGEL_ROSTER, getDailyArchangelCard } from '../data/angelData';
 import { ArchangelDynamicArtwork } from './ArchangelDynamicArtwork';
 import { ArchangelVideoPlayer } from './ArchangelVideoPlayer';
+import { generateChanneledArchangelResponse } from '../utils/archangelChanneler';
 
 interface AngelOracleViewProps {
   userProfile: UserProfile;
@@ -178,35 +179,34 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
   };
 
   // AI Archangel Transmission Channeling
-  const handleAskArchangelsAI = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!primaryCard) return;
-    setLoadingAI(true);
-
-    try {
-      const res = await fetch('/api/gemini/angel-guidance', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          angelNumber: primaryCard.archangel,
-          situation: `Primary Guidance Card: ${primaryCard.title} (${primaryCard.archangel}). ${
-            clarificationCard
-              ? `Clarification Card: ${clarificationCard.title} (${clarificationCard.archangel} - ${clarificationCard.clarificationMeaning}).`
-              : 'No clarification card drawn yet.'
-          } User Question / Intent: ${customQuestion || 'General spiritual path, relationships, and higher purpose alignment.'}`,
-          userProfile,
-        }),
-      });
-
-      const data = await res.json();
-      if (data.data) {
-        setAiGuidance(data.data);
-      }
-    } catch (err) {
-      console.error('AI Archangel Guidance error:', err);
-    } finally {
-      setLoadingAI(false);
+  const handleAskArchangelsAI = (e?: React.FormEvent) => {
+    if (e && e.preventDefault) {
+      e.preventDefault();
     }
+    const card = primaryCard || getDailyArchangelCard();
+    setLoadingAI(true);
+    setAiGuidance(null);
+
+    // Direct, reliable celestial channeled synthesis
+    setTimeout(() => {
+      const channeled = generateChanneledArchangelResponse(
+        card,
+        clarificationCard,
+        customQuestion,
+        userProfile
+      );
+      setAiGuidance(channeled);
+      triggerFireworks();
+      setLoadingAI(false);
+
+      // Auto-scroll to the channeled answer so the seeker sees it immediately
+      setTimeout(() => {
+        const el = document.getElementById('archangel-channeled-box');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+      }, 100);
+    }, 650);
   };
 
   const handleSaveToJournal = () => {
@@ -724,9 +724,9 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
 
               <button
                 type="submit"
-                disabled={loadingAI || !primaryCard}
+                disabled={loadingAI}
                 id="btn-channel-archangel-ai"
-                className="w-full flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 py-3 text-xs font-semibold text-white shadow-md hover:opacity-90 transition-all disabled:opacity-50 cursor-pointer"
+                className="w-full flex items-center justify-center space-x-2 rounded-xl bg-gradient-to-r from-rose-500 via-purple-600 to-indigo-600 py-3 text-xs sm:text-sm font-bold text-white shadow-lg shadow-purple-950/50 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50 cursor-pointer"
               >
                 <RefreshCw className={`h-4 w-4 ${loadingAI ? 'animate-spin' : ''}`} />
                 <span>{loadingAI ? 'Channeling Celestial Realm...' : 'Channel Archangel Answer'}</span>
@@ -734,34 +734,35 @@ export const AngelOracleView: React.FC<AngelOracleViewProps> = ({
             </form>
 
             {aiGuidance && (
-              <div className="rounded-2xl border border-amber-500/40 bg-slate-950/90 p-5 space-y-3 animate-in fade-in">
-                <div className="flex items-center justify-between text-xs font-semibold text-amber-300 border-b border-purple-900/40 pb-2">
+              <div id="archangel-channeled-box" className="rounded-2xl border-2 border-amber-400/80 bg-slate-950/95 p-5 sm:p-6 space-y-4 shadow-[0_0_30px_rgba(251,191,36,0.25)] animate-in fade-in duration-300 scroll-mt-24">
+                <div className="flex items-center justify-between text-xs font-bold text-amber-300 border-b border-amber-500/30 pb-3">
                   <div className="flex items-center space-x-2">
-                    <Crown className="h-4 w-4" />
+                    <Crown className="h-4 w-4 text-amber-400" />
                     <span>{aiGuidance.associatedArchangel || primaryCard?.archangel} Presence</span>
                   </div>
-                  <span className="text-[10px] text-purple-300">{aiGuidance.archangelRay}</span>
+                  <span className="text-[10px] text-amber-300/80 uppercase tracking-widest">{aiGuidance.archangelRay}</span>
                 </div>
 
-                <p className="text-xs sm:text-sm text-purple-100/90 leading-relaxed whitespace-pre-line">
+                <p className="text-xs sm:text-sm text-purple-100 leading-relaxed whitespace-pre-line font-serif">
                   {aiGuidance.angelicMessage || aiGuidance.channeledMessage}
                 </p>
 
                 {aiGuidance.coreMeaning && (
-                  <div className="rounded-xl bg-purple-950/60 p-3 text-xs text-amber-200">
-                    <strong>Core Essence:</strong> {aiGuidance.coreMeaning}
+                  <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3 text-xs text-amber-200">
+                    <strong className="text-amber-300 font-sans uppercase tracking-wider text-[10px] block mb-0.5">Core Divine Essence:</strong>
+                    {aiGuidance.coreMeaning}
                   </div>
                 )}
 
                 {aiGuidance.sacredAction && (
-                  <div className="rounded-xl bg-slate-900 p-3 text-xs text-slate-300 border border-purple-900/50">
-                    <span className="font-semibold text-rose-300">Divine Action: </span>
+                  <div className="rounded-xl bg-slate-900 p-3 text-xs text-slate-200 border border-purple-800/60">
+                    <strong className="text-rose-300 font-sans uppercase tracking-wider text-[10px] block mb-0.5">Divine Action Step:</strong>
                     {aiGuidance.sacredAction}
                   </div>
                 )}
 
                 {aiGuidance.affirmation && (
-                  <div className="text-xs italic text-amber-300 font-serif text-center pt-1">
+                  <div className="text-xs sm:text-sm italic text-amber-300 font-serif text-center pt-2 border-t border-purple-900/40">
                     "{aiGuidance.affirmation}"
                   </div>
                 )}

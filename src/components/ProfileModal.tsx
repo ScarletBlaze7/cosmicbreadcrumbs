@@ -19,7 +19,10 @@ import {
   Mail,
   HelpCircle,
   Lock,
-  MessageSquare
+  MessageSquare,
+  Eye,
+  EyeOff,
+  KeyRound
 } from 'lucide-react';
 import { UserProfile, MembershipStatus } from '../types';
 import { getSunSignFromDate } from '../utils/astrologyCalc';
@@ -28,6 +31,7 @@ import { CosmicLogo } from './CosmicLogo';
 import { ZodiacSymbolIcon } from './ZodiacSymbolIcon';
 import { SanctuaryEmblem } from './SanctuaryEmblem';
 import { getTrialTimeRemaining } from '../utils/membership';
+import { getStoredAuthUser, updateUserEmail, updateUserPassword } from '../utils/authManager';
 
 
 interface ProfileModalProps {
@@ -58,11 +62,74 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [supportSentSuccess, setSupportSentSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Account Email & Password Management State
+  const storedUser = getStoredAuthUser();
+  const [accountEmail, setAccountEmail] = useState(storedUser?.email || userProfile.email || '');
+  const [emailStatusMsg, setEmailStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
+
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [passwordStatusMsg, setPasswordStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
   if (!isOpen) return null;
 
   const currentChangeCount = userProfile.birthDateChangeCount ?? 0;
   const changesRemaining = Math.max(0, MAX_BIRTHDATE_CHANGES - currentChangeCount);
   const isBirthdateLocked = changesRemaining <= 0;
+
+  const handleUpdateEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailStatusMsg(null);
+    if (!accountEmail.trim() || !accountEmail.includes('@')) {
+      setEmailStatusMsg({ type: 'error', text: 'Please enter a valid email address.' });
+      return;
+    }
+    setIsUpdatingEmail(true);
+    try {
+      const res = await updateUserEmail(accountEmail);
+      if (res.success) {
+        setEmailStatusMsg({ type: 'success', text: `✨ Email successfully updated to ${accountEmail}!` });
+        const updated: UserProfile = {
+          ...userProfile,
+          email: accountEmail.trim().toLowerCase(),
+        };
+        onSaveProfile(updated);
+      } else {
+        setEmailStatusMsg({ type: 'error', text: res.error || 'Failed to update email.' });
+      }
+    } finally {
+      setIsUpdatingEmail(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordStatusMsg(null);
+    if (newPassword.length < 6) {
+      setPasswordStatusMsg({ type: 'error', text: 'Password must be at least 6 characters long.' });
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordStatusMsg({ type: 'error', text: 'Passwords do not match.' });
+      return;
+    }
+    setIsUpdatingPassword(true);
+    try {
+      const res = await updateUserPassword(newPassword);
+      if (res.success) {
+        setPasswordStatusMsg({ type: 'success', text: '✨ Password updated successfully!' });
+        setNewPassword('');
+        setConfirmPassword('');
+      } else {
+        setPasswordStatusMsg({ type: 'error', text: res.error || 'Failed to update password.' });
+      }
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
 
   const trialTime = getTrialTimeRemaining(membership?.trialExpiryDate);
 
@@ -474,6 +541,133 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   Ancient Babylonian occult sound vibration system (Digits 1–8 & Sacred Divine 9) with Master Numbers (11, 22, 33).
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Account Credentials & Security (Email & Password) */}
+          <div className="rounded-2xl border border-purple-800/50 bg-[#0d0b1a] p-4 sm:p-5 space-y-4 shadow-lg shadow-purple-950/40">
+            <div className="flex items-center justify-between border-b border-purple-900/60 pb-3">
+              <div className="flex items-center space-x-2">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                  <ShieldCheck className="h-4 w-4" />
+                </div>
+                <div>
+                  <h4 className="font-serif text-xs font-bold text-slate-100 uppercase tracking-wider">
+                    Account & Security Settings
+                  </h4>
+                  <p className="text-[10px] text-purple-300/80">
+                    Manage your sign-in email and password
+                  </p>
+                </div>
+              </div>
+
+              {onOpenAuth && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onOpenAuth();
+                  }}
+                  className="rounded-lg bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/50 px-2.5 py-1 text-[10px] font-bold text-purple-200 transition-all flex items-center gap-1"
+                >
+                  <User className="h-3 w-3 text-amber-400" />
+                  <span>Switch / Sign In</span>
+                </button>
+              )}
+            </div>
+
+            {/* Email Management Form */}
+            <div className="space-y-2 pt-1">
+              <label className="block text-xs font-semibold text-purple-200 flex items-center space-x-1.5">
+                <Mail className="h-3.5 w-3.5 text-amber-400" />
+                <span>Account Email Address</span>
+              </label>
+
+              <div className="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="email"
+                  value={accountEmail}
+                  onChange={(e) => setAccountEmail(e.target.value)}
+                  placeholder="your.email@example.com"
+                  className="flex-1 rounded-xl border border-purple-900/60 bg-slate-950 px-3 py-2 text-xs text-slate-100 placeholder-purple-400/30 focus:border-amber-400 focus:outline-none"
+                />
+                <button
+                  type="button"
+                  disabled={isUpdatingEmail || !accountEmail.trim()}
+                  onClick={handleUpdateEmail}
+                  className="rounded-xl bg-purple-700 hover:bg-purple-600 disabled:opacity-50 px-4 py-2 text-xs font-bold text-white transition-all shadow-md shrink-0 cursor-pointer"
+                >
+                  {isUpdatingEmail ? 'Updating...' : 'Update Email'}
+                </button>
+              </div>
+
+              {emailStatusMsg && (
+                <div
+                  className={`p-2.5 rounded-xl text-[11px] font-medium ${
+                    emailStatusMsg.type === 'success'
+                      ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300'
+                      : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
+                  }`}
+                >
+                  {emailStatusMsg.text}
+                </div>
+              )}
+            </div>
+
+            {/* Password Change Form */}
+            <div className="space-y-2.5 pt-2 border-t border-purple-900/40">
+              <label className="block text-xs font-semibold text-purple-200 flex items-center space-x-1.5">
+                <KeyRound className="h-3.5 w-3.5 text-amber-400" />
+                <span>Change Password</span>
+              </label>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="New Password (6+ chars)"
+                    className="w-full rounded-xl border border-purple-900/60 bg-slate-950 px-3 py-2 pr-9 text-xs text-slate-100 placeholder-purple-400/30 focus:border-amber-400 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2.5 top-2.5 text-purple-400 hover:text-white"
+                  >
+                    {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </button>
+                </div>
+
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm New Password"
+                  className="w-full rounded-xl border border-purple-900/60 bg-slate-950 px-3 py-2 text-xs text-slate-100 placeholder-purple-400/30 focus:border-amber-400 focus:outline-none"
+                />
+              </div>
+
+              <button
+                type="button"
+                disabled={isUpdatingPassword || !newPassword}
+                onClick={handleUpdatePassword}
+                className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 disabled:opacity-50 px-4 py-2 text-xs font-bold transition-all shadow-md cursor-pointer"
+              >
+                {isUpdatingPassword ? 'Saving Password...' : 'Save New Password'}
+              </button>
+
+              {passwordStatusMsg && (
+                <div
+                  className={`p-2.5 rounded-xl text-[11px] font-medium ${
+                    passwordStatusMsg.type === 'success'
+                      ? 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-300'
+                      : 'bg-rose-950/60 border border-rose-500/40 text-rose-300'
+                  }`}
+                >
+                  {passwordStatusMsg.text}
+                </div>
+              )}
             </div>
           </div>
 

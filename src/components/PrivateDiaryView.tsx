@@ -81,24 +81,13 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
     const saved = localStorage.getItem(DIARY_ENTRIES_STORAGE_KEY);
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed: DiaryEntry[] = JSON.parse(saved);
+        // Filter out legacy demo entries that had today's dynamic date
+        const cleaned = parsed.filter(e => e.id !== 'diary-demo-1');
+        return cleaned;
       } catch (e) {}
     }
-    return [
-      {
-        id: 'diary-demo-1',
-        date: new Date().toISOString().slice(0, 10),
-        createdAt: new Date().toISOString(),
-        morningIntuition: "I sensed this morning would bring an unexpected breakthrough in my creative project, and felt a gentle pull toward reaching out to an old mentor.",
-        eveningReflection: "My intuition was right on target! A surprise email arrived at 2 PM with the exact collaboration opportunity I visualized. The day felt calm yet productive.",
-        readingAccuracyRating: 5,
-        accuracyNotes: "The daily reading predicted 'A serendipitous messenger carrying silver keys'—and the email arrived right during the power hour!",
-        dailyThoughts: "Writing this for my future self: Trust the initial spark. Whenever you feel that quiet hum in your heart before the day starts, don't let logical doubt drown it out. You are becoming sharper, calmer, and more aligned with the rhythms of the cosmos.",
-        mood: 'radiant',
-        tags: ['Intuition', 'Breakthrough', 'Synchronicity'],
-        isFavorite: true,
-      }
-    ];
+    return [];
   });
 
   // Current Form State
@@ -109,7 +98,7 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
   const [accuracyNotes, setAccuracyNotes] = useState('');
   const [dailyThoughts, setDailyThoughts] = useState('');
   const [mood, setMood] = useState<DiaryEntry['mood']>('peaceful');
-  const [tagsInput, setTagsInput] = useState('Intuition, Daily Reflection');
+  const [tagsInput, setTagsInput] = useState('');
   const [isEditingId, setIsEditingId] = useState<string | null>(null);
 
   // Diary Filter & Search & Calendar Controls
@@ -130,7 +119,8 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
       const saved = localStorage.getItem(DIARY_ENTRIES_STORAGE_KEY);
       if (saved) {
         try {
-          setEntries(JSON.parse(saved));
+          const parsed: DiaryEntry[] = JSON.parse(saved);
+          setEntries(parsed.filter(e => e.id !== 'diary-demo-1'));
         } catch (e) {}
       }
     };
@@ -164,7 +154,7 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
 
   // Load entry into editor if exists for selectedDate
   useEffect(() => {
-    const existing = entries.find((e) => e.date === selectedDate);
+    const existing = entries.find((e) => e.date === selectedDate && e.id !== 'diary-demo-1');
     if (existing && !isEditingId) {
       setMorningIntuition(existing.morningIntuition || '');
       setEveningReflection(existing.eveningReflection || '');
@@ -180,7 +170,7 @@ export const PrivateDiaryView: React.FC<PrivateDiaryViewProps> = ({
       setAccuracyNotes('');
       setDailyThoughts('');
       setMood('peaceful');
-      setTagsInput('Intuition, Daily Reflection');
+      setTagsInput('');
     }
   }, [selectedDate, entries, isEditingId]);
 

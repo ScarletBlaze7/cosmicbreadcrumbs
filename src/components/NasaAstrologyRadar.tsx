@@ -23,6 +23,7 @@ import {
   PlanetaryPosition, 
   CelestialAspect 
 } from '../utils/nasaEphemeris';
+import { InteractivePlanetMap } from './InteractivePlanetMap';
 
 interface NasaAstrologyRadarProps {
   onClose?: () => void;
@@ -31,7 +32,7 @@ interface NasaAstrologyRadarProps {
 
 export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact = false }) => {
   const [matrix, setMatrix] = useState<RealtimeAstrologicalMatrix>(() => getRealtimeAstrologicalMatrix());
-  const [activeTab, setActiveTab] = useState<'positions' | 'aspects' | 'spaceWeather' | 'telemetryGuide'>('positions');
+  const [activeTab, setActiveTab] = useState<'map' | 'positions' | 'aspects' | 'spaceWeather' | 'telemetryGuide'>('map');
   const [highlightedMetric, setHighlightedMetric] = useState<string | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetaryPosition | null>(null);
@@ -67,7 +68,7 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(168,85,247,0.15),transparent_60%)]" />
       <div className="pointer-events-none absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-cyan-500/10 blur-3xl" />
 
-      {/* HEADER: NASA JPL EPHEMERIS RADAR */}
+      {/* HEADER: LIVE NASA PLANETARY SKY MAP */}
       <div className="relative z-10 border-b border-purple-900/50 p-4 sm:p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="space-y-1">
@@ -77,17 +78,17 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyan-500"></span>
               </span>
               <span className="font-mono text-[10px] font-bold tracking-widest text-cyan-300 uppercase">
-                NASA JPL EPHEMERIS • REAL-TIME RADAR
+                LIVE SKY MAP • POWERED BY NASA
               </span>
               <span className="rounded-full bg-cyan-950/80 border border-cyan-800/60 px-2 py-0.5 font-mono text-[9px] text-cyan-400">
                 LIVE
               </span>
             </div>
             <h3 className="font-sans text-lg sm:text-xl font-black tracking-wider text-slate-100 flex items-center space-x-2">
-              <span>Real-Time Astrological Telemetry</span>
+              <span>Live Planet Positions & Space Energy</span>
             </h3>
-            <p className="text-xs text-purple-200/80 max-w-xl">
-              Proprietary synthesis of NASA Keplerian planetary coordinates, active geometric aspects, and live space weather frequencies.
+            <p className="text-xs text-purple-200/90 max-w-xl">
+              See where the planets are located in the sky right now, how their energies connect, and how solar weather influences your day.
             </p>
           </div>
 
@@ -98,39 +99,39 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                 {currentTime.toLocaleTimeString()} UTC
               </div>
               <div className="font-mono text-[9px] text-purple-400/70">
-                JD {matrix.julianDate}
+                Live Sky Alignment
               </div>
             </div>
 
             <button
               onClick={handleManualRefresh}
               disabled={isRefreshing}
-              className="flex items-center space-x-1.5 rounded-2xl border border-cyan-500/40 bg-cyan-950/40 px-3.5 py-2 font-mono text-xs font-semibold text-cyan-300 hover:bg-cyan-900/50 active:scale-95 transition-all shadow-md"
-              title="Sync latest NASA JPL orbital data"
+              className="flex items-center space-x-1.5 rounded-2xl border border-cyan-500/40 bg-cyan-950/40 px-3.5 py-2 font-mono text-xs font-semibold text-cyan-300 hover:bg-cyan-900/50 active:scale-95 transition-all shadow-md cursor-pointer"
+              title="Refresh with latest live NASA sky data"
             >
               <RotateCw className={`h-3.5 w-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>{isRefreshing ? 'Syncing...' : 'Sync Telemetry'}</span>
+              <span>{isRefreshing ? 'Syncing...' : 'Refresh Sky Map'}</span>
             </button>
           </div>
         </div>
 
-        {/* LIVE SPACE WEATHER & HARMONIC SCORE STRIP (Interactive telemetry metrics) */}
+        {/* LIVE SPACE WEATHER & HARMONY METRICS (Plain English) */}
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {/* Metric 1: Proprietary Resonance Score */}
+          {/* Metric 1: Cosmic Harmony */}
           <div 
             onClick={() => {
               setActiveTab('telemetryGuide');
               setHighlightedMetric('resonance');
             }}
             className="group cursor-pointer rounded-2xl border border-amber-500/30 bg-amber-500/10 p-2.5 flex items-center space-x-2.5 hover:border-amber-400 hover:bg-amber-500/20 transition-all"
-            title="Click to learn what Cosmic Resonance means"
+            title="Click to learn what Cosmic Harmony means"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 font-bold font-serif text-sm group-hover:scale-105 transition-transform">
               {spaceWeather.cosmicResonanceScore}%
             </div>
             <div className="min-w-0">
-              <div className="text-[9px] font-mono font-bold tracking-wider text-amber-300 uppercase truncate flex items-center space-x-1">
-                <span>Cosmic Resonance</span>
+              <div className="text-[9px] font-sans font-bold tracking-wider text-amber-300 uppercase truncate flex items-center space-x-1">
+                <span>Cosmic Harmony</span>
                 <Info className="h-2.5 w-2.5 opacity-60 group-hover:opacity-100" />
               </div>
               <div className="text-[11px] font-semibold text-amber-100 truncate">
@@ -139,109 +140,120 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
             </div>
           </div>
 
-          {/* Metric 2: Solar Wind Speed */}
+          {/* Metric 2: Solar Energy */}
           <div 
             onClick={() => {
               setActiveTab('telemetryGuide');
               setHighlightedMetric('solarWind');
             }}
             className="group cursor-pointer rounded-2xl border border-purple-800/40 bg-slate-900/80 p-2.5 flex items-center space-x-2.5 hover:border-purple-600 hover:bg-slate-900 transition-all"
-            title="Click to learn what Solar Wind telemetry means"
+            title="Click to learn what Solar Energy speed means"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-950 text-purple-300 group-hover:scale-105 transition-transform">
               <Sun className="h-4 w-4 text-amber-400" />
             </div>
             <div className="min-w-0">
-              <div className="text-[9px] font-mono font-bold tracking-wider text-purple-300 uppercase truncate flex items-center space-x-1">
-                <span>Solar Wind</span>
+              <div className="text-[9px] font-sans font-bold tracking-wider text-purple-300 uppercase truncate flex items-center space-x-1">
+                <span>Solar Stream</span>
                 <Info className="h-2.5 w-2.5 opacity-60 group-hover:opacity-100" />
               </div>
-              <div className="text-[11px] font-mono font-bold text-slate-100">
-                {spaceWeather.solarWindSpeed} km/s
+              <div className="text-[11px] font-sans font-bold text-slate-100 truncate">
+                {spaceWeather.solarWindStatus}
               </div>
             </div>
           </div>
 
-          {/* Metric 3: Geomagnetic Kp Index */}
+          {/* Metric 3: Earth Field */}
           <div 
             onClick={() => {
               setActiveTab('telemetryGuide');
               setHighlightedMetric('kpIndex');
             }}
             className="group cursor-pointer rounded-2xl border border-purple-800/40 bg-slate-900/80 p-2.5 flex items-center space-x-2.5 hover:border-cyan-500/50 hover:bg-slate-900 transition-all"
-            title="Click to learn what the Kp Geomagnetic Index means"
+            title="Click to learn what Earth's Magnetic Field status means"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-950 text-cyan-300 group-hover:scale-105 transition-transform">
               <Activity className="h-4 w-4 text-cyan-400" />
             </div>
             <div className="min-w-0">
-              <div className="text-[9px] font-mono font-bold tracking-wider text-purple-300 uppercase truncate flex items-center space-x-1">
-                <span>Geomagnetic Kp</span>
+              <div className="text-[9px] font-sans font-bold tracking-wider text-purple-300 uppercase truncate flex items-center space-x-1">
+                <span>Earth Field</span>
                 <Info className="h-2.5 w-2.5 opacity-60 group-hover:opacity-100" />
               </div>
-              <div className="text-[11px] font-mono font-bold text-slate-100">
-                Kp {spaceWeather.kpIndex} ({spaceWeather.kpStatus})
+              <div className="text-[11px] font-sans font-bold text-slate-100 truncate">
+                {spaceWeather.kpStatus} (Kp {spaceWeather.kpIndex})
               </div>
             </div>
           </div>
 
-          {/* Metric 4: Solar Flare Flux */}
+          {/* Metric 4: Sun Activity */}
           <div 
             onClick={() => {
               setActiveTab('telemetryGuide');
               setHighlightedMetric('solarFlare');
             }}
             className="group cursor-pointer rounded-2xl border border-purple-800/40 bg-slate-900/80 p-2.5 flex items-center space-x-2.5 hover:border-rose-500/50 hover:bg-slate-900 transition-all"
-            title="Click to learn what Solar Flare Flux means"
+            title="Click to learn what Solar Activity means"
           >
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-purple-950 text-rose-300 group-hover:scale-105 transition-transform">
               <Zap className="h-4 w-4 text-rose-400" />
             </div>
             <div className="min-w-0">
-              <div className="text-[9px] font-mono font-bold tracking-wider text-purple-300 uppercase truncate flex items-center space-x-1">
-                <span>Flare Flux</span>
+              <div className="text-[9px] font-sans font-bold tracking-wider text-purple-300 uppercase truncate flex items-center space-x-1">
+                <span>Sun Activity</span>
                 <Info className="h-2.5 w-2.5 opacity-60 group-hover:opacity-100" />
               </div>
-              <div className="text-[11px] font-mono font-bold text-slate-100">
-                Class {spaceWeather.solarFlareFlux}
+              <div className="text-[11px] font-sans font-bold text-slate-100 truncate">
+                Quiet (Class {spaceWeather.solarFlareFlux})
               </div>
             </div>
           </div>
         </div>
 
-        {/* TABS NAVIGATION */}
+        {/* TABS NAVIGATION (Plain English) */}
         <div className="mt-4 flex items-center space-x-1.5 border-b border-purple-900/40 pb-1 overflow-x-auto no-scrollbar">
           <button
+            onClick={() => setActiveTab('map')}
+            className={`rounded-xl px-3 py-1.5 font-sans text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-1.5 cursor-pointer ${
+              activeTab === 'map'
+                ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-black shadow-md'
+                : 'text-amber-300 hover:text-amber-200 bg-amber-500/10 border border-amber-500/30'
+            }`}
+          >
+            <span>🗺️ Interactive Sky Map</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('positions')}
-            className={`rounded-xl px-3 py-1.5 font-mono text-xs font-bold uppercase whitespace-nowrap transition-all ${
+            className={`rounded-xl px-3 py-1.5 font-sans text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'positions'
-                ? 'bg-purple-900/60 text-amber-300 border border-purple-700'
+                ? 'bg-purple-900/80 text-amber-300 border border-purple-600 shadow-sm'
                 : 'text-purple-300/70 hover:text-purple-200'
             }`}
           >
-            NASA Orbital Ephemeris ({planets.length})
+            🪐 Planet Positions ({planets.length})
           </button>
 
           <button
             onClick={() => setActiveTab('aspects')}
-            className={`rounded-xl px-3 py-1.5 font-mono text-xs font-bold uppercase whitespace-nowrap transition-all ${
+            className={`rounded-xl px-3 py-1.5 font-sans text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'aspects'
-                ? 'bg-purple-900/60 text-amber-300 border border-purple-700'
+                ? 'bg-purple-900/80 text-amber-300 border border-purple-600 shadow-sm'
                 : 'text-purple-300/70 hover:text-purple-200'
             }`}
           >
-            Geometric Aspects ({activeAspects.length})
+            ✨ Planetary Connections ({activeAspects.length})
           </button>
 
           <button
             onClick={() => setActiveTab('spaceWeather')}
-            className={`rounded-xl px-3 py-1.5 font-mono text-xs font-bold uppercase whitespace-nowrap transition-all ${
+            className={`rounded-xl px-3 py-1.5 font-sans text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
               activeTab === 'spaceWeather'
-                ? 'bg-purple-900/60 text-amber-300 border border-purple-700'
+                ? 'bg-purple-900/80 text-amber-300 border border-purple-600 shadow-sm'
                 : 'text-purple-300/70 hover:text-purple-200'
             }`}
           >
-            Algorithm Insights
+            🌟 Cosmic Energy Summary
           </button>
 
           <button
@@ -249,27 +261,37 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
               setActiveTab('telemetryGuide');
               setHighlightedMetric(null);
             }}
-            className={`rounded-xl px-3 py-1.5 font-mono text-xs font-bold uppercase whitespace-nowrap transition-all flex items-center space-x-1.5 ${
+            className={`rounded-xl px-3 py-1.5 font-sans text-xs font-bold whitespace-nowrap transition-all flex items-center space-x-1.5 cursor-pointer ${
               activeTab === 'telemetryGuide'
                 ? 'bg-amber-500/20 text-amber-300 border border-amber-500/60 shadow-sm'
                 : 'text-amber-400/80 hover:text-amber-300 hover:bg-amber-500/10'
             }`}
           >
-            <Info className="h-3 w-3 text-amber-400" />
-            <span>Telemetry Guide & Meanings</span>
+            <Info className="h-3.5 w-3.5 text-amber-400" />
+            <span>📖 Simple Guide: What This Means</span>
           </button>
         </div>
       </div>
 
       {/* BODY CONTENT */}
       <div className="relative z-10 p-4 sm:p-5 space-y-4">
-        {/* TAB 1: PLANETARY EPHEMERIS TABLE */}
+        {/* TAB 0: INTERACTIVE PLANET MAP */}
+        {activeTab === 'map' && (
+          <InteractivePlanetMap
+            matrix={matrix}
+            onSelectPlanet={(p) => {
+              setSelectedPlanet(p);
+            }}
+          />
+        )}
+
+        {/* TAB 1: PLANET POSITIONS */}
         {activeTab === 'positions' && (
           <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-purple-300/80 px-1">
-              <span>Current Geocentric Ecliptic Longitudes</span>
-              <span className="font-mono text-[10px] text-cyan-300">
-                Dominant Element: <strong className="text-white uppercase">{dominantElement}</strong>
+            <div className="flex items-center justify-between text-xs text-purple-200/90 px-1">
+              <span>Live Positions Across the Zodiac Signs</span>
+              <span className="text-xs text-amber-300 font-sans">
+                Dominant Element: <strong className="text-white uppercase font-bold">{dominantElement}</strong>
               </span>
             </div>
 
@@ -295,7 +317,7 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                           <div className="font-serif text-xs font-bold text-slate-100">
                             {planet.name}
                           </div>
-                          <div className="font-mono text-[10px] text-purple-300">
+                          <div className="font-sans text-[11px] text-amber-300 font-semibold">
                             {planet.formattedPos}
                           </div>
                         </div>
@@ -303,33 +325,80 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
 
                       <div className="text-right space-y-0.5">
                         {planet.isRetrograde ? (
-                          <span className="inline-flex items-center space-x-1 rounded-full bg-rose-500/20 border border-rose-500/40 px-2 py-0.5 text-[9px] font-mono font-bold text-rose-300">
+                          <span className="inline-flex items-center space-x-1 rounded-full bg-rose-500/20 border border-rose-500/40 px-2 py-0.5 text-[9px] font-sans font-bold text-rose-300">
                             <span>Rx</span>
                             <span>Retrograde</span>
                           </span>
                         ) : (
-                          <span className="inline-flex items-center space-x-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-mono font-bold text-emerald-300">
+                          <span className="inline-flex items-center space-x-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 text-[9px] font-sans font-bold text-emerald-300">
                             <span>●</span>
-                            <span>Direct ({planet.speed > 0 ? `+${planet.speed}` : planet.speed}°/d)</span>
+                            <span>Moving Direct</span>
                           </span>
                         )}
-                        <div className="text-[9px] font-mono text-purple-400/80">
-                          {planet.distanceAU} AU
+                        <div className="text-[10px] font-sans text-purple-300/80">
+                          Tap for meaning ↓
                         </div>
                       </div>
                     </div>
 
+                    {/* Quick Moon Phase Indicator on Moon card */}
+                    {planet.id === 'moon' && planet.moonPhaseInfo && (
+                      <div className="mt-2 rounded-xl bg-cyan-950/40 border border-cyan-500/30 p-2 flex items-center justify-between text-xs">
+                        <div className="flex items-center space-x-1.5 text-cyan-200 font-semibold text-[11px]">
+                          <span>{planet.moonPhaseInfo.phaseIcon}</span>
+                          <span>Phase: {planet.moonPhaseInfo.phaseName} ({planet.moonPhaseInfo.illumination}%)</span>
+                        </div>
+                        <span className="text-[10px] text-cyan-400 font-mono">
+                          {planet.moonPhaseInfo.isWaxing ? 'Waxing' : 'Waning'}
+                        </span>
+                      </div>
+                    )}
+
                     {isSelected && (
-                      <div className="mt-2.5 pt-2 border-t border-purple-900/50 space-y-1.5 text-xs text-purple-200 animate-in fade-in">
+                      <div className="mt-2.5 pt-2 border-t border-purple-900/50 space-y-2 text-xs text-purple-200 animate-in fade-in">
                         <p className="text-[11px] leading-relaxed text-slate-200">
                           {planet.significance}
                         </p>
-                        <div className="flex flex-wrap items-center gap-2 pt-1 font-mono text-[9px]">
-                          <span className="rounded bg-purple-950 px-1.5 py-0.5 text-amber-300 border border-purple-800">
+
+                        {/* Dedicated Moon Phase Meaning Box */}
+                        {planet.id === 'moon' && planet.moonPhaseInfo && (
+                          <div className="rounded-xl border border-cyan-500/40 bg-gradient-to-br from-cyan-950/60 via-purple-950/60 to-slate-950 p-3 space-y-2">
+                            <div className="flex items-center justify-between border-b border-cyan-900/50 pb-1.5">
+                              <div className="flex items-center space-x-1.5 text-xs font-bold text-cyan-200">
+                                <span>{planet.moonPhaseInfo.phaseIcon}</span>
+                                <span>{planet.moonPhaseInfo.phaseName}</span>
+                              </div>
+                              <span className="text-[10px] text-cyan-300 font-mono">
+                                {planet.moonPhaseInfo.illumination}% Illumination
+                              </span>
+                            </div>
+
+                            <div className="space-y-1 text-[11px]">
+                              <strong className="text-amber-300 block text-[10px] uppercase tracking-wider">
+                                ✨ What This Moon Phase Means Today:
+                              </strong>
+                              <p className="text-purple-100/90 leading-relaxed font-sans">
+                                {planet.moonPhaseInfo.phaseMeaning}
+                              </p>
+                            </div>
+
+                            <div className="pt-1.5 border-t border-purple-900/40 text-[10px] text-slate-300 space-y-0.5">
+                              <strong className="text-cyan-300 block uppercase tracking-wider">
+                                🕯️ Lunar Intention & Action:
+                              </strong>
+                              <p>
+                                <strong>Intention:</strong> {planet.moonPhaseInfo.intention} — {planet.moonPhaseInfo.ritualAdvice}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="flex flex-wrap items-center gap-2 pt-1 text-[10px]">
+                          <span className="rounded-lg bg-purple-950 px-2 py-0.5 text-amber-300 border border-purple-800 font-medium">
                             Element: {planet.element}
                           </span>
-                          <span className="rounded bg-purple-950 px-1.5 py-0.5 text-cyan-300 border border-purple-800">
-                            Dignity: {planet.dignity}
+                          <span className="rounded-lg bg-purple-950 px-2 py-0.5 text-cyan-300 border border-purple-800 font-medium">
+                            Status: {planet.dignity}
                           </span>
                         </div>
                       </div>
@@ -341,11 +410,11 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
           </div>
         )}
 
-        {/* TAB 2: ACTIVE INTERPLANETARY ASPECTS */}
+        {/* TAB 2: PLANETARY CONNECTIONS (ASPECTS) */}
         {activeTab === 'aspects' && (
           <div className="space-y-3">
-            <div className="text-xs text-purple-300/80 px-1">
-              Active Interplanetary Geometric Conduits (Exact Angular Orbs):
+            <div className="text-xs text-purple-200/90 px-1">
+              How the planets connect and share energy today:
             </div>
 
             <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
@@ -359,28 +428,25 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                       <span className="font-serif text-sm font-bold text-slate-100">
                         {aspect.planet1} {aspect.aspectName} {aspect.planet2}
                       </span>
-                      <span className="font-mono text-[10px] text-purple-400">
-                        ({aspect.angle}° • {aspect.orb}° orb)
-                      </span>
                     </div>
 
-                    <span className={`rounded-full px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase ${
+                    <span className={`rounded-full px-2.5 py-0.5 font-sans text-[10px] font-bold uppercase ${
                       aspect.energyType === 'Harmonic'
                         ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
                         : aspect.energyType === 'Dynamic'
                         ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                         : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
                     }`}>
-                      {aspect.energyType}
+                      {aspect.energyType === 'Harmonic' ? 'Harmonious Flow' : aspect.energyType === 'Dynamic' ? 'Growth & Action' : 'Intense Focus'}
                     </span>
                   </div>
 
-                  <p className="text-xs text-purple-200/90 leading-relaxed font-sans">
+                  <p className="text-xs text-purple-100 leading-relaxed font-sans">
                     {aspect.interpretation}
                   </p>
 
                   <div className="rounded-xl bg-purple-950/60 p-2 text-[11px] text-amber-200 font-medium border border-purple-900/40">
-                    💡 Astrological Guidance: {aspect.recommendedAction}
+                    💡 Spiritual Focus: {aspect.recommendedAction}
                   </div>
                 </div>
               ))}
@@ -388,13 +454,13 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
           </div>
         )}
 
-        {/* TAB 3: PROPRIETARY ALGORITHM SYNTHESIS */}
+        {/* TAB 3: DAILY ENERGY SUMMARY */}
         {activeTab === 'spaceWeather' && (
           <div className="space-y-4">
             <div className="rounded-2xl border border-purple-800/60 bg-gradient-to-br from-purple-950/40 via-slate-900 to-indigo-950/40 p-4 space-y-3">
-              <div className="flex items-center space-x-2 text-xs font-mono font-bold text-amber-300 uppercase">
+              <div className="flex items-center space-x-2 text-xs font-sans font-bold text-amber-300 uppercase">
                 <Sparkles className="h-4 w-4" />
-                <span>Cosmic Breadcrumbs Proprietary Forecast</span>
+                <span>Today's Cosmic Energy Reading</span>
               </div>
               <p className="text-xs sm:text-sm text-slate-100 leading-relaxed font-sans">
                 {matrix.proprietaryForecast}
@@ -405,17 +471,17 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
             <div className="rounded-2xl border border-purple-900/50 bg-slate-900/70 p-4 space-y-2">
               <div className="flex items-center justify-between">
                 <span className="font-serif text-xs font-bold text-slate-200">
-                  Active Retrograde Celestial Stations ({retrogradeSummary.length})
+                  Planets in Retrograde ({retrogradeSummary.length})
                 </span>
-                <span className="font-mono text-[9px] text-rose-300 uppercase font-bold">
-                  Introspection Windows
+                <span className="font-sans text-[10px] text-rose-300 uppercase font-bold">
+                  Time for Reflection
                 </span>
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
                 {retrogradeSummary.map((item, idx) => (
                   <span
                     key={idx}
-                    className="rounded-full bg-rose-500/10 border border-rose-500/30 px-3 py-1 font-mono text-[10px] text-rose-200 font-semibold"
+                    className="rounded-full bg-rose-500/10 border border-rose-500/30 px-3 py-1 font-sans text-[10px] text-rose-200 font-semibold"
                   >
                     {item}
                   </span>
@@ -423,29 +489,29 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
               </div>
             </div>
 
-            <div className="text-[11px] text-purple-400/80 font-mono text-center">
-              Data synchronized via {spaceWeather.nasaDataSource}
+            <div className="text-[11px] text-purple-300 font-sans text-center">
+              ✨ Grounded in real NASA astronomy data
             </div>
           </div>
         )}
 
-        {/* TAB 4: TELEMETRY GUIDE & MEANINGS */}
+        {/* TAB 4: SIMPLE GUIDE & WHAT THIS MEANS */}
         {activeTab === 'telemetryGuide' && (
           <div className="space-y-4 animate-in fade-in">
             <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-br from-purple-950/60 via-slate-900 to-amber-950/30 p-4 space-y-2">
               <div className="flex items-center space-x-2">
                 <Info className="h-4 w-4 text-amber-400" />
                 <h3 className="font-serif text-sm font-bold text-amber-200 uppercase tracking-wide">
-                  Cosmic Telemetry Dictionary & Meanings
+                  Simple Guide: What the Sky Data Means
                 </h3>
               </div>
               <p className="text-xs text-purple-200/90 leading-relaxed font-sans">
-                Our Planetary Radar marries <strong>NASA JPL Horizons ephemeris telemetry</strong> with sacred Babylonian, Chaldean, and Hellenistic astrological mechanics. Below is what each live data point represents scientifically and spiritually.
+                We track real live NASA astronomy data to calculate exactly where the planets and moon are in the sky. Here is an easy guide explaining how space weather and planetary positions affect your daily life.
               </p>
             </div>
 
             <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-              {/* Metric 1: Cosmic Resonance Score */}
+              {/* Metric 1: Cosmic Harmony Score */}
               <div 
                 className={`rounded-2xl border p-4 transition-all ${
                   highlightedMetric === 'resonance' 
@@ -460,30 +526,30 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                     </div>
                     <div>
                       <h4 className="font-serif text-sm font-bold text-amber-200">
-                        Cosmic Resonance Score & Grade
+                        Cosmic Harmony Score
                       </h4>
-                      <span className="font-mono text-[10px] text-amber-400/90">
-                        Current: {spaceWeather.resonanceGrade} ({spaceWeather.cosmicResonanceScore}%)
+                      <span className="font-sans text-[11px] text-amber-300">
+                        Today's Vibe: {spaceWeather.resonanceGrade} ({spaceWeather.cosmicResonanceScore}%)
                       </span>
                     </div>
                   </div>
-                  <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-2.5 py-0.5 font-mono text-[9px] text-amber-300 uppercase font-bold">
-                    Proprietary Index
+                  <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-2.5 py-0.5 font-sans text-[10px] text-amber-300 font-bold">
+                    Daily Overall Vibe
                   </span>
                 </div>
-                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans">
+                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans leading-relaxed">
                   <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    A composite index (0–100%) calculated by synthesizing lunar phases, harmonic planetary aspects (Trines, Sextiles), solar wind velocity, and geomagnetic calm.
+                    <strong className="text-amber-300">What it means: </strong>
+                    This score measures how smooth and supportive the universal energy is today, combining the Moon phase, friendly planet connections, and calm space weather.
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    Measures the overall ease and fluidity of cosmic energy today. <strong>80%+ (Sublime/Harmonic)</strong> indicates effortless manifestation, high creativity, and smooth conversations. <strong>Below 50% (Catalytic)</strong> denotes profound transformative tension where conscious patience is advised.
+                    <strong className="text-purple-300">How it affects you: </strong>
+                    <strong>High scores (75%+)</strong> mean conversations flow easily, creativity is boosted, and manifestations happen faster. <strong>Lower scores (under 50%)</strong> simply mean the day brings valuable lessons and invites patience and rest.
                   </div>
                 </div>
               </div>
 
-              {/* Metric 2: Solar Wind Speed */}
+              {/* Metric 2: Solar Stream */}
               <div 
                 className={`rounded-2xl border p-4 transition-all ${
                   highlightedMetric === 'solarWind' 
@@ -498,30 +564,30 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                     </div>
                     <div>
                       <h4 className="font-serif text-sm font-bold text-slate-100">
-                        Solar Wind Stream (km/s)
+                        Solar Stream (Sunlight Energy)
                       </h4>
-                      <span className="font-mono text-[10px] text-purple-300">
+                      <span className="font-sans text-[11px] text-purple-200">
                         Current: {spaceWeather.solarWindSpeed} km/s • {spaceWeather.solarWindStatus}
                       </span>
                     </div>
                   </div>
-                  <span className="rounded-full bg-purple-950 border border-purple-800 px-2.5 py-0.5 font-mono text-[9px] text-purple-300 uppercase font-bold">
-                    Solar Telemetry
+                  <span className="rounded-full bg-purple-950 border border-purple-800 px-2.5 py-0.5 font-sans text-[10px] text-purple-300 font-bold">
+                    Sun Energy
                   </span>
                 </div>
-                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans">
+                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans leading-relaxed">
                   <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    The speed at which ionized plasma protons and electrons stream from the Sun’s corona through interplanetary space toward Earth, measured in kilometers per second (km/s).
+                    <strong className="text-amber-300">What it means: </strong>
+                    The steady stream of light and particles flowing from the Sun toward Earth.
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    Baseline speeds are ~350–450 km/s (Quiet). When high-speed streams exceed 500–700+ km/s, they compress Earth's magnetosphere, activating human nervous system sensitivity, lucid dreaming, sudden spontaneous epiphanies, and rapid downloads of inspiration.
+                    <strong className="text-purple-300">How it affects you: </strong>
+                    A <strong>Calm & Steady stream</strong> brings relaxed focus and peace. When solar activity is <strong>High</strong>, you might feel an extra burst of energetic motivation, vivid dreams, or sudden flashes of inspiration!
                   </div>
                 </div>
               </div>
 
-              {/* Metric 3: Geomagnetic Kp Index */}
+              {/* Metric 3: Earth Field */}
               <div 
                 className={`rounded-2xl border p-4 transition-all ${
                   highlightedMetric === 'kpIndex' 
@@ -536,30 +602,30 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                     </div>
                     <div>
                       <h4 className="font-serif text-sm font-bold text-slate-100">
-                        Geomagnetic Kp Index (0–9)
+                        Earth Magnetic Field
                       </h4>
-                      <span className="font-mono text-[10px] text-cyan-300">
-                        Current: Kp {spaceWeather.kpIndex} ({spaceWeather.kpStatus})
+                      <span className="font-sans text-[11px] text-cyan-300">
+                        Status: {spaceWeather.kpStatus} (Kp {spaceWeather.kpIndex})
                       </span>
                     </div>
                   </div>
-                  <span className="rounded-full bg-cyan-500/10 border border-cyan-500/30 px-2.5 py-0.5 font-mono text-[9px] text-cyan-300 uppercase font-bold">
-                    Earth Magnetics
+                  <span className="rounded-full bg-cyan-500/10 border border-cyan-500/30 px-2.5 py-0.5 font-sans text-[10px] text-cyan-300 font-bold">
+                    Grounding Level
                   </span>
                 </div>
-                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans">
+                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans leading-relaxed">
                   <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    The planetary K-index quantifies horizontal disturbances in the Earth's magnetic field on a standard logarithmic 0-to-9 scale.
+                    <strong className="text-amber-300">What it means: </strong>
+                    Measures how still or active Earth's protective magnetic field is right now on a scale of 0 to 9.
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    <strong>Kp 0–2 (Quiet)</strong> offers deep grounding, mental stability, and restorative sleep. <strong>Kp 3–4 (Unsettled)</strong> brings energetic awakening. <strong>Kp 5+ (Geomagnetic Storm)</strong> triggers intense auroras, emotional clearing, energetic purges, and a call for psychic protection and salt baths.
+                    <strong className="text-purple-300">How it affects you: </strong>
+                    <strong>Quiet / Calm (0–2)</strong> provides deep emotional grounding, clear thinking, and restful sleep. <strong>Active (3+)</strong> awakens inner sensitivity and prompts you to stay hydrated and take calming nature walks.
                   </div>
                 </div>
               </div>
 
-              {/* Metric 4: Solar Flare Flux */}
+              {/* Metric 4: Sun Activity & Flares */}
               <div 
                 className={`rounded-2xl border p-4 transition-all ${
                   highlightedMetric === 'solarFlare' 
@@ -574,135 +640,91 @@ export const NasaAstrologyRadar: React.FC<NasaAstrologyRadarProps> = ({ compact 
                     </div>
                     <div>
                       <h4 className="font-serif text-sm font-bold text-slate-100">
-                        Solar Flare Flux & Classification
+                        Solar Flares & Light Bursts
                       </h4>
-                      <span className="font-mono text-[10px] text-rose-300">
-                        Current: Class {spaceWeather.solarFlareFlux}
+                      <span className="font-sans text-[11px] text-rose-300">
+                        Activity: Class {spaceWeather.solarFlareFlux} (Quiet)
                       </span>
                     </div>
                   </div>
-                  <span className="rounded-full bg-rose-500/10 border border-rose-500/30 px-2.5 py-0.5 font-mono text-[9px] text-rose-300 uppercase font-bold">
-                    X-Ray Radiation
+                  <span className="rounded-full bg-rose-500/10 border border-rose-500/30 px-2.5 py-0.5 font-sans text-[10px] text-rose-300 font-bold">
+                    Solar Pulses
                   </span>
                 </div>
-                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans">
+                <div className="mt-3 space-y-2 text-xs text-slate-200 font-sans leading-relaxed">
                   <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    Peak X-ray energy flux emitted by active sunspot magnetic loops, classified exponentially: A, B, C, M, and X classes.
+                    <strong className="text-amber-300">What it means: </strong>
+                    Natural bursts of energy released by the Sun.
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    Flares release bursts of photonic light. <strong>Classes A, B, & C</strong> maintain steady energetic equilibrium. <strong>M-Class & X-Class</strong> bursts accelerate consciousness evolution, release old mental stagnation, and trigger strong energetic shifts.
+                    <strong className="text-purple-300">How it affects you: </strong>
+                    Quiet classes (A, B, C) represent normal, stable cosmic weather. Stronger flares help break through old mental habits and inspire fresh new life ideas.
                   </div>
                 </div>
               </div>
 
-              {/* Metric 5: Orbital Ephemeris & Ecliptic Longitude */}
+              {/* Metric 5: Planet Positions in the Zodiac */}
               <div className="rounded-2xl border border-purple-900/50 bg-slate-900/80 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="font-serif text-sm font-bold text-slate-100">
-                    NASA Planetary Ephemeris (Ecliptic Longitude)
+                    Where the Planets are in the Zodiac
                   </h4>
-                  <span className="rounded-full bg-purple-950 border border-purple-800 px-2.5 py-0.5 font-mono text-[9px] text-purple-300 uppercase font-bold">
-                    Astronomical Coordinates
+                  <span className="rounded-full bg-purple-950 border border-purple-800 px-2.5 py-0.5 font-sans text-[10px] text-amber-300 font-bold">
+                    Zodiac Signs
                   </span>
                 </div>
-                <div className="space-y-2 text-xs text-slate-200 font-sans">
+                <div className="space-y-2 text-xs text-slate-200 font-sans leading-relaxed">
                   <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    The exact mathematical celestial angle (0.00° to 359.99°) of a planet along the Sun’s apparent annual path (the ecliptic) projected as seen from Earth.
+                    <strong className="text-amber-300">What it means: </strong>
+                    As the planets orbit through space, they pass in front of the 12 signs of the zodiac (like Aries, Taurus, Cancer, etc.).
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    Divides the sky into the 12 sacred 30-degree zodiac constellations (Aries 0° to Pisces 330°+), revealing the archetype, temperament, and psychological lens through which that planet's energy is expressed today.
+                    <strong className="text-purple-300">How it affects you: </strong>
+                    Each planet governs a part of life: <strong>Venus</strong> shapes love, <strong>Mercury</strong> shapes communication, and <strong>Mars</strong> drives motivation. The zodiac sign a planet is currently in gives that part of life its special flavor today.
                   </div>
                 </div>
               </div>
 
-              {/* Metric 6: Retrograde vs Direct Motion */}
+              {/* Metric 6: Direct vs Retrograde */}
               <div className="rounded-2xl border border-purple-900/50 bg-slate-900/80 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="font-serif text-sm font-bold text-slate-100">
-                    Planetary Motion: Direct (●) vs. Retrograde (Rx)
+                    Direct Motion (●) vs. Retrograde (Rx)
                   </h4>
-                  <span className="rounded-full bg-rose-500/10 border border-rose-500/30 px-2.5 py-0.5 font-mono text-[9px] text-rose-200 uppercase font-bold">
-                    Orbital Direction
+                  <span className="rounded-full bg-rose-500/10 border border-rose-500/30 px-2.5 py-0.5 font-sans text-[10px] text-rose-300 font-bold">
+                    Cosmic Rhythm
                   </span>
                 </div>
-                <div className="space-y-2 text-xs text-slate-200 font-sans">
+                <div className="space-y-2 text-xs text-slate-200 font-sans leading-relaxed">
                   <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    Apparent traversal speed along the zodiac. When Earth overtakes another planet on its orbit, the planet appears from our vantage point to slow down and traverse backward through the sky.
+                    <strong className="text-amber-300">What it means: </strong>
+                    From our viewpoint on Earth, planets usually move forward across the sky (<strong>Direct</strong>). Occasionally, due to Earth passing them in orbit, they appear to slow down and move backward (<strong>Retrograde</strong>).
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    <strong>Direct motion</strong> powers outward progress, new beginnings, contract signings, and momentum. <strong>Retrograde (Rx)</strong> marks an inward cosmic pause for review, reflection, revision, and completing unfinished karma.
+                    <strong className="text-purple-300">How it affects you: </strong>
+                    <strong>Direct motion</strong> is the green light for new projects and moving ahead. <strong>Retrograde</strong> is not bad — it is simply the universe's reminder to slow down, double-check details, and reflect.
                   </div>
                 </div>
               </div>
 
-              {/* Metric 7: Astronomical Units (Distance in AU) */}
+              {/* Metric 7: Planetary Connections (Aspects) */}
               <div className="rounded-2xl border border-purple-900/50 bg-slate-900/80 p-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <h4 className="font-serif text-sm font-bold text-slate-100">
-                    Geocentric Distance (Astronomical Units - AU)
+                    Planetary Connections & Angles (Aspects)
                   </h4>
-                  <span className="rounded-full bg-purple-950 border border-purple-800 px-2.5 py-0.5 font-mono text-[9px] text-purple-300 uppercase font-bold">
-                    Proximity
+                  <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 font-sans text-[10px] text-emerald-300 font-bold">
+                    Shared Energy
                   </span>
                 </div>
-                <div className="space-y-2 text-xs text-slate-200 font-sans">
+                <div className="space-y-2 text-xs text-slate-200 font-sans leading-relaxed">
                   <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    The instantaneous distance from Earth to that planet, where 1 AU is equal to the mean Earth-Sun distance (~149.6 million km or ~93 million miles).
+                    <strong className="text-amber-300">What it means: </strong>
+                    When two planets align at certain angles in the sky, their energies blend together like two musical notes played in harmony.
                   </div>
                   <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    Planets at perihelion or perigee (closest AU approach) exert a heightened gravitational, tidal, and archetypal pull on personal consciousness and daily experiences.
-                  </div>
-                </div>
-              </div>
-
-              {/* Metric 8: Geometric Aspects & Orbs */}
-              <div className="rounded-2xl border border-purple-900/50 bg-slate-900/80 p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-serif text-sm font-bold text-slate-100">
-                    Interplanetary Geometric Aspects & Orbs
-                  </h4>
-                  <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 font-mono text-[9px] text-emerald-300 uppercase font-bold">
-                    Sacred Geometry
-                  </span>
-                </div>
-                <div className="space-y-2 text-xs text-slate-200 font-sans">
-                  <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    Angular relationships between planetary coordinate vectors (Conjunction 0°, Sextile 60°, Square 90°, Trine 120°, Opposition 180°). The "Orb" is how many degrees the angle deviates from exact precision (smaller orb = stronger power).
-                  </div>
-                  <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    Aspects create the musical harmony of the spheres. <strong>Trines & Sextiles</strong> produce smooth, supportive flow and gifts; <strong>Squares & Oppositions</strong> present constructive friction, decisive challenges, and breakthroughs.
-                  </div>
-                </div>
-              </div>
-
-              {/* Metric 9: Julian Date (JD) */}
-              <div className="rounded-2xl border border-purple-900/50 bg-slate-900/80 p-4 space-y-2">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-serif text-sm font-bold text-slate-100">
-                    Astronomical Julian Date (JD)
-                  </h4>
-                  <span className="rounded-full bg-purple-950 border border-purple-800 px-2.5 py-0.5 font-mono text-[9px] text-cyan-300 uppercase font-bold">
-                    Epoch Time
-                  </span>
-                </div>
-                <div className="space-y-2 text-xs text-slate-200 font-sans">
-                  <div>
-                    <span className="font-semibold text-amber-300">What it is: </span>
-                    The continuous scientific count of days since Greenwich noon on January 1, 4713 BCE, used by astronomers and NASA JPL Horizons.
-                  </div>
-                  <div>
-                    <span className="font-semibold text-purple-300">What it means: </span>
-                    Bypasses calendar irregularities, leap centuries, and timezone anomalies to provide the exact immutable mathematical clock ticking across the cosmos.
+                    <strong className="text-purple-300">How it affects you: </strong>
+                    <strong>Harmonious angles (Trines & Sextiles)</strong> make things feel effortless and lucky. <strong>Dynamic angles (Squares & Oppositions)</strong> give you the spark and energy to overcome challenges and grow stronger.
                   </div>
                 </div>
               </div>

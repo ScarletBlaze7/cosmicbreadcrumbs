@@ -46,7 +46,7 @@ const DREAM_PIN_STORAGE_KEY = 'cosmic_dreams_pin';
 const INITIAL_DREAM_LOG: DreamEntry[] = [
   {
     id: 'dream-1',
-    date: new Date().toISOString().slice(0, 10),
+    date: '2024-01-15',
     isPastDream: false,
     title: 'Flight over Crystal Water & Silver Keys',
     dreamNarrative: 'I was standing at the edge of a turquoise ocean when I suddenly realized I could fly. As I soared over the water, I caught sight of a shimmering silver key resting on a golden reef. I dove down and grasped it without losing breath.',

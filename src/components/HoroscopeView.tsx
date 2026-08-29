@@ -148,13 +148,13 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
       <div className="border-b border-purple-900/50 pb-5 space-y-1.5">
         <div className="flex items-center space-x-2 text-xs font-semibold uppercase tracking-wider text-amber-400">
           <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
-          <span>NASA's Real-time planetary alignments, dimensional forecasts, and AI cosmic synthesis</span>
+          <span>Real-time planetary positions, dimensional forecasts, and cosmic guidance</span>
         </div>
         <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-slate-100 mt-1">
           Astrological Insights
         </h1>
         <p className="text-xs sm:text-sm text-purple-200 mt-1 leading-relaxed">
-          Free Daily horoscope for all users. Sanctuary members may see Daily/Tomorrow/weekly/monthy and AI deep transit synthsis, Love and relationship, Career and wellness etc..
+          Free Daily horoscope for all seekers. Sanctuary members can explore Daily, Tomorrow, Weekly, and Monthly forecasts, Love & Relationship dynamics, Career paths, and Wellness guidance.
         </p>
       </div>
 
@@ -168,7 +168,7 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
         />
       </div>
 
-      {/* NASA REAL-TIME DATA & EPHEMERIS SCIENTIFIC PROVENANCE BANNER */}
+      {/* NASA REAL-TIME DATA & SKY ACCURACY BANNER */}
       <div className="relative overflow-hidden rounded-3xl border-2 border-cyan-500/40 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950/80 p-5 sm:p-6 shadow-xl shadow-cyan-950/20 space-y-3.5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-cyan-900/40 pb-3">
           <div className="flex items-center space-x-3">
@@ -179,14 +179,14 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
             <div className="space-y-1">
               <div className="flex items-center space-x-2">
                 <span className="font-sans text-xs sm:text-sm font-bold uppercase tracking-wider text-cyan-300">
-                  NASA JPL Real-Time Astronomical Grounding
+                  ✨ Powered by Live NASA Sky Data
                 </span>
                 <span className="rounded-full bg-cyan-950 border border-cyan-700/60 px-2.5 py-0.5 font-sans text-xs text-cyan-300 font-bold">
-                  LIVE EPHEMERIS
+                  LIVE SKY
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-purple-100 leading-relaxed">
-                Our horoscopes are <strong>not generic text</strong>. Every planetary transit, lunar illumination, and aspect angle is computed from <strong>live astronomical coordinates from NASA JPL, NOAA space weather telemetry, and Keplerian orbital algorithms</strong>.
+                Our daily horoscopes are <strong>never generic predictions</strong>. Every reading is calculated from <strong>live astronomical planet positions and moon phases from NASA</strong>, so your guidance reflects the real universe today.
               </p>
             </div>
           </div>
@@ -199,57 +199,57 @@ export const HoroscopeView: React.FC<HoroscopeViewProps> = ({
                 const el = document.getElementById('nasa-radar-anchor');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="inline-flex items-center space-x-2 rounded-xl border border-cyan-500/50 bg-cyan-950/60 px-4 py-2 text-xs sm:text-sm font-bold text-cyan-200 hover:bg-cyan-900/60 hover:text-white transition-all shadow-sm"
+              className="inline-flex items-center space-x-2 rounded-xl border border-cyan-500/50 bg-cyan-950/60 px-4 py-2 text-xs sm:text-sm font-bold text-cyan-200 hover:bg-cyan-900/60 hover:text-white transition-all shadow-sm cursor-pointer"
             >
               <Radio className="h-4 w-4 text-cyan-400 animate-pulse" />
-              <span>Inspect Live Telemetry</span>
+              <span>🗺️ View Interactive Planet Map ↓</span>
             </a>
           </div>
         </div>
 
-        {/* Scientific Grounding Telemetry Badges */}
+        {/* Scientific Grounding Plain-English Badges */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
           <div className="rounded-xl border border-cyan-900/50 bg-slate-950/70 p-3 space-y-1">
             <div className="flex items-center space-x-1.5 text-xs text-cyan-400 font-medium">
               <Globe2 className="h-3.5 w-3.5" />
-              <span>NASA JPL Ephemeris</span>
+              <span>NASA Planet Tracking</span>
             </div>
             <div className="text-xs sm:text-sm font-bold text-slate-100 flex items-center space-x-1">
               <Check className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Live J2000 Coordinates</span>
+              <span>Live Planet Coordinates</span>
             </div>
           </div>
 
           <div className="rounded-xl border border-purple-900/50 bg-slate-950/70 p-3 space-y-1">
             <div className="flex items-center space-x-1.5 text-xs text-purple-300 font-medium">
               <Activity className="h-3.5 w-3.5" />
-              <span>NOAA Space Weather</span>
+              <span>Space & Solar Energy</span>
             </div>
             <div className="text-xs sm:text-sm font-bold text-slate-100 flex items-center space-x-1">
               <Check className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Solar Wind & Kp Indices</span>
+              <span>Sun & Geomagnetic Peace</span>
             </div>
           </div>
 
           <div className="rounded-xl border border-indigo-900/50 bg-slate-950/70 p-3 space-y-1">
             <div className="flex items-center space-x-1.5 text-xs text-indigo-300 font-medium">
-              <Compass className="h-3.5 w-3.5" />
-              <span>Keplerian Mechanics</span>
+              <Moon className="h-3.5 w-3.5" />
+              <span>Real Moon Phases</span>
             </div>
             <div className="text-xs sm:text-sm font-bold text-slate-100 flex items-center space-x-1">
               <Check className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Sub-Arcminute Orbs</span>
+              <span>Live Lunar Illumination</span>
             </div>
           </div>
 
           <div className="rounded-xl border border-amber-900/50 bg-slate-950/70 p-3 space-y-1">
             <div className="flex items-center space-x-1.5 text-xs text-amber-300 font-medium">
               <Sparkles className="h-3.5 w-3.5" />
-              <span>Swiss Ephemeris Alg.</span>
+              <span>Zodiac Accuracy</span>
             </div>
             <div className="text-xs sm:text-sm font-bold text-slate-100 flex items-center space-x-1">
               <Check className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Exact Planetary Degrees</span>
+              <span>Exact Degree Alignment</span>
             </div>
           </div>
         </div>
