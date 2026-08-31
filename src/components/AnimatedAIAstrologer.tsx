@@ -421,11 +421,49 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
         </div>
       )}
 
-      {/* MAIN STAGE: 2-COLUMN NEWS STUDIO LAYOUT */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+      {/* MAIN STAGE: READING ON TOP, VIDEO BELOW THE READING */}
+      <div className="space-y-6">
         
-        {/* LEFT / CENTER: ANIMATED AI ASTROLOGER VIDEO / AVATAR (5 Cols) */}
-        <div className="md:col-span-5 flex flex-col items-center justify-center space-y-3">
+        {/* 1. DAILY HOROSCOPE FORECAST READING (ON TOP) */}
+        <div className="rounded-3xl border-2 border-purple-800/70 bg-gradient-to-b from-[#110c2e] via-slate-950 to-slate-950 p-5 sm:p-6 space-y-4 shadow-2xl">
+          <div className="flex items-center justify-between text-xs text-purple-300 border-b border-purple-900/60 pb-3">
+            <span className="font-bold uppercase tracking-wider text-amber-300 flex items-center gap-2 text-sm sm:text-base">
+              <Radio className="h-5 w-5 text-amber-400" />
+              <span>Daily Horoscope Forecast Reading</span>
+            </span>
+            <div className="flex items-center space-x-2">
+              <span className="text-[11px] text-amber-300 font-mono font-bold bg-amber-950/80 px-3 py-1 rounded-xl border border-amber-500/40">
+                {sign.name} • {activeHost.species} Broadcast
+              </span>
+            </div>
+          </div>
+
+          {/* Reading Script Paragraphs */}
+          <div className="space-y-4 text-base sm:text-lg leading-relaxed text-slate-100 font-sans">
+            <div className="p-4 sm:p-5 rounded-2xl bg-purple-950/40 border border-purple-800/60 space-y-2">
+              <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase font-mono">
+                <span>🎙️ Lead Astrologer:</span>
+                <span>{activeAnchor.name} ({activeAnchor.speciesBadge})</span>
+              </div>
+              <p className="text-slate-100 font-sans leading-relaxed">
+                {script.part1Text}
+              </p>
+            </div>
+
+            <div className="p-4 sm:p-5 rounded-2xl bg-cyan-950/20 border border-cyan-900/50 space-y-2">
+              <div className="text-xs font-bold text-cyan-300 flex items-center gap-1.5 uppercase font-mono">
+                <span>🎙️ Planetary & Lunar Influences:</span>
+                <span>{coAnchor.name} ({coAnchor.speciesBadge})</span>
+              </div>
+              <p className="text-slate-200 font-sans leading-relaxed">
+                {script.part2Text}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 2. NEWSCASTER VIDEO PLAYER (BELOW THE READING) */}
+        <div className="flex flex-col items-center justify-center space-y-4 pt-2">
           
           {/* Animated Video / Avatar Medallion */}
           <div className="relative group">
@@ -441,7 +479,7 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
 
             {/* Main Stage Frame Box with Direct On-Video Controls */}
             <div 
-              className={`relative ${activeVideoUrl || activePhotoUrl ? 'w-48 sm:w-56 md:w-64 aspect-[3/4] rounded-3xl' : 'h-44 w-44 sm:h-52 sm:w-52 rounded-full'} border-4 ${
+              className={`relative ${activeVideoUrl || activePhotoUrl ? 'w-56 sm:w-64 md:w-72 aspect-[3/4] rounded-3xl' : 'h-48 w-48 sm:h-56 sm:w-56 rounded-full'} border-4 ${
                 activeHost.species === 'Lyran'
                   ? 'border-amber-400/90'
                   : activeHost.species === 'Lemurian'
@@ -500,52 +538,6 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
 
                     <rect x="88" y="105" width="24" height="35" rx="6" fill={activeHost.avatarConfig.skinTone} />
                     <ellipse cx="100" cy="80" rx="34" ry="40" fill={activeHost.avatarConfig.skinTone} />
-
-                    {/* Hair Rendering */}
-                    {activeHost.avatarConfig.hairStyle === 'short-styled' && (
-                      <path d="M64 75 C64 45, 80 32, 100 32 C120 32, 136 45, 136 75 C136 60, 130 45, 100 45 C70 45, 64 60, 64 75 Z" fill={activeHost.avatarConfig.hairColor} />
-                    )}
-                    {activeHost.avatarConfig.hairStyle === 'wavy-long' && (
-                      <path d="M62 70 C62 40, 80 35, 100 35 C120 35, 138 40, 138 70 C142 95, 145 130, 138 150 C130 130, 134 85, 100 48 C66 85, 70 130, 62 150 C55 130, 58 95, 62 70 Z" fill={activeHost.avatarConfig.hairColor} />
-                    )}
-                    {activeHost.avatarConfig.hairStyle === 'classic-sidepart' && (
-                      <path d="M64 75 C64 42, 80 34, 102 34 C124 34, 136 48, 136 75 C132 50, 118 45, 96 45 C74 45, 66 58, 64 75 Z" fill={activeHost.avatarConfig.hairColor} />
-                    )}
-                    {activeHost.avatarConfig.hairStyle === 'silver-waves' && (
-                      <path d="M63 75 C63 42, 80 35, 100 35 C120 35, 137 42, 137 75 C132 55, 122 48, 100 48 C78 48, 68 55, 63 75 Z" fill={activeHost.avatarConfig.hairColor} />
-                    )}
-                    {activeHost.avatarConfig.hairStyle === 'curly-taper' && (
-                      <g fill={activeHost.avatarConfig.hairColor}>
-                        <circle cx="80" cy="45" r="14" />
-                        <circle cx="100" cy="40" r="16" />
-                        <circle cx="120" cy="45" r="14" />
-                      </g>
-                    )}
-
-                    {/* Eyes & Blinking */}
-                    {isBlinking ? (
-                      <g stroke="#333" strokeWidth="2.5" strokeLinecap="round">
-                        <line x1="80" y1="78" x2="92" y2="78" />
-                        <line x1="108" y1="78" x2="120" y2="78" />
-                      </g>
-                    ) : (
-                      <g>
-                        <ellipse cx="86" cy="77" rx="6.5" ry="5.5" fill="#FFFFFF" />
-                        <ellipse cx="114" cy="77" rx="6.5" ry="5.5" fill="#FFFFFF" />
-                        <circle cx="86" cy="77" r="3.8" fill={activeHost.avatarConfig.eyeColor} />
-                        <circle cx="114" cy="77" r="3.8" fill={activeHost.avatarConfig.eyeColor} />
-                      </g>
-                    )}
-
-                    {/* Mouth */}
-                    {isPlaying && !isPaused && mouthOpenAmount > 15 ? (
-                      <g>
-                        <ellipse cx="100" cy="102" rx={7 + (mouthOpenAmount / 35)} ry={2 + (mouthOpenAmount / 18)} fill="#741B28" />
-                        <path d="M95 99 Q100 100 105 99" stroke="#FFFFFF" strokeWidth="1.2" fill="none" />
-                      </g>
-                    ) : (
-                      <path d="M93 102 Q100 106 107 102" stroke="#8B263E" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-                    )}
                   </svg>
                 </>
               )}
@@ -558,8 +550,8 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
                   className="absolute inset-0 z-30 flex items-center justify-center bg-slate-950/40 hover:bg-slate-950/20 backdrop-blur-[1px] transition-all cursor-pointer group"
                   title="Play Horoscope Broadcast"
                 >
-                  <div className="flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950 shadow-2xl shadow-amber-500/50 group-hover:scale-110 transition-transform ring-4 ring-amber-300/60">
-                    <Play className="h-7 w-7 fill-slate-950 translate-x-0.5" />
+                  <div className="flex h-16 w-16 sm:h-18 sm:w-18 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-950 shadow-2xl shadow-amber-500/50 group-hover:scale-110 transition-transform ring-4 ring-amber-300/60">
+                    <Play className="h-8 w-8 fill-slate-950 translate-x-0.5" />
                   </div>
                 </button>
               )}
@@ -621,15 +613,13 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
                 </button>
               </div>
             </div>
-
-
           </div>
 
           {/* Anchor Name Tag, Star Species Badge & Title */}
           <div className="text-center space-y-1">
-            <div className="font-serif text-base font-bold text-slate-100 flex items-center justify-center gap-1.5">
+            <div className="font-serif text-lg font-bold text-slate-100 flex items-center justify-center gap-2">
               <span>{activeHost.name}</span>
-              <span className="rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono px-2 py-0.5 border border-amber-400/40 font-bold">
+              <span className="rounded-lg bg-amber-500/20 text-amber-300 text-xs font-mono px-2.5 py-0.5 border border-amber-400/40 font-bold">
                 {activeHost.speciesBadge}
               </span>
             </div>
@@ -637,14 +627,14 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
           </div>
 
           {/* Co-Host / Anchor Toggle (Male vs. Female On-Duty) */}
-          <div className="flex items-center space-x-2 bg-slate-950/90 rounded-2xl p-1 border border-purple-800/50">
+          <div className="flex items-center space-x-2 bg-slate-950/90 rounded-2xl p-1.5 border border-purple-800/50">
             <button
               type="button"
               onClick={() => {
                 setSelectedGender('male');
                 handleStopBroadcast();
               }}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedGender === 'male'
                   ? 'bg-purple-700 text-white shadow-md border border-purple-500'
                   : 'text-purple-300 hover:text-white'
@@ -659,7 +649,7 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
                 setSelectedGender('female');
                 handleStopBroadcast();
               }}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 selectedGender === 'female'
                   ? 'bg-purple-700 text-white shadow-md border border-purple-500'
                   : 'text-purple-300 hover:text-white'
@@ -670,19 +660,19 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
           </div>
 
           {/* 📺 LIVE BROADCAST CAPTIONS (Directly Under Video) */}
-          <div className="w-full max-w-sm rounded-2xl border-2 border-amber-400/60 bg-black/95 p-3.5 space-y-2 shadow-2xl shadow-purple-950/80">
-            <div className="flex items-center justify-between border-b border-purple-900/60 pb-1.5">
-              <div className="flex items-center space-x-1.5">
-                <span className="rounded bg-amber-500/20 text-amber-300 text-[9px] font-mono px-1.5 py-0.5 font-black border border-amber-400/40">
+          <div className="w-full max-w-md rounded-2xl border-2 border-amber-400/60 bg-black/95 p-4 space-y-2 shadow-2xl shadow-purple-950/80">
+            <div className="flex items-center justify-between border-b border-purple-900/60 pb-2">
+              <div className="flex items-center space-x-2">
+                <span className="rounded bg-amber-500/20 text-amber-300 text-[10px] font-mono px-2 py-0.5 font-black border border-amber-400/40">
                   CC
                 </span>
-                <span className="text-[11px] font-black uppercase tracking-wider text-amber-300">
-                  Live Captions
+                <span className="text-xs font-black uppercase tracking-wider text-amber-300">
+                  Live Broadcast Captions
                 </span>
               </div>
               
               {isPlaying && !isPaused ? (
-                <div className="flex items-center space-x-1.5 text-[10px] text-emerald-400 font-mono font-bold">
+                <div className="flex items-center space-x-1.5 text-xs text-emerald-400 font-mono font-bold">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -690,16 +680,16 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
                   <span>ON-AIR</span>
                 </div>
               ) : (
-                <span className="text-[10px] font-mono text-purple-400 font-bold">
+                <span className="text-xs font-mono text-purple-400 font-bold">
                   STANDBY
                 </span>
               )}
             </div>
 
             {/* Captions Text Area */}
-            <div className="min-h-[64px] flex items-center justify-center text-center px-1">
+            <div className="min-h-[56px] flex items-center justify-center text-center px-1">
               {isPlaying ? (
-                <p className="text-xs sm:text-sm font-sans font-medium text-slate-100 leading-snug">
+                <p className="text-sm font-sans font-medium text-slate-100 leading-snug">
                   <span className="text-amber-300 font-bold mr-1.5">
                     {activeHost.name.split(' ')[0]}:
                   </span>
@@ -710,229 +700,9 @@ export const AnimatedAIAstrologer: React.FC<AnimatedAIAstrologerProps> = ({
                   </span>
                 </p>
               ) : (
-                <p className="text-[11px] text-purple-300/80 italic">
+                <p className="text-xs text-purple-300/80 italic">
                   Tap the Play button on the video above to start listening with synchronized captions.
                 </p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT: BROADCAST CONTROLS, MOON CYCLES & PLANETARY DATA (7 Cols) */}
-        <div className="md:col-span-7 space-y-4">
-          
-          {/* Audio Controls & Broadcast Buttons */}
-          <div className="rounded-2xl border border-purple-800/50 bg-slate-950/80 p-4 space-y-3 shadow-inner">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                <span>Listen to Today's Horoscope Broadcast</span>
-              </span>
-              
-              <div className="flex items-center space-x-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    handlePlayBroadcast('part1');
-                  }}
-                  className="flex items-center space-x-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold text-[10px] hover:brightness-110 cursor-pointer shadow-sm"
-                  title="Quick play with voice"
-                >
-                  <Volume2 className="h-3 w-3" />
-                  <span>Test Voice</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleCycleSpeed}
-                  className="flex items-center space-x-1 px-2 py-1 rounded-lg bg-purple-950 border border-purple-700/50 text-[10px] font-mono text-purple-200 hover:text-white cursor-pointer"
-                  title="Change Narration Speed"
-                >
-                  <FastForward className="h-3 w-3 text-amber-400" />
-                  <span>{playbackSpeed}x Speed</span>
-                </button>
-              </div>
-            </div>
-
-            {/* 3 Playback Mode Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              
-              {/* Part 1: Daily Horoscope */}
-              <button
-                type="button"
-                id="btn-ai-read-daily-horoscope"
-                onClick={() => handlePlayBroadcast('part1')}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                  isPlaying && broadcastPart === 'part1'
-                    ? 'border-amber-400 bg-amber-500/20 text-amber-300 ring-1 ring-amber-400/50'
-                    : 'border-purple-800/40 bg-purple-950/30 text-purple-200 hover:border-amber-400/50 hover:bg-purple-900/40'
-                }`}
-              >
-                <div className="flex items-center space-x-1.5 text-xs font-bold">
-                  {isPlaying && broadcastPart === 'part1' && !isPaused ? (
-                    <Pause className="h-3.5 w-3.5 text-amber-400" />
-                  ) : (
-                    <Play className="h-3.5 w-3.5 text-amber-400" />
-                  )}
-                  <span>Daily Horoscope</span>
-                </div>
-                <span className="text-[10px] text-purple-300/80 mt-0.5">{activeAnchor.name.startsWith('Dr.') ? 'Dr. Samson' : activeAnchor.name.split(' ')[0]} reads Daily</span>
-              </button>
-
-              {/* Part 2: Remaining Horoscope (Moon & Planets) */}
-              <button
-                type="button"
-                id="btn-ai-read-remaining-horoscope"
-                onClick={() => handlePlayBroadcast('part2')}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                  isPlaying && broadcastPart === 'part2'
-                    ? 'border-amber-400 bg-amber-500/20 text-amber-300 ring-1 ring-amber-400/50'
-                    : 'border-purple-800/40 bg-purple-950/30 text-purple-200 hover:border-amber-400/50 hover:bg-purple-900/40'
-                }`}
-              >
-                <div className="flex items-center space-x-1.5 text-xs font-bold">
-                  {isPlaying && broadcastPart === 'part2' && !isPaused ? (
-                    <Pause className="h-3.5 w-3.5 text-amber-400" />
-                  ) : (
-                    <Play className="h-3.5 w-3.5 text-amber-400" />
-                  )}
-                  <span>Remaining Horoscope</span>
-                </div>
-                <span className="text-[10px] text-purple-300/80 mt-0.5">{coAnchor.name.startsWith('Dr.') ? 'Dr. Samson' : coAnchor.name.split(' ')[0]} reads Moon & Planets</span>
-              </button>
-
-              {/* Duet: Full News Broadcast */}
-              <button
-                type="button"
-                id="btn-ai-read-full-broadcast"
-                onClick={() => handlePlayBroadcast('duet')}
-                className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                  isPlaying && broadcastPart === 'duet'
-                    ? 'border-amber-400 bg-amber-500/20 text-amber-300 ring-1 ring-amber-400/50'
-                    : 'border-purple-800/40 bg-purple-950/30 text-purple-200 hover:border-amber-400/50 hover:bg-purple-900/40'
-                }`}
-              >
-                <div className="flex items-center space-x-1.5 text-xs font-bold">
-                  {isPlaying && broadcastPart === 'duet' && !isPaused ? (
-                    <Pause className="h-3.5 w-3.5 text-amber-400" />
-                  ) : (
-                    <Play className="h-3.5 w-3.5 text-amber-400" />
-                  )}
-                  <span>Full Broadcast</span>
-                </div>
-                <span className="text-[10px] text-purple-300/80 mt-0.5">Duet ({activeAnchor.name.startsWith('Dr.') ? 'Dr. Samson' : activeAnchor.name.split(' ')[0]} + {coAnchor.name.startsWith('Dr.') ? 'Dr. Samson' : coAnchor.name.split(' ')[0]})</span>
-              </button>
-            </div>
-
-            {/* Playback Control Bar (when audio is active) */}
-            {isPlaying && (
-              <div className="flex items-center justify-between rounded-xl bg-purple-950/80 border border-purple-700/50 p-2.5 text-xs">
-                <div className="flex items-center space-x-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
-                  </span>
-                  <span className="text-purple-200 font-medium truncate max-w-[200px] sm:max-w-xs">
-                    {activeHost.name} speaking: <span className="text-amber-300 font-mono">"{currentSpokenWord || '...'}"</span>
-                  </span>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  {isPaused ? (
-                    <button
-                      type="button"
-                      onClick={() => handlePlayBroadcast(broadcastPart)}
-                      className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-400/40 font-bold hover:bg-amber-500/30 cursor-pointer"
-                    >
-                      Resume
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={handlePauseBroadcast}
-                      className="px-2.5 py-1 rounded-lg bg-purple-900 text-purple-200 border border-purple-700 hover:text-white cursor-pointer"
-                    >
-                      Pause
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={handleStopBroadcast}
-                    className="p-1 rounded-lg bg-rose-950 text-rose-300 border border-rose-800 hover:text-white cursor-pointer"
-                    title="Stop Broadcast"
-                  >
-                    <RotateCcw className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Unobstructed, Full-Width Daily Horoscope Reading Script Card */}
-          <div className="rounded-2xl border border-purple-800/60 bg-slate-950/95 p-5 space-y-3.5 shadow-xl">
-            <div className="flex items-center justify-between text-xs text-purple-300 border-b border-purple-900/50 pb-2.5">
-              <span className="font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5 text-xs sm:text-sm">
-                <Radio className="h-4 w-4 text-amber-400" />
-                <span>Daily Horoscope Forecast Reading</span>
-              </span>
-              <span className="text-[11px] text-purple-300 font-mono font-bold bg-purple-950 px-2.5 py-1 rounded-lg border border-purple-800">
-                {broadcastPart === 'part1' ? 'Part 1: Daily Horoscope' : broadcastPart === 'part2' ? 'Part 2: Moon & Planetary Influences' : 'Complete Duet Broadcast'}
-              </span>
-            </div>
-
-            <div className="space-y-4 text-sm sm:text-base leading-relaxed text-slate-100">
-              {broadcastPart === 'part1' && (
-                <div className="p-3.5 rounded-xl bg-purple-950/40 border border-amber-500/30 space-y-1.5">
-                  <div className="text-xs font-bold text-amber-300 flex items-center gap-1.5 uppercase font-mono">
-                    <span>🎙️ Lead Astrologer:</span>
-                    <span>{activeAnchor.name} ({activeAnchor.speciesBadge})</span>
-                  </div>
-                  <p className="text-slate-100 font-sans leading-relaxed text-sm sm:text-base">
-                    {script.part1Text}
-                  </p>
-                </div>
-              )}
-
-              {broadcastPart === 'part2' && (
-                <div className="p-3.5 rounded-xl bg-purple-950/40 border border-cyan-500/30 space-y-1.5">
-                  <div className="text-xs font-bold text-cyan-300 flex items-center gap-1.5 uppercase font-mono">
-                    <span>🎙️ Co-Anchor:</span>
-                    <span>{coAnchor.name} ({coAnchor.speciesBadge})</span>
-                  </div>
-                  <p className="text-slate-100 font-sans leading-relaxed text-sm sm:text-base">
-                    {script.part2Text}
-                  </p>
-                </div>
-              )}
-
-              {broadcastPart === 'duet' && (
-                <div className="space-y-3">
-                  <div className={`p-4 rounded-xl border transition-all ${
-                    activeHost.id === activeAnchor.id && isPlaying 
-                      ? 'border-amber-400 bg-amber-950/30 text-amber-50 shadow-lg ring-1 ring-amber-400/30' 
-                      : 'border-purple-900/50 bg-slate-900/60 text-slate-200'
-                  }`}>
-                    <div className="text-xs font-bold text-amber-300 mb-1 flex items-center gap-1.5 uppercase font-mono">
-                      <span>🎙️ Part 1 (Daily Forecast) • {activeAnchor.name} ({activeAnchor.speciesBadge})</span>
-                    </div>
-                    <p className="text-sm sm:text-base leading-relaxed">
-                      {script.part1Text}
-                    </p>
-                  </div>
-
-                  <div className={`p-4 rounded-xl border transition-all ${
-                    activeHost.id === coAnchor.id && isPlaying 
-                      ? 'border-cyan-400 bg-cyan-950/30 text-cyan-50 shadow-lg ring-1 ring-cyan-400/30' 
-                      : 'border-purple-900/50 bg-slate-900/60 text-slate-200'
-                  }`}>
-                    <div className="text-xs font-bold text-cyan-300 mb-1 flex items-center gap-1.5 uppercase font-mono">
-                      <span>🎙️ Part 2 (Moon & Planetary Transits) • {coAnchor.name} ({coAnchor.speciesBadge})</span>
-                    </div>
-                    <p className="text-sm sm:text-base leading-relaxed">
-                      {script.part2Text}
-                    </p>
-                  </div>
-                </div>
               )}
             </div>
           </div>
