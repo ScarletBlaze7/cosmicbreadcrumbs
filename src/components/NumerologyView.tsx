@@ -422,36 +422,6 @@ export const NumerologyView: React.FC<NumerologyViewProps> = ({
       {/* TAB 1: Soul Matrix */}
       {activeTab === 'matrix' && (
         <div className="space-y-6">
-          {/* Chaldean Sacred System Banner */}
-          <div className="rounded-3xl border border-amber-500/40 bg-gradient-to-r from-amber-950/40 via-purple-950/50 to-slate-950 p-4 sm:p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start space-x-3.5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-300 border border-amber-400/40 font-serif text-lg font-bold">
-                ✦
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <span className="font-serif text-sm sm:text-base font-bold text-slate-100">
-                    Calculated Exclusively with Chaldean Sacred Numerology
-                  </span>
-                  <span className="rounded-full bg-amber-400/25 border border-amber-400/50 px-2 py-0.5 text-[9px] font-bold text-amber-300 tracking-wider">
-                    ANCIENT SOUND FREQUENCIES
-                  </span>
-                </div>
-                <p className="text-xs text-purple-200/80 leading-relaxed max-w-3xl">
-                  {CHALDEAN_NUMEROLOGY_INFO.shortDescription}
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setActiveTab('chaldean')}
-              className="shrink-0 flex items-center space-x-1.5 rounded-xl border border-amber-400/60 bg-amber-500/10 px-3.5 py-2 text-xs font-semibold text-amber-300 hover:bg-amber-500/20 transition-all self-start sm:self-auto"
-            >
-              <span>Explore Chaldean Wisdom</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
           {/* Core Numbers Bento Grid: 1 FREE (Life Path) + 3 MEMBERS-ONLY */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             

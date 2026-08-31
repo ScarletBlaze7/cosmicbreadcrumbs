@@ -16,7 +16,7 @@ export const SanctuaryProfileBadge: React.FC<ProfileProps> = ({ isMember, userna
             src="/assets/sanctuaryemb.jpg"
             onError={(e) => { (e.currentTarget as HTMLImageElement).src = './assets/sanctuaryemb.jpg'; }}
             alt="Sanctuary Member Emblem"
-            className="w-48 h-48 object-contain rounded-2xl drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]"
+            className="w-48 h-48 aspect-square object-cover rounded-full drop-shadow-[0_0_15px_rgba(212,175,55,0.5)] border-2 border-amber-400"
           />
           <span className="text-[#D4AF37] text-xs tracking-widest mt-2 uppercase font-bold">
             Sanctuary Member

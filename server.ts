@@ -11,6 +11,15 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Ensure browsers and webviews always fetch fresh bundles without stale caching
+app.use((req, res, next) => {
+  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.set('Pragma', 'no-cache');
+  res.set('Expires', '0');
+  res.set('Surrogate-Control', 'no-store');
+  next();
+});
+
 // ── User Accounts & Cloud Data Synchronization ──────────────────────────────
 const DATA_DIR = path.resolve(process.cwd(), 'server-data');
 if (!fs.existsSync(DATA_DIR)) {
@@ -87,32 +96,68 @@ app.post('/api/auth/register', (req, res) => {
   }
 });
 
-// API: User Login
+// In-memory or file-backed reset tokens
+const RESET_TOKENS_FILE = path.join(DATA_DIR, 'reset-tokens.json');
+function loadResetTokens(): Record<string, any> {
+  try {
+    if (fs.existsSync(RESET_TOKENS_FILE)) {
+      return JSON.parse(fs.readFileSync(RESET_TOKENS_FILE, 'utf8'));
+    }
+  } catch (e) {}
+  return {};
+}
+
+function saveResetTokens(tokens: Record<string, any>): void {
+  try {
+    fs.writeFileSync(RESET_TOKENS_FILE, JSON.stringify(tokens, null, 2));
+  } catch (e) {
+    console.error('Failed to save reset tokens:', e);
+  }
+}
+
+// API: User Login (Supports Email OR Username/Profile Name)
 app.post('/api/auth/login', (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ success: false, error: 'Email and password required.' });
+    const { email, username, identifier, password } = req.body;
+    const rawIdentifier = (identifier || email || username || '').trim();
+    if (!rawIdentifier || !password) {
+      return res.status(400).json({ success: false, error: 'Email/Username and password required.' });
     }
 
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanInput = rawIdentifier.toLowerCase();
     const accounts = loadAccounts();
-    const user = accounts[cleanEmail];
-
-    if (!user) {
-      return res.status(400).json({ success: false, error: 'No account found with this email. Please register.' });
+    
+    // Search by exact email or by username/profile name
+    let foundEmail: string | null = null;
+    if (accounts[cleanInput]) {
+      foundEmail = cleanInput;
+    } else {
+      for (const [em, acc] of Object.entries(accounts)) {
+        const u = acc as any;
+        const profileName = (u.profile?.name || '').trim().toLowerCase();
+        const emailPrefix = em.split('@')[0].toLowerCase();
+        if (cleanInput === profileName || cleanInput === emailPrefix) {
+          foundEmail = em;
+          break;
+        }
+      }
     }
 
+    if (!foundEmail || !accounts[foundEmail]) {
+      return res.status(400).json({ success: false, error: 'No account found with that email or username. Please check your credentials or tap "Forgot Email / Username".' });
+    }
+
+    const user = accounts[foundEmail];
     const passHash = Buffer.from(password).toString('base64');
     if (user.passwordHash !== passHash) {
-      return res.status(400).json({ success: false, error: 'Incorrect password.' });
+      return res.status(400).json({ success: false, error: 'Incorrect password. Tap "Forgot Password?" to reset.' });
     }
 
     user.lastLoginAt = new Date().toISOString();
-    accounts[cleanEmail] = user;
+    accounts[foundEmail] = user;
     saveAccounts(accounts);
 
-    const token = 'tok_' + Buffer.from(user.id + ':' + cleanEmail).toString('base64');
+    const token = 'tok_' + Buffer.from(user.id + ':' + foundEmail).toString('base64');
     const safeUser = {
       id: user.id,
       email: user.email,
@@ -128,6 +173,175 @@ app.post('/api/auth/login', (req, res) => {
   } catch (err: any) {
     console.error('Login error:', err);
     res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+// API: Recover / Lookup Account Email or Username
+app.post('/api/auth/lookup-account', (req, res) => {
+  try {
+    const { name, birthDate, emailPrefix } = req.body;
+    const accounts = loadAccounts();
+    const matches: Array<{ email: string; maskedEmail: string; name?: string; sunSign?: string }> = [];
+
+    const cleanName = (name || '').trim().toLowerCase();
+    const cleanPrefix = (emailPrefix || '').trim().toLowerCase();
+    const cleanBirthDate = (birthDate || '').trim();
+
+    for (const [em, acc] of Object.entries(accounts)) {
+      const u = acc as any;
+      const profileName = (u.profile?.name || '').trim().toLowerCase();
+      const profileBirthDate = (u.profile?.birthDate || '').trim();
+      const emPrefix = em.split('@')[0].toLowerCase();
+
+      let matched = false;
+      if (cleanName && profileName && (profileName.includes(cleanName) || cleanName.includes(profileName))) {
+        matched = true;
+      }
+      if (cleanName && (emPrefix.includes(cleanName) || cleanName.includes(emPrefix))) {
+        matched = true;
+      }
+      if (cleanPrefix && emPrefix.includes(cleanPrefix)) {
+        matched = true;
+      }
+      if (cleanBirthDate && profileBirthDate === cleanBirthDate) {
+        matched = true;
+      }
+
+      if (matched) {
+        // Mask email: e.g. "seeker@gmail.com" -> "s***r@gmail.com"
+        const [local, domain] = em.split('@');
+        let maskedLocal = local;
+        if (local.length > 2) {
+          maskedLocal = local[0] + '*'.repeat(Math.max(1, local.length - 2)) + local[local.length - 1];
+        } else if (local.length === 2) {
+          maskedLocal = local[0] + '*';
+        }
+        const maskedEmail = `${maskedLocal}@${domain || 'cosmic.com'}`;
+
+        matches.push({
+          email: em,
+          maskedEmail,
+          name: u.profile?.name,
+          sunSign: u.profile?.sunSign,
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      matches,
+      totalFound: matches.length,
+    });
+  } catch (err: any) {
+    console.error('Account lookup error:', err);
+    res.status(500).json({ success: false, error: 'Failed to look up account.' });
+  }
+});
+
+// API: Request Password Reset Link / Code
+app.post('/api/auth/forgot-password', (req, res) => {
+  try {
+    const { identifier } = req.body;
+    const raw = (identifier || '').trim().toLowerCase();
+    if (!raw) {
+      return res.status(400).json({ success: false, error: 'Please provide your account email or username.' });
+    }
+
+    const accounts = loadAccounts();
+    let targetEmail: string | null = null;
+
+    if (accounts[raw]) {
+      targetEmail = raw;
+    } else {
+      for (const [em, acc] of Object.entries(accounts)) {
+        const u = acc as any;
+        const profileName = (u.profile?.name || '').trim().toLowerCase();
+        const emPrefix = em.split('@')[0].toLowerCase();
+        if (raw === profileName || raw === emPrefix) {
+          targetEmail = em;
+          break;
+        }
+      }
+    }
+
+    if (!targetEmail) {
+      // Return success with generic message to prevent account enumeration if desired, or return direct message
+      return res.json({
+        success: true,
+        message: `If an account matches "${raw}", recovery instructions have been prepared.`,
+        token: null,
+      });
+    }
+
+    const token = 'rst_' + Date.now() + '_' + Math.random().toString(36).substring(2, 8);
+    const tokens = loadResetTokens();
+    tokens[token] = {
+      email: targetEmail,
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60).toISOString(), // 1 hour
+    };
+    saveResetTokens(tokens);
+
+    res.json({
+      success: true,
+      email: targetEmail,
+      token,
+      message: `Password reset request generated for ${targetEmail}.`,
+    });
+  } catch (err: any) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ success: false, error: 'Internal server error.' });
+  }
+});
+
+// API: Reset Password With Token
+app.post('/api/auth/reset-password', (req, res) => {
+  try {
+    const { email, token, newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters.' });
+    }
+
+    const cleanEmail = (email || '').trim().toLowerCase();
+    const accounts = loadAccounts();
+    const tokens = loadResetTokens();
+
+    let validEmail = cleanEmail;
+    if (token && tokens[token]) {
+      const record = tokens[token];
+      if (new Date(record.expiresAt).getTime() > Date.now()) {
+        validEmail = record.email;
+      }
+      delete tokens[token];
+      saveResetTokens(tokens);
+    }
+
+    if (!validEmail || !accounts[validEmail]) {
+      // If no server account yet, allow setting or create
+      if (validEmail) {
+        accounts[validEmail] = {
+          id: 'usr_' + Date.now(),
+          email: validEmail,
+          passwordHash: Buffer.from(newPassword).toString('base64'),
+          createdAt: new Date().toISOString(),
+          lastLoginAt: new Date().toISOString(),
+          profile: null,
+          membership: null,
+        };
+        saveAccounts(accounts);
+        return res.json({ success: true, message: 'Password updated successfully.' });
+      }
+      return res.status(400).json({ success: false, error: 'Invalid or expired reset token. Please request a new reset link.' });
+    }
+
+    accounts[validEmail].passwordHash = Buffer.from(newPassword).toString('base64');
+    accounts[validEmail].lastLoginAt = new Date().toISOString();
+    saveAccounts(accounts);
+
+    res.json({ success: true, message: 'Password updated successfully.', email: validEmail });
+  } catch (err: any) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ success: false, error: 'Internal server error.' });
   }
 });
 
@@ -727,6 +941,18 @@ async function startServer() {
       appType: 'spa',
     });
     app.use(vite.middlewares);
+
+    app.use('*', async (req, res, next) => {
+      const url = req.originalUrl;
+      try {
+        let template = fs.readFileSync(path.resolve(process.cwd(), 'index.html'), 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+      } catch (e: any) {
+        vite.ssrFixStacktrace(e);
+        next(e);
+      }
+    });
   } else {
     const distPath = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));

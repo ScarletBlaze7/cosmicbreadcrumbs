@@ -228,4 +228,121 @@
   padding-right: env(safe-area-inset-right, 0px);
 }
 
+/* ==========================================================================
+   ✨ ALIEN NEWSCASTER REALISTIC SPEAKING & SPECIES ANIMATIONS
+   ========================================================================== */
+
+/* 1. Realistic Conversational Speaking Motion (Breathing + Micro-Tilt) */
+@keyframes speakingBreathing {
+  0% {
+    transform: scale(1) translateY(0px) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.025) translateY(-2px) rotate(0.4deg);
+  }
+  50% {
+    transform: scale(1.015) translateY(-0.5px) rotate(-0.3deg);
+  }
+  75% {
+    transform: scale(1.03) translateY(-3px) rotate(0.2deg);
+  }
+  100% {
+    transform: scale(1) translateY(0px) rotate(0deg);
+  }
+}
+
+.animate-speaking-portrait {
+  animation: speakingBreathing 3.6s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* 2. Gentle Rest/Idle Anchor Breathing */
+@keyframes idleAnchorBreathing {
+  0%, 100% {
+    transform: scale(1) translateY(0px);
+  }
+  50% {
+    transform: scale(1.01) translateY(-1.5px);
+  }
+}
+
+.animate-idle-portrait {
+  animation: idleAnchorBreathing 5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+/* 3. Star-Race Species Aura Pulses */
+@keyframes lyranSolarAura {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.4), inset 0 0 15px rgba(251, 191, 36, 0.2);
+    filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.5));
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(245, 158, 11, 0.7), inset 0 0 25px rgba(251, 191, 36, 0.4);
+    filter: drop-shadow(0 0 20px rgba(251, 191, 36, 0.8));
+  }
+}
+
+.aura-lyran-active {
+  animation: lyranSolarAura 2.2s ease-in-out infinite;
+}
+
+@keyframes lemurianCrystalAura {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(45, 212, 191, 0.4), inset 0 0 15px rgba(16, 185, 129, 0.2);
+    filter: drop-shadow(0 0 12px rgba(45, 212, 191, 0.5));
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(45, 212, 191, 0.7), inset 0 0 25px rgba(52, 211, 153, 0.4);
+    filter: drop-shadow(0 0 20px rgba(45, 212, 191, 0.8));
+  }
+}
+
+.aura-lemurian-active {
+  animation: lemurianCrystalAura 2.2s ease-in-out infinite;
+}
+
+@keyframes arcturianStarlightAura {
+  0%, 100% {
+    box-shadow: 0 0 25px rgba(129, 140, 248, 0.4), inset 0 0 15px rgba(192, 132, 252, 0.2);
+    filter: drop-shadow(0 0 12px rgba(129, 140, 248, 0.5));
+  }
+  50% {
+    box-shadow: 0 0 45px rgba(168, 85, 247, 0.7), inset 0 0 25px rgba(129, 140, 248, 0.4);
+    filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.8));
+  }
+}
+
+.aura-arcturian-active {
+  animation: arcturianStarlightAura 2.2s ease-in-out infinite;
+}
+
+/* 4. Bioluminescent Circuitry Shimmer */
+@keyframes circuitPulse {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.65;
+  }
+}
+
+.animate-circuit-pulse {
+  animation: circuitPulse 2.8s ease-in-out infinite;
+}
+
+/* 5. On-Air Dynamic Equalizer Bars */
+@keyframes eqBar1 { 0%, 100% { height: 6px; } 50% { height: 22px; } }
+@keyframes eqBar2 { 0%, 100% { height: 18px; } 50% { height: 8px; } }
+@keyframes eqBar3 { 0%, 100% { height: 12px; } 50% { height: 26px; } }
+@keyframes eqBar4 { 0%, 100% { height: 24px; } 50% { height: 10px; } }
+@keyframes eqBar5 { 0%, 100% { height: 10px; } 50% { height: 20px; } }
+
+.animate-eq-1 { animation: eqBar1 0.45s ease-in-out infinite; }
+.animate-eq-2 { animation: eqBar2 0.38s ease-in-out infinite; }
+.animate-eq-3 { animation: eqBar3 0.52s ease-in-out infinite; }
+.animate-eq-4 { animation: eqBar4 0.41s ease-in-out infinite; }
+.animate-eq-5 { animation: eqBar5 0.48s ease-in-out infinite; }
+
+
 

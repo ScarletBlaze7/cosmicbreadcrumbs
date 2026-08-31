@@ -54,6 +54,7 @@ export interface SpaceWeatherTelemetry {
   kpIndex: number; // 0 to 9 geomagnetic disturbance
   kpStatus: 'Quiet' | 'Unsettled' | 'Active Storm' | 'Severe Geomagnetic Event';
   solarWindSpeed: number; // km/s (typical 300 - 800 km/s)
+  solarWindStatus: 'Calm Breeze' | 'Moderate Stream' | 'High Velocity Solar Flow';
   solarFlareFlux: string; // Class A, B, C, M, X
   protonFlux: number;
   cosmicResonanceScore: number; // 0 to 100% computed via proprietary algorithm
@@ -520,7 +521,7 @@ export function calculatePlanetaryPositions(targetDate: Date = new Date()): Plan
       id: 'chiron',
       name: 'Chiron (Healer)',
       symbol: '⚷',
-      longitude: L_chiron,
+      longitude: chironLong,
       zodiacSign: chironZodiac.sign,
       zodiacSymbol: chironZodiac.symbol,
       degrees: chironZodiac.degrees,
@@ -630,6 +631,10 @@ export function calculateSpaceWeather(
   else if (kpIndex > 3.0) kpStatus = 'Unsettled';
 
   const solarWindSpeed = Math.round(390 + Math.sin(jd * 2.1) * 85 + seed * 40);
+  let solarWindStatus: SpaceWeatherTelemetry['solarWindStatus'] = 'Calm Breeze';
+  if (solarWindSpeed > 500) solarWindStatus = 'High Velocity Solar Flow';
+  else if (solarWindSpeed > 400) solarWindStatus = 'Moderate Stream';
+
   const flareClasses = ['B2.4', 'C1.1', 'C4.8', 'M1.2', 'C2.9', 'B8.4'];
   const solarFlareFlux = flareClasses[Math.floor((jd * 7) % flareClasses.length)];
 
@@ -658,6 +663,7 @@ export function calculateSpaceWeather(
     kpIndex,
     kpStatus,
     solarWindSpeed,
+    solarWindStatus,
     solarFlareFlux,
     protonFlux: Math.round((0.45 + seed * 0.3) * 100) / 100,
     cosmicResonanceScore,

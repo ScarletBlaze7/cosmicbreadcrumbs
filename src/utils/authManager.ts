@@ -53,10 +53,29 @@ export function getAuthToken(): string | null {
   return localStorage.getItem(AUTH_TOKEN_KEY);
 }
 
+const LAST_EMAIL_KEY = 'cosmic_last_email';
+
+export function getLastUsedEmail(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    return localStorage.getItem(LAST_EMAIL_KEY) || '';
+  } catch (e) {
+    return '';
+  }
+}
+
+export function setLastUsedEmail(email: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    if (email) localStorage.setItem(LAST_EMAIL_KEY, email.trim().toLowerCase());
+  } catch (e) {}
+}
+
 export function saveAuthSession(user: UserAccount, token: string): void {
   try {
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
     localStorage.setItem(AUTH_TOKEN_KEY, token);
+    if (user?.email) setLastUsedEmail(user.email);
     window.dispatchEvent(new CustomEvent('cosmic_auth_changed', { detail: { user } }));
   } catch (e) {}
 }
@@ -69,7 +88,33 @@ export function clearAuthSession(): void {
   } catch (e) {}
 }
 
-export async function registerAccount(email: string, password: string): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
+export async function loginAsGuest(guestName?: string): Promise<{ success: boolean; user: UserAccount }> {
+  const guestId = 'guest_' + Date.now();
+  const guestEmail = `seeker_${Date.now().toString().slice(-4)}@guest.cosmicbreadcrumbs.com`;
+  const guestUser: UserAccount = {
+    id: guestId,
+    email: guestEmail,
+    createdAt: new Date().toISOString(),
+    lastLoginAt: new Date().toISOString(),
+    profile: {
+      name: guestName || 'Universal Traveler',
+      birthDate: '1996-07-22',
+      birthTime: '11:11',
+      birthPlace: 'Sedona, Arizona',
+      sunSign: 'Cancer',
+      lifePathNumber: 7,
+      destinyNumber: 11,
+      numerologySystem: 'chaldean',
+      birthDateChangeCount: 0,
+      hasCompletedOnboarding: true,
+    },
+  };
+
+  saveAuthSession(guestUser, 'guest_token_' + Date.now());
+  return { success: true, user: guestUser };
+}
+
+export async function registerAccount(email: string, password: string): Promise<{ success: boolean; user?: UserAccount; error?: string; isExistingAccount?: boolean }> {
   const cleanEmail = email ? email.trim().toLowerCase() : '';
   if (!cleanEmail || !cleanEmail.includes('@')) {
     return { success: false, error: 'Please enter a valid email address.' };
@@ -81,7 +126,7 @@ export async function registerAccount(email: string, password: string): Promise<
   // Check local registry first
   const accounts = getRegisteredAccounts();
   if (accounts[cleanEmail]) {
-    return { success: false, error: 'An account with this email already exists. Please sign in.' };
+    return { success: false, error: 'An account with this email already exists.', isExistingAccount: true };
   }
 
   try {
@@ -130,27 +175,132 @@ export async function registerAccount(email: string, password: string): Promise<
   return { success: true, user: offlineUser };
 }
 
-export async function loginAccount(email: string, password: string): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
-  const cleanEmail = email ? email.trim().toLowerCase() : '';
-  if (!cleanEmail || !cleanEmail.includes('@')) {
-    return { success: false, error: 'Please enter a valid email address.' };
+export function getSavedDeviceAccounts(): Array<{ email: string; maskedEmail: string; name?: string }> {
+  const accounts = getRegisteredAccounts();
+  const list: Array<{ email: string; maskedEmail: string; name?: string }> = [];
+  for (const [em, acc] of Object.entries(accounts)) {
+    const [local, domain] = em.split('@');
+    let maskedLocal = local;
+    if (local.length > 2) {
+      maskedLocal = local[0] + '*'.repeat(Math.max(1, local.length - 2)) + local[local.length - 1];
+    } else if (local.length === 2) {
+      maskedLocal = local[0] + '*';
+    }
+    const maskedEmail = `${maskedLocal}@${domain || 'cosmic.com'}`;
+    list.push({
+      email: em,
+      maskedEmail,
+    });
+  }
+  return list;
+}
+
+export async function lookupAccountByDetails(params: {
+  name?: string;
+  birthDate?: string;
+  emailPrefix?: string;
+}): Promise<{
+  success: boolean;
+  matches: Array<{ email: string; maskedEmail: string; name?: string; sunSign?: string }>;
+  error?: string;
+}> {
+  const matches: Array<{ email: string; maskedEmail: string; name?: string; sunSign?: string }> = [];
+  const seen = new Set<string>();
+
+  // 1. Check local device registered accounts
+  const localAccounts = getRegisteredAccounts();
+  const cleanName = (params.name || '').trim().toLowerCase();
+  const cleanPrefix = (params.emailPrefix || '').trim().toLowerCase();
+
+  for (const [em, acc] of Object.entries(localAccounts)) {
+    const emPrefix = em.split('@')[0].toLowerCase();
+    let matched = false;
+    if (cleanName && emPrefix.includes(cleanName)) matched = true;
+    if (cleanPrefix && emPrefix.includes(cleanPrefix)) matched = true;
+
+    if (matched && !seen.has(em)) {
+      seen.add(em);
+      const [local, domain] = em.split('@');
+      let maskedLocal = local;
+      if (local.length > 2) {
+        maskedLocal = local[0] + '*'.repeat(Math.max(1, local.length - 2)) + local[local.length - 1];
+      } else if (local.length === 2) {
+        maskedLocal = local[0] + '*';
+      }
+      matches.push({
+        email: em,
+        maskedEmail: `${maskedLocal}@${domain || 'cosmic.com'}`,
+      });
+    }
+  }
+
+  // 2. Query server for matching accounts
+  try {
+    const res = await fetch('/api/auth/lookup-account', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && Array.isArray(data.matches)) {
+        for (const item of data.matches) {
+          if (!seen.has(item.email)) {
+            seen.add(item.email);
+            matches.push(item);
+          }
+        }
+      }
+    }
+  } catch (e) {
+    // Network fallback
+  }
+
+  return {
+    success: true,
+    matches,
+  };
+}
+
+export async function loginAccount(emailOrUsername: string, password: string): Promise<{ success: boolean; user?: UserAccount; error?: string }> {
+  const rawInput = emailOrUsername ? emailOrUsername.trim() : '';
+  if (!rawInput) {
+    return { success: false, error: 'Please enter your email or username.' };
   }
   if (!password || password.length < 6) {
     return { success: false, error: 'Password must be at least 6 characters.' };
   }
 
+  const cleanInput = rawInput.toLowerCase();
+
+  // Try API first
   try {
     const res = await fetch('/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: cleanEmail, password }),
+      body: JSON.stringify({ identifier: cleanInput, password }),
     });
 
     if (res.ok) {
       const data = await res.json();
       if (data.success && data.user) {
         saveAuthSession(data.user, data.token);
+        const accounts = getRegisteredAccounts();
+        accounts[data.user.email.toLowerCase()] = {
+          id: data.user.id,
+          email: data.user.email.toLowerCase(),
+          passwordHash: password,
+          createdAt: data.user.createdAt,
+          lastLoginAt: data.user.lastLoginAt,
+        };
+        saveRegisteredAccounts(accounts);
         return { success: true, user: data.user };
+      }
+    } else {
+      const errData = await res.json().catch(() => ({}));
+      if (errData.error) {
+        return { success: false, error: errData.error };
       }
     }
   } catch (err: any) {
@@ -159,13 +309,23 @@ export async function loginAccount(email: string, password: string): Promise<{ s
 
   // Local authentication check
   const accounts = getRegisteredAccounts();
-  const existing = accounts[cleanEmail];
+  let existingKey = accounts[cleanInput] ? cleanInput : null;
 
-  if (existing) {
+  if (!existingKey) {
+    for (const [em] of Object.entries(accounts)) {
+      if (em.split('@')[0].toLowerCase() === cleanInput) {
+        existingKey = em;
+        break;
+      }
+    }
+  }
+
+  if (existingKey && accounts[existingKey]) {
+    const existing = accounts[existingKey];
     if (existing.passwordHash === password) {
       const updatedUser: UserAccount = {
         id: existing.id,
-        email: cleanEmail,
+        email: existing.email,
         createdAt: existing.createdAt,
         lastLoginAt: new Date().toISOString(),
       };
@@ -174,27 +334,31 @@ export async function loginAccount(email: string, password: string): Promise<{ s
       saveAuthSession(updatedUser, 'offline_token_' + Date.now());
       return { success: true, user: updatedUser };
     } else {
-      return { success: false, error: 'Incorrect password. Tap "Forgot password?" if you need a reset link.' };
+      return { success: false, error: 'Incorrect password. Tap "Forgot Password?" if you need to reset.' };
     }
   }
 
-  // If this is the very first login and no accounts are recorded, create the account smoothly
-  const newUser: UserAccount = {
-    id: 'usr_' + Date.now(),
-    email: cleanEmail,
-    createdAt: new Date().toISOString(),
-    lastLoginAt: new Date().toISOString(),
-  };
-  accounts[cleanEmail] = {
-    id: newUser.id,
-    email: cleanEmail,
-    passwordHash: password,
-    createdAt: newUser.createdAt,
-    lastLoginAt: newUser.lastLoginAt,
-  };
-  saveRegisteredAccounts(accounts);
-  saveAuthSession(newUser, 'offline_token_' + Date.now());
-  return { success: true, user: newUser };
+  // If this is the very first login and no accounts are recorded, create the account smoothly if it looks like an email
+  if (cleanInput.includes('@')) {
+    const newUser: UserAccount = {
+      id: 'usr_' + Date.now(),
+      email: cleanInput,
+      createdAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+    };
+    accounts[cleanInput] = {
+      id: newUser.id,
+      email: cleanInput,
+      passwordHash: password,
+      createdAt: newUser.createdAt,
+      lastLoginAt: newUser.lastLoginAt,
+    };
+    saveRegisteredAccounts(accounts);
+    saveAuthSession(newUser, 'offline_token_' + Date.now());
+    return { success: true, user: newUser };
+  }
+
+  return { success: false, error: 'No account found matching this username or email. Please register or recover your account.' };
 }
 
 export async function updateUserEmail(newEmail: string, currentPassword?: string): Promise<{ success: boolean; error?: string }> {
@@ -280,20 +444,41 @@ export async function updateUserPassword(newPassword: string, oldPassword?: stri
   return { success: true };
 }
 
-export async function requestPasswordResetLink(email: string): Promise<{ success: boolean; message?: string; error?: string; resetLink?: string; token?: string }> {
-  const cleanEmail = email ? email.trim().toLowerCase() : '';
-  if (!cleanEmail || !cleanEmail.includes('@')) {
-    return { success: false, error: 'Please provide a valid email address.' };
+export async function requestPasswordResetLink(identifier: string): Promise<{ success: boolean; message?: string; error?: string; resetLink?: string; token?: string; email?: string }> {
+  const raw = identifier ? identifier.trim() : '';
+  if (!raw) {
+    return { success: false, error: 'Please provide a valid email address or username.' };
   }
 
-  const token = 'rst_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
-  const resetLink = `${window.location.origin}/#reset-password?token=${token}&email=${encodeURIComponent(cleanEmail)}`;
+  let serverToken: string | null = null;
+  let serverEmail = raw.toLowerCase();
+
+  try {
+    const res = await fetch('/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier: raw }),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success) {
+        serverToken = data.token;
+        if (data.email) serverEmail = data.email;
+      }
+    }
+  } catch (e) {}
+
+  const token = serverToken || ('rst_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7));
+  const resetLink = typeof window !== 'undefined'
+    ? `${window.location.origin}/#reset-password?token=${token}&email=${encodeURIComponent(serverEmail)}`
+    : `https://cosmicbreadcrumbs.com/#reset-password?token=${token}&email=${encodeURIComponent(serverEmail)}`;
 
   try {
     const rawTokens = localStorage.getItem(RESET_TOKENS_KEY);
     const tokens = rawTokens ? JSON.parse(rawTokens) : {};
     tokens[token] = {
-      email: cleanEmail,
+      email: serverEmail,
       createdAt: Date.now(),
       expiresAt: Date.now() + 1000 * 60 * 60, // 1 hour
     };
@@ -302,7 +487,8 @@ export async function requestPasswordResetLink(email: string): Promise<{ success
 
   return {
     success: true,
-    message: `A secure password reset link has been dispatched to ${cleanEmail}. Check your inbox to set a new password.`,
+    email: serverEmail,
+    message: `A secure password reset link has been prepared for ${serverEmail}. You can set your new password immediately.`,
     resetLink,
     token,
   };
@@ -314,11 +500,26 @@ export async function resetPasswordWithToken(email: string, token: string, newPa
     return { success: false, error: 'Password must be at least 6 characters.' };
   }
 
+  // Call Server API
+  try {
+    const res = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: cleanEmail, token, newPassword }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (data.error) {
+        // We will still allow local update if offline
+      }
+    }
+  } catch (e) {}
+
   const accounts = getRegisteredAccounts();
   if (accounts[cleanEmail]) {
     accounts[cleanEmail].passwordHash = newPassword;
     saveRegisteredAccounts(accounts);
-  } else {
+  } else if (cleanEmail) {
     accounts[cleanEmail] = {
       id: 'usr_' + Date.now(),
       email: cleanEmail,

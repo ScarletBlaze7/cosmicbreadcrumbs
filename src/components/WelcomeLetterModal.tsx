@@ -69,12 +69,12 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
   const [checkoutSuccessMessage, setCheckoutSuccessMessage] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  // Card Checkout Form State
-  const [cardNumber, setCardNumber] = useState<string>('4242 •••• •••• 4242');
-  const [cardExpiry, setCardExpiry] = useState<string>('12/28');
-  const [cardCvc, setCardCvc] = useState<string>('888');
+  // Card Checkout Form State (Blank by default so users don't need to erase anything)
+  const [cardNumber, setCardNumber] = useState<string>('');
+  const [cardExpiry, setCardExpiry] = useState<string>('');
+  const [cardCvc, setCardCvc] = useState<string>('');
   const [cardName, setCardName] = useState<string>('');
-  const [cardZip, setCardZip] = useState<string>('90210');
+  const [cardZip, setCardZip] = useState<string>('');
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'apple' | 'google'>('card');
   const [stripeStatus, setStripeStatus] = useState<{ hasStripeKey: boolean; publishableKey?: string } | null>(null);
 
@@ -314,28 +314,17 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                 </div>
               </div>
 
-              {/* Official Sanctuary Emblem Showcase Box */}
-              <div className="rounded-2xl border border-purple-900/80 bg-[#070814] p-4 flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                <SanctuaryEmblem size="lg" isUnlocked={Boolean(membership.isActive)} tier={membership.tier} interactive={true} />
-                <div className="text-center sm:text-left space-y-1">
-                  <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    <span className="font-mono text-xs font-bold text-white uppercase tracking-wider">
-                      The Sanctuary Emblem
-                    </span>
-                    {membership.isActive ? (
-                      <span className="rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[9px] font-mono font-bold px-2 py-0.5">
-                        ACTIVE MEMBER SEAL
-                      </span>
-                    ) : (
-                      <span className="rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-mono font-bold px-2 py-0.5">
-                        FOR MEMBERS & TRIAL ACCESS
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-slate-300 leading-relaxed">
-                    This sacred Sanctuary Emblem is awarded to seekers who join a paid Sanctuary Club membership ($3/wk, $11/mo, or $33 Lifetime). <strong className="text-amber-200">Not included for free users or on the free 3-day trial.</strong>
-                  </p>
+              {/* Limited-Time Launch Promotion Banner */}
+              <div className="rounded-3xl border-2 border-amber-400/60 bg-gradient-to-r from-amber-950/50 via-purple-950/70 to-amber-950/50 p-5 sm:p-6 shadow-xl shadow-amber-500/10 space-y-2.5">
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="h-5 w-5 text-amber-400 animate-pulse shrink-0" />
+                  <span className="font-serif text-sm sm:text-base font-extrabold uppercase tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400">
+                    Limited-Time Launch Opportunity: Lifetime VIP for $33
+                  </span>
                 </div>
+                <p className="text-xs sm:text-sm text-purple-100/95 leading-relaxed font-medium">
+                  ONLY 2 weeks after the app launches, For a limited time we are taking LIFETIME members for only $33! This promotion will only be in effect for the first 3 months of releasing the app. This is to aquire and hold membrance of those who joined us in the beginning and will continue to be part of our collective family for years ahead..make sure to leave some of your own breadcrumbs along your path.
+                </p>
               </div>
 
               {/* Parchment-style Welcome Letter Card */}
@@ -406,177 +395,6 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                     </span>
                   </div>
                 )}
-              </div>
-
-              {/* Free vs Premium Feature Matrix & What Free Users Miss */}
-              <div className="rounded-3xl border border-purple-800/50 bg-slate-950/60 p-5 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-purple-900/40 pb-3">
-                  <h4 className="font-serif text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-rose-200 uppercase tracking-wider flex items-center space-x-2">
-                    <Compass className="h-4 w-4 text-amber-400" />
-                    <span>Free Seeker vs. Sanctuary Club Access</span>
-                  </h4>
-                  <span className="rounded-full bg-rose-500/20 border border-rose-500/40 px-2.5 py-0.5 text-[10px] font-bold text-rose-300">
-                    See What Free Users Miss Below
-                  </span>
-                </div>
-
-                {/* Side-by-Side Quick Summary */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                  <div className="rounded-2xl border border-slate-700/50 bg-slate-900/60 p-4 space-y-2.5">
-                    <div className="flex items-center justify-between text-slate-300 font-bold border-b border-slate-800 pb-2">
-                      <span className="flex items-center space-x-1.5">
-                        <span>✨ Free App Tier</span>
-                      </span>
-                      <span className="rounded bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">Included Free</span>
-                    </div>
-                    <ul className="space-y-2 text-slate-300 text-[11px]">
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                        <span>Daily Personalized Horoscope (Real-Time NASA Ephemeris)</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                        <span>Daily Tarot Card Pull (1-Card)</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                        <span>Basic Life Path Number Calculation</span>
-                      </li>
-                      <li className="flex items-center space-x-2 text-rose-400/80 font-medium">
-                        <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-rose-500/20 text-[10px] text-rose-400 font-bold">✕</span>
-                        <span>All other sanctuary sacred tools locked</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="rounded-2xl border-2 border-amber-500/50 bg-gradient-to-b from-purple-950/40 via-amber-950/20 to-slate-900 p-4 space-y-2.5 shadow-lg shadow-amber-500/5">
-                    <div className="flex items-center justify-between text-amber-300 font-bold border-b border-amber-500/30 pb-2">
-                      <span className="flex items-center space-x-1.5">
-                        <Crown className="h-4 w-4 text-amber-400" />
-                        <span>👑 The Sanctuary Club</span>
-                      </span>
-                      <span className="rounded bg-amber-500/20 px-2 py-0.5 text-[10px] text-amber-300 font-extrabold">All Unlocked ($0 Trial)</span>
-                    </div>
-                    <ul className="space-y-2 text-purple-100 text-[11px]">
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                        <span>Full Sacred Chaldean Matrix (Destiny + Soul Urge)</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                        <span>Calculate Matrix for Loved Ones & Synastry</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                        <span>Archangel Oracle Guidance & Clarification Draws</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                        <span>Dream Sanctuary & Midnight Symbol Decoder</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                        <span>4-Digit PIN Encrypted Private Intuition Diary</span>
-                      </li>
-                      <li className="flex items-center space-x-2">
-                        <Check className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                        <span>AI Cosmic Oracle 24/7 Consultations</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* DETAILED "WHAT YOU MISS" HIGHLIGHT GRID */}
-                <div className="mt-4 rounded-2xl border border-rose-500/30 bg-gradient-to-b from-rose-950/20 via-slate-900 to-purple-950/20 p-4 sm:p-5 space-y-3">
-                  <div className="flex items-center space-x-2">
-                    <AlertCircle className="h-4 w-4 text-rose-400" />
-                    <h5 className="font-serif text-xs sm:text-sm font-bold text-rose-200 uppercase tracking-wide">
-                      Everything You Miss Out On Without Sanctuary Club Access:
-                    </h5>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5 text-xs">
-                    
-                    <div className="rounded-xl border border-rose-900/40 bg-slate-950/60 p-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-300 flex items-center space-x-1.5">
-                          <span className="text-rose-400">🔒</span>
-                          <span>Chaldean Destiny & Soul Urge Matrix</span>
-                        </span>
-                        <span className="text-[10px] text-rose-400 font-medium">Free misses this</span>
-                      </div>
-                      <p className="text-[11px] text-purple-200/80 leading-relaxed">
-                        Free users only see their basic Life Path number. You miss discovering your true root Chaldean Destiny vibration, inner Soul Urge desires, and karmic life lessons.
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl border border-rose-900/40 bg-slate-950/60 p-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-300 flex items-center space-x-1.5">
-                          <span className="text-rose-400">🔒</span>
-                          <span>Calculate for Loved Ones & Synastry</span>
-                        </span>
-                        <span className="text-[10px] text-rose-400 font-medium">Free misses this</span>
-                      </div>
-                      <p className="text-[11px] text-purple-200/80 leading-relaxed">
-                        Inability to calculate birth matrix vibrations for your romantic partner, family, or friends, and locked harmonic compatibility ratings.
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl border border-rose-900/40 bg-slate-950/60 p-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-300 flex items-center space-x-1.5">
-                          <span className="text-rose-400">🔒</span>
-                          <span>Archangel Oracle & Sacred Temple</span>
-                        </span>
-                        <span className="text-[10px] text-rose-400 font-medium">Free misses this</span>
-                      </div>
-                      <p className="text-[11px] text-purple-200/80 leading-relaxed">
-                        No access to daily Archangel transmissions, the 15-Archangel Temple roster, color ray attunements, prayers, or multi-card clarification guidance draws.
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl border border-rose-900/40 bg-slate-950/60 p-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-300 flex items-center space-x-1.5">
-                          <span className="text-rose-400">🔒</span>
-                          <span>Dream Sanctuary & Symbol Decoder</span>
-                        </span>
-                        <span className="text-[10px] text-rose-400 font-medium">Free misses this</span>
-                      </div>
-                      <p className="text-[11px] text-purple-200/80 leading-relaxed">
-                        Missing nocturnal dream analysis, archetype recognition, dream symbol frequency calculator, and subconscious dream interpretation.
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl border border-rose-900/40 bg-slate-950/60 p-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-300 flex items-center space-x-1.5">
-                          <span className="text-rose-400">🔒</span>
-                          <span>Private Intuition Diary with PIN Lock</span>
-                        </span>
-                        <span className="text-[10px] text-rose-400 font-medium">Free misses this</span>
-                      </div>
-                      <p className="text-[11px] text-purple-200/80 leading-relaxed">
-                        Locked out of maintaining a secure, password-protected journal to track angel numbers, synchronicities, personal reflections, and breakthroughs.
-                      </p>
-                    </div>
-
-                    <div className="rounded-xl border border-rose-900/40 bg-slate-950/60 p-3 space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-rose-300 flex items-center space-x-1.5">
-                          <span className="text-rose-400">🔒</span>
-                          <span>AI Cosmic Oracle Consultations</span>
-                        </span>
-                        <span className="text-[10px] text-rose-400 font-medium">Free misses this</span>
-                      </div>
-                      <p className="text-[11px] text-purple-200/80 leading-relaxed">
-                        Free users cannot ask real-time spiritual questions, receive channeled angel answers, or explore custom astrological advice on demand.
-                      </p>
-                    </div>
-
-                  </div>
-                </div>
               </div>
 
               {/* Call to Action Buttons */}
@@ -748,7 +566,7 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                       <button
                         type="button"
                         onClick={fillTestCard}
-                        className="text-[10px] text-amber-300 hover:text-amber-200 underline"
+                        className="text-[10px] text-amber-300 hover:text-amber-200 underline cursor-pointer"
                       >
                         Auto-fill Test Card (4242...)
                       </button>
@@ -757,9 +575,10 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                       <input
                         type="text"
                         value={cardNumber}
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => setCardNumber(e.target.value)}
-                        placeholder="4242 4242 4242 4242"
-                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none"
+                        placeholder="16-digit card number"
+                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2.5 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none transition-all"
                       />
                       <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center space-x-1 text-[10px] font-bold text-slate-400">
                         <span>VISA</span>
@@ -779,9 +598,10 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                       <input
                         type="text"
                         value={cardExpiry}
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => setCardExpiry(e.target.value)}
-                        placeholder="MM/YY"
-                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none"
+                        placeholder="MM / YY"
+                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -792,9 +612,10 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                         type="password"
                         maxLength={4}
                         value={cardCvc}
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => setCardCvc(e.target.value)}
-                        placeholder="888"
-                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none"
+                        placeholder="CVC"
+                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none transition-all"
                       />
                     </div>
                     <div>
@@ -804,9 +625,10 @@ export const WelcomeLetterModal: React.FC<WelcomeLetterModalProps> = ({
                       <input
                         type="text"
                         value={cardZip}
+                        onFocus={(e) => e.target.select()}
                         onChange={(e) => setCardZip(e.target.value)}
-                        placeholder="90210"
-                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none"
+                        placeholder="ZIP / Postal"
+                        className="w-full rounded-xl border border-purple-900/60 bg-slate-900 px-3.5 py-2 text-xs text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none transition-all"
                       />
                     </div>
                   </div>

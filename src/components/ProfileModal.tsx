@@ -404,6 +404,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
               required
               id="input-profile-name"
               value={formData.name}
+              onFocus={(e) => e.target.select()}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g. Tiffany Carver"
               className="w-full rounded-xl border border-purple-900/60 bg-slate-950/80 px-3.5 py-2.5 text-sm text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none focus:ring-1 focus:ring-amber-400/50 transition-all"
@@ -440,6 +441,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 disabled={isBirthdateLocked}
                 id="input-profile-birthdate"
                 value={formData.birthDate}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
                 className={`w-full rounded-xl border px-3.5 py-2.5 text-sm text-slate-100 transition-all ${
                   isBirthdateLocked
@@ -499,6 +501,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 type="time"
                 id="input-profile-birthtime"
                 value={formData.birthTime || ''}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => setFormData({ ...formData, birthTime: e.target.value })}
                 className="w-full rounded-xl border border-purple-900/60 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 focus:border-amber-400 focus:outline-none transition-all"
               />
@@ -515,6 +518,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 type="text"
                 id="input-profile-birthplace"
                 value={formData.birthPlace || ''}
+                onFocus={(e) => e.target.select()}
                 onChange={(e) => setFormData({ ...formData, birthPlace: e.target.value })}
                 placeholder="e.g. Austin, Texas"
                 className="w-full rounded-xl border border-purple-900/60 bg-slate-950/80 px-3 py-2 text-sm text-slate-100 placeholder-slate-600 focus:border-amber-400 focus:outline-none transition-all"
@@ -522,24 +526,26 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             </div>
           </div>
 
-          {/* Numerology System */}
+          {/* Sacred Numerology System */}
           <div>
             <label className="block text-xs font-medium text-purple-200 mb-1.5 flex items-center space-x-1.5">
               <Compass className="h-3.5 w-3.5 text-amber-400" />
               <span>Sacred Numerology System</span>
             </label>
-            <div className="rounded-xl border border-amber-400/50 bg-gradient-to-r from-amber-950/40 via-purple-950/40 to-slate-950 p-3.5 flex items-start space-x-3 shadow-inner">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/20 text-amber-300 font-serif text-sm font-bold border border-amber-400/40">
-                ✦
-              </div>
-              <div className="space-y-0.5">
-                <div className="font-semibold text-xs text-amber-300 flex items-center space-x-1.5">
-                  <span>Chaldean Sacred Vibration System</span>
-                  <span className="rounded-full bg-amber-400/20 text-amber-300 text-[9px] px-1.5 py-0.2 border border-amber-400/30">Active</span>
+            <div className="rounded-xl border border-amber-400/40 bg-gradient-to-r from-amber-950/30 via-purple-950/40 to-slate-950 p-3 flex items-center justify-between shadow-inner">
+              <div className="flex items-center space-x-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-300 font-serif text-base font-bold border border-amber-400/40">
+                  {previewLifePath || userProfile.lifePathNumber || '✦'}
                 </div>
-                <p className="text-[11px] text-purple-200/80 leading-relaxed">
-                  Ancient Babylonian occult sound vibration system (Digits 1–8 & Sacred Divine 9) with Master Numbers (11, 22, 33).
-                </p>
+                <div>
+                  <div className="font-semibold text-xs text-slate-100 flex items-center space-x-1.5">
+                    <span>Life Path Number: <strong className="text-amber-300 font-serif text-sm">{previewLifePath || userProfile.lifePathNumber || '—'}</strong></span>
+                    <span className="rounded-full bg-emerald-500/20 text-emerald-300 text-[9px] px-1.5 py-0.2 border border-emerald-500/30 font-bold">Free Life Path</span>
+                  </div>
+                  <p className="text-[10.5px] text-purple-300/80 leading-tight mt-0.5">
+                    Your core universal frequency derived from your date of birth.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -587,6 +593,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 <input
                   type="email"
                   value={accountEmail}
+                  onFocus={(e) => e.target.select()}
                   onChange={(e) => setAccountEmail(e.target.value)}
                   placeholder="your.email@example.com"
                   className="flex-1 rounded-xl border border-purple-900/60 bg-slate-950 px-3 py-2 text-xs text-slate-100 placeholder-purple-400/30 focus:border-amber-400 focus:outline-none"
@@ -626,6 +633,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={newPassword}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="New Password (6+ chars)"
                     className="w-full rounded-xl border border-purple-900/60 bg-slate-950 px-3 py-2 pr-9 text-xs text-slate-100 placeholder-purple-400/30 focus:border-amber-400 focus:outline-none"
@@ -642,20 +650,23 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={confirmPassword}
+                  onFocus={(e) => e.target.select()}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm New Password"
                   className="w-full rounded-xl border border-purple-900/60 bg-slate-950 px-3 py-2 text-xs text-slate-100 placeholder-purple-400/30 focus:border-amber-400 focus:outline-none"
                 />
               </div>
 
-              <button
-                type="button"
-                disabled={isUpdatingPassword || !newPassword}
-                onClick={handleUpdatePassword}
-                className="w-full sm:w-auto rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 disabled:opacity-50 px-4 py-2 text-xs font-bold transition-all shadow-md cursor-pointer"
-              >
-                {isUpdatingPassword ? 'Saving Password...' : 'Save New Password'}
-              </button>
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  disabled={isUpdatingPassword || !newPassword.trim()}
+                  onClick={handleUpdatePassword}
+                  className="rounded-xl bg-purple-700 hover:bg-purple-600 disabled:opacity-50 px-4 py-2 text-xs font-bold text-white transition-all shadow-md cursor-pointer"
+                >
+                  {isUpdatingPassword ? 'Updating Password...' : 'Save New Password'}
+                </button>
+              </div>
 
               {passwordStatusMsg && (
                 <div
@@ -676,15 +687,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
             <div className="rounded-2xl border border-purple-800/40 bg-slate-950/60 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
-                  {membership.tier === 'trial' ? (
-                    <Gift className="h-4 w-4 text-amber-400" />
-                  ) : membership.isActive ? (
-                    <Crown className="h-4 w-4 text-amber-400" />
-                  ) : (
-                    <Sparkles className="h-4 w-4 text-purple-400" />
-                  )}
+                  <Crown className="h-4 w-4 text-amber-400" />
                   <span className="font-serif text-xs font-bold text-slate-200">
-                    The Sanctuary Club
+                    Sanctuary Club Membership
                   </span>
                 </div>
                 <span className="rounded-full bg-amber-500/20 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-300">
@@ -718,15 +723,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                         UNLOCKED & ACTIVE
                       </span>
                     ) : (
-                      <span className="rounded bg-rose-500/20 border border-rose-500/40 text-rose-300 text-[9px] font-mono font-bold px-1.5 py-0.2">
-                        PAID MEMBERS ONLY
+                      <span className="rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[9px] font-mono font-bold px-1.5 py-0.2">
+                        SANCTUARY CLUB
                       </span>
                     )}
                   </div>
                   <p className="text-[10px] text-slate-300 leading-tight mt-0.5">
-                    {(membership.tier === 'weekly' || membership.tier === 'monthly' || membership.tier === 'lifetime')
-                      ? 'Official seal of The Sanctuary Club. Embodying ancient cosmic alignment, wisdom, and inner sight.'
-                      : 'Awarded exclusively to paid members who join The Sanctuary Club. (Not available for free users or 3-Day free trial).'}
+                    Official seal of The Sanctuary Club. Embodying ancient cosmic alignment, wisdom, and inner sight.
                   </p>
                 </div>
               </div>
@@ -744,7 +747,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                     onClose();
                     onOpenMembership();
                   }}
-                  className="w-full rounded-xl border border-amber-500/40 bg-amber-500/10 py-2 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 transition-all text-center"
+                  className="w-full rounded-xl border border-amber-500/40 bg-amber-500/10 py-2 text-xs font-semibold text-amber-200 hover:bg-amber-500/20 transition-all text-center cursor-pointer"
                 >
                   {membership.isActive ? 'Manage Sanctuary Club Membership / Plans ($3, $11, $33)' : 'Join The Sanctuary Club (3-Day Free Trial / $3, $11, $33)'}
                 </button>

@@ -24,6 +24,7 @@ import { getSunSignFromDate } from './utils/astrologyCalc';
 import { calculateLifePath, calculateDestinyNumber } from './utils/numerologyCalc';
 import { getStoredMembership, isFeatureUnlocked, activateSubscription } from './utils/membership';
 import { initFontSize } from './utils/fontSizePreference';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Sparkles, Moon, Compass, Hash, Feather, Heart, Lock, Gift, Crown } from 'lucide-react';
 
 const INITIAL_PROFILE: UserProfile = {
@@ -269,71 +270,73 @@ export default function App() {
 
         {/* View Content */}
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 flex-1">
-          {currentView === 'dashboard' && (
-            <DailyDashboard
-              userProfile={userProfile}
-              onNavigate={handleNavigate}
-              onSaveJournal={handleSaveJournal}
-              membership={membership}
-              onOpenWelcomeModal={handleOpenWelcomeModal}
-              onOpenProfile={() => setIsProfileOpen(true)}
-            />
-          )}
+          <ErrorBoundary fallbackTitle="Cosmic Sanctuary Refreshing">
+            {currentView === 'dashboard' && (
+              <DailyDashboard
+                userProfile={userProfile}
+                onNavigate={handleNavigate}
+                onSaveJournal={handleSaveJournal}
+                membership={membership}
+                onOpenWelcomeModal={handleOpenWelcomeModal}
+                onOpenProfile={() => setIsProfileOpen(true)}
+              />
+            )}
 
-          {currentView === 'horoscope' && (
-            <HoroscopeView
-              userProfile={userProfile}
-              onSaveJournal={handleSaveJournal}
-              membership={membership}
-              onOpenWelcomeModal={handleOpenWelcomeModal}
-            />
-          )}
+            {currentView === 'horoscope' && (
+              <HoroscopeView
+                userProfile={userProfile}
+                onSaveJournal={handleSaveJournal}
+                membership={membership}
+                onOpenWelcomeModal={handleOpenWelcomeModal}
+              />
+            )}
 
-          {currentView === 'numerology' && (
-            <NumerologyView
-              userProfile={userProfile}
-              onSaveJournal={handleSaveJournal}
-              membership={membership}
-              onOpenWelcomeModal={handleOpenWelcomeModal}
-              onNavigate={handleNavigate}
-            />
-          )}
+            {currentView === 'numerology' && (
+              <NumerologyView
+                userProfile={userProfile}
+                onSaveJournal={handleSaveJournal}
+                membership={membership}
+                onOpenWelcomeModal={handleOpenWelcomeModal}
+                onNavigate={handleNavigate}
+              />
+            )}
 
-          {currentView === 'angel-oracle' && (
-            <AngelOracleView
-              userProfile={userProfile}
-              onSaveJournal={handleSaveJournal}
-            />
-          )}
+            {currentView === 'angel-oracle' && (
+              <AngelOracleView
+                userProfile={userProfile}
+                onSaveJournal={handleSaveJournal}
+              />
+            )}
 
-          {currentView === 'tarot' && (
-            <TarotPullView
-              userProfile={userProfile}
-              onSaveJournal={handleSaveJournal}
-              membership={membership}
-              onOpenWelcomeModal={handleOpenWelcomeModal}
-            />
-          )}
+            {currentView === 'tarot' && (
+              <TarotPullView
+                userProfile={userProfile}
+                onSaveJournal={handleSaveJournal}
+                membership={membership}
+                onOpenWelcomeModal={handleOpenWelcomeModal}
+              />
+            )}
 
-          {currentView === 'dreams' && (
-            <DreamSanctuaryView
-              userProfile={userProfile}
-            />
-          )}
+            {currentView === 'dreams' && (
+              <DreamSanctuaryView
+                userProfile={userProfile}
+              />
+            )}
 
-          {(currentView === 'diary' || currentView === 'journal') && (
-            <PrivateDiaryView
-              userProfile={userProfile}
-              journalEntries={journalEntries}
-              onDeleteJournalEntry={handleDeleteJournalEntry}
-              onToggleJournalFavorite={handleToggleFavorite}
-              initialTab={currentView === 'journal' ? 'keepsakes' : 'diary'}
-            />
-          )}
+            {(currentView === 'diary' || currentView === 'journal') && (
+              <PrivateDiaryView
+                userProfile={userProfile}
+                journalEntries={journalEntries}
+                onDeleteJournalEntry={handleDeleteJournalEntry}
+                onToggleJournalFavorite={handleToggleFavorite}
+                initialTab={currentView === 'journal' ? 'keepsakes' : 'diary'}
+              />
+            )}
+          </ErrorBoundary>
         </main>
 
         {/* Bottom Navigation Bar */}
-        <BottomNav currentView={currentView} onViewChange={setCurrentView} membership={membership} />
+        <BottomNav currentView={currentView} onViewChange={handleNavigate} membership={membership} />
 
         {/* Footer */}
         <footer className="border-t border-purple-950/80 bg-[#060710]/95 py-8 text-center text-xs text-slate-400">
